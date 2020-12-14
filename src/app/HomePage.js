@@ -20,6 +20,7 @@ import {
 } from "@chakra-ui/react";
 import Moment from "react-moment";
 import 'moment-timezone';
+import TheTable from "./TheTable";
 
 
 function Time({stamp}) {
@@ -158,6 +159,8 @@ export default function HomePage() {
                     <ColorModeButton/>
                 </HStack>
             </header>
+
+            <TheTable/>
         </Box>
     )
 }
