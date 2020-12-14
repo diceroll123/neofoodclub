@@ -41,7 +41,7 @@ const GithubIcon = (props) => (
 function GitHubButton() {
     return (
         <Tooltip label="GitHub">
-            <Link isExternal aria-label="GitHub" href="https://github.com/diceroll123">
+            <Link isExternal aria-label="GitHub" href="https://github.com/diceroll123/foodclub">
                 <Icon
                     as={GithubIcon}
                     transition="color 0.2s"
