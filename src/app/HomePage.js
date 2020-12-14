@@ -16,7 +16,8 @@ import {
     Text,
     Tooltip,
     useColorMode,
-    VStack
+    VStack,
+    useToast
 } from "@chakra-ui/react";
 import Moment from "react-moment";
 import 'moment-timezone';
@@ -111,6 +112,7 @@ function RoundInfo() {
 
 export default function HomePage() {
     const {roundState, setRoundState} = React.useContext(RoundContext);
+    const toast = useToast();
 
     useEffect(() => {
         new Promise((resolve, reject) => {
@@ -132,7 +134,13 @@ export default function HomePage() {
                     .then(response => response.json())
                     .then(roundData => setRoundState({roundData}))
                     .catch(() => {
-                        // rip
+                        toast({
+                            title: `Round ${roundState.currentRound} not found.`,
+                            description: "We don't seem to have data for this round. 🤔",
+                            status: "error",
+                            duration: 3000,
+                            isClosable: true
+                        })
                     });
             }
         }).catch(() => {
