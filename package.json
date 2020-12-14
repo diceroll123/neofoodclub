@@ -3,11 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@chakra-ui/react": "^1.0.3",
+    "@emotion/react": "^11.1.2",
+    "@emotion/styled": "^11.0.0",
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.5.0",
+    "framer-motion": "^2.9.5",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.32",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-moment": "^1.0.0",
     "react-scripts": "4.0.1",
     "web-vitals": "^0.2.4"
   },
