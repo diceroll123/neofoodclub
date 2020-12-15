@@ -90,14 +90,14 @@ function RoundInfo() {
 
     if (roundState.roundData === null) {
         return (
-            <Box>
+            <>
                 <SkeletonText noOfLines={3} spacing="1" width="180px"/>
-            </Box>
+            </>
         )
     }
 
     return (
-        <Box>
+        <Box textAlign="left">
             <Text fontSize="xs">
                 Last Update <Time stamp={roundState.roundData.lastUpdate}/>
             </Text>
@@ -115,25 +115,44 @@ export default function HomePage() {
     const toast = useToast();
 
     useEffect(() => {
+        // TODO: Debounce round number input
         new Promise((resolve, reject) => {
             if (roundState.currentRound === null) {
                 // first pass-through sets the round, then bails out
                 // which starts useEffect again a second time, with a round number
                 fetch("/next_round.txt", {cache: "no-cache"})
                     .then(response => response.text())
-                    .then(data => setRoundState({currentRound: parseInt(data)}))
+                    .then(data => {
+                        let currentRound = parseInt(data);
+                        if (isNaN(currentRound) === false) {
+                            setRoundState({currentRound})
+                        } else {
+                            throw Error('Cannot grab current round data');
+                        }
+                    })
+                    .catch(() => {
+                        toast.closeAll();
+                        toast({
+                            title: `Current round data not found.`,
+                            description: "We don't seem to know what round it currently is. 🤔",
+                            status: "error",
+                            duration: 3000,
+                            isClosable: true
+                        })
+                    })
                     .then(reject)
             } else {
                 resolve();
             }
         }).then(() => {
-            if(roundState.currentRound !== null) {
+            if (roundState.currentRound !== null) {
                 fetch(`/rounds/${roundState.currentRound}.json`, {
                     cache: "no-cache"
                 })
                     .then(response => response.json())
                     .then(roundData => setRoundState({roundData}))
                     .catch(() => {
+                        toast.closeAll();
                         toast({
                             title: `Round ${roundState.currentRound} not found.`,
                             description: "We don't seem to have data for this round. 🤔",
@@ -150,7 +169,7 @@ export default function HomePage() {
 
     return (
         <Box padding={4}>
-            <header>
+            <Box mx="auto" maxW="1200px">
                 <HStack spacing={5}>
                     <Text>
                         Round
@@ -166,7 +185,7 @@ export default function HomePage() {
                     <GitHubButton/>
                     <ColorModeButton/>
                 </HStack>
-            </header>
+            </Box>
 
             <TheTable/>
         </Box>
