@@ -68,7 +68,10 @@ function RoundInput() {
     return (
         <NumberInput isDisabled={roundState.currentSelectedRound === null}
                      value={roundState.currentSelectedRound || 1}
-                     min={1} max={roundState.currentRound || 99999} width="90px"
+                     min={1}
+                     max={roundState.currentRound || 99999}
+                     allowMouseWheel
+                     width="90px"
                      onChange={(r) => setRoundState({currentSelectedRound: parseInt(r), roundData: null})}>
             <NumberInputField/>
             <NumberInputStepper>
@@ -84,9 +87,7 @@ function RoundInfo() {
 
     if (roundState.roundData === null) {
         return (
-            <>
-                <SkeletonText noOfLines={3} spacing="1" width="180px"/>
-            </>
+            <SkeletonText noOfLines={3} spacing="1" width="180px"/>
         )
     }
 
@@ -97,7 +98,7 @@ function RoundInfo() {
                     Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
                 </Text>
                 {roundState.roundData.lastChange &&
-                 roundState.roundData.lastUpdate !== roundState.roundData.lastChange &&
+                roundState.roundData.lastUpdate !== roundState.roundData.lastChange &&
                 < Text fontSize="xs">
                     Last Change: <TimeAgo date={roundState.roundData.lastChange}/>
                 </Text>
@@ -107,11 +108,9 @@ function RoundInfo() {
     }
 
     return (
-        <Box>
-            <Text fontSize="xs">
-                Round ended <Moment format="YYYY-MM-DD hh:mm:ss A" date={roundState.roundData.lastUpdate}/>
-            </Text>
-        </Box>
+        <Text fontSize="xs">
+            Round ended <Moment format="YYYY-MM-DD hh:mm:ss A" date={roundState.roundData.lastUpdate}/>
+        </Text>
     )
 }
 
