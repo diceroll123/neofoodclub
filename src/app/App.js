@@ -8,7 +8,11 @@ function reducer(state, item) {
 }
 
 function App() {
-    const [roundState, setRoundState] = useReducer(reducer, {roundData: null, currentRound: null});
+    const [roundState, setRoundState] = useReducer(reducer, {
+        roundData: null,
+        currentRound: null,
+        currentSelectedRound: null
+    });
     return (
         <RoundContext.Provider value={{roundState, setRoundState}}>
             <HomePage/>

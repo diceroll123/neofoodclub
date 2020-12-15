@@ -21,14 +21,8 @@ import {
 } from "@chakra-ui/react";
 import Moment from "react-moment";
 import 'moment-timezone';
+import TimeAgo from 'react-timeago'
 import TheTable from "./TheTable";
-
-
-function Time({stamp}) {
-    return (
-        <Moment format="YYYY-MM-DD hh:mm:ss A" date={stamp}/>
-    )
-}
 
 const GithubIcon = (props) => (
     <svg viewBox="0 0 20 20" {...props}>
@@ -72,10 +66,10 @@ function RoundInput() {
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
     return (
-        <NumberInput isDisabled={roundState.currentRound === null}
-                     value={roundState.currentRound || 1}
-                     min={1} max={99999} width="90px"
-                     onChange={(r) => setRoundState({currentRound: parseInt(r), roundData: null})}>
+        <NumberInput isDisabled={roundState.currentSelectedRound === null}
+                     value={roundState.currentSelectedRound || 1}
+                     min={1} max={roundState.currentRound || 99999} width="90px"
+                     onChange={(r) => setRoundState({currentSelectedRound: parseInt(r), roundData: null})}>
             <NumberInputField/>
             <NumberInputStepper>
                 <NumberIncrementStepper/>
@@ -96,16 +90,27 @@ function RoundInfo() {
         )
     }
 
+    if (roundState.currentRound === roundState.currentSelectedRound) {
+        return (
+            <Box textAlign="left">
+                <Text fontSize="xs">
+                    Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
+                </Text>
+                {roundState.roundData.lastChange &&
+                 roundState.roundData.lastUpdate !== roundState.roundData.lastChange &&
+                < Text fontSize="xs">
+                    Last Change: <TimeAgo date={roundState.roundData.lastChange}/>
+                </Text>
+                }
+            </Box>
+        )
+    }
+
     return (
-        <Box textAlign="left">
+        <Box>
             <Text fontSize="xs">
-                Last Update <Time stamp={roundState.roundData.lastUpdate}/>
+                Round ended <Moment format="YYYY-MM-DD hh:mm:ss A" date={roundState.roundData.lastUpdate}/>
             </Text>
-            {roundState.roundData.lastChange &&
-            <Text fontSize="xs">
-                Last Change <Time stamp={roundState.roundData.lastChange}/>
-            </Text>
-            }
         </Box>
     )
 }
@@ -125,7 +130,7 @@ export default function HomePage() {
                     .then(data => {
                         let currentRound = parseInt(data);
                         if (isNaN(currentRound) === false) {
-                            setRoundState({currentRound})
+                            setRoundState({currentRound: currentRound, currentSelectedRound: currentRound})
                         } else {
                             throw Error('Cannot grab current round data');
                         }
@@ -145,8 +150,8 @@ export default function HomePage() {
                 resolve();
             }
         }).then(() => {
-            if (roundState.currentRound !== null) {
-                fetch(`/rounds/${roundState.currentRound}.json`, {
+            if (roundState.currentSelectedRound !== null) {
+                fetch(`/rounds/${roundState.currentSelectedRound}.json`, {
                     cache: "no-cache"
                 })
                     .then(response => response.json())
@@ -154,7 +159,7 @@ export default function HomePage() {
                     .catch(() => {
                         toast.closeAll();
                         toast({
-                            title: `Round ${roundState.currentRound} not found.`,
+                            title: `Round ${roundState.currentSelectedRound} not found.`,
                             description: "We don't seem to have data for this round. 🤔",
                             status: "error",
                             duration: 3000,
@@ -165,11 +170,11 @@ export default function HomePage() {
         }).catch(() => {
             // blah
         })
-    }, [roundState.currentRound])
+    }, [roundState.currentSelectedRound])
 
     return (
         <Box padding={4}>
-            <Box mx="auto" maxW="1200px">
+            <Box mx="auto" maxW="6xl">
                 <HStack spacing={5}>
                     <Text>
                         Round
