@@ -23,6 +23,7 @@ import Moment from "react-moment";
 import 'moment-timezone';
 import TimeAgo from 'react-timeago'
 import TheTable from "./TheTable";
+import RoundInput from "./RoundInput"
 
 const GithubIcon = (props) => (
     <svg viewBox="0 0 20 20" {...props}>
@@ -60,26 +61,6 @@ function ColorModeButton() {
             </Button>
         </Tooltip>
     );
-}
-
-function RoundInput() {
-    const {roundState, setRoundState} = React.useContext(RoundContext);
-
-    return (
-        <NumberInput isDisabled={roundState.currentSelectedRound === null}
-                     value={roundState.currentSelectedRound || 1}
-                     min={1}
-                     max={roundState.currentRound || 99999}
-                     allowMouseWheel
-                     width="90px"
-                     onChange={(r) => setRoundState({currentSelectedRound: parseInt(r), roundData: null})}>
-            <NumberInputField/>
-            <NumberInputStepper>
-                <NumberIncrementStepper/>
-                <NumberDecrementStepper/>
-            </NumberInputStepper>
-        </NumberInput>
-    )
 }
 
 function RoundInfo() {
@@ -176,7 +157,7 @@ export default function HomePage() {
             <Box mx="auto" maxW="6xl">
                 <HStack spacing={5}>
                     <Text>
-                        Round
+                        Round:
                     </Text>
 
                     <RoundInput/>
