@@ -1,6 +1,5 @@
 import {
     Skeleton,
-    SkeletonText,
     Box,
     Button,
     StatArrow,
@@ -91,7 +90,7 @@ function PirateTable() {
                         <Tbody>
                             <Tr>
                                 <Td rowSpan={5}>{arenaName}</Td>
-                                <Td rowSpan={5}>
+                                <Td rowSpan={5} isNumeric>
                                     {roundState.roundData ?
                                         <Text>0%</Text> :
                                         <Skeleton><Box>&nbsp;</Box></Skeleton>
@@ -104,17 +103,20 @@ function PirateTable() {
                                 <Td colSpan={2}></Td>
                                 {/*<Td colSpan={1}></Td>*/}
                                 {/*<Td>showOddsTimeline</Td>*/}
-                                {[...Array(amountOfBets)].map((bet, betNum) => {
-                                    return (
-                                        // TODO: Chakra's Radio component does not play well with this atm
-                                        <Td><input type="radio" name={"bet" + (betNum + 1) + arenaId} value={0}/></Td>
-                                    )
-                                })}
-                                <Td>
-                                    <Button size="xs">
-                                        10-Bet
-                                    </Button>
-                                </Td>
+                                {roundState.roundData !== null ? <>
+                                    {[...Array(amountOfBets)].map((bet, betNum) => {
+                                        return (
+                                            // TODO: Chakra's Radio component does not play well with this atm
+                                            <Td><input type="radio" name={"bet" + (betNum + 1) + arenaId}
+                                                       value={0}/></Td>
+                                        )
+                                    })}
+                                    <Td>
+                                        <Button size="xs">
+                                            10-Bet
+                                        </Button>
+                                    </Td>
+                                </> : <Td colSpan={100}><Skeleton height="24px"><Box>&nbsp;</Box></Skeleton></Td>}
                             </Tr>
 
                             {pirates.map((pirateId, pirateIndex) => {

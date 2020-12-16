@@ -7,7 +7,6 @@ import {
     Icon,
     Link,
     Skeleton,
-    SkeletonText,
     Spacer,
     Text,
     Tooltip,
@@ -94,7 +93,7 @@ function RoundInfo() {
     let data = <Box width="210px">&nbsp;</Box>;
 
     if (roundState.roundData !== null) {
-        if(roundState.currentRound === roundState.currentSelectedRound) {
+        if (roundState.currentRound === roundState.currentSelectedRound) {
             data = <CurrentRoundInfo/>
         } else {
             data = <PreviousRoundInfo/>
@@ -129,7 +128,10 @@ export default function HomePage() {
                     .then(data => {
                         let currentRound = parseInt(data);
                         if (isNaN(currentRound) === false) {
-                            setRoundState({currentRound: currentRound, currentSelectedRound: currentRound})
+                            setRoundState({
+                                currentRound: currentRound,
+                                currentSelectedRound: roundState.currentSelectedRound || currentRound
+                            })
                         } else {
                             throw Error('Cannot grab current round data');
                         }
@@ -149,12 +151,16 @@ export default function HomePage() {
                 resolve();
             }
         }).then(() => {
-            if (roundState.currentSelectedRound !== null) {
+            if (roundState.currentSelectedRound !== null && roundState.roundData === null) {
                 fetch(`/rounds/${roundState.currentSelectedRound}.json`, {
                     cache: "no-cache"
                 })
                     .then(response => response.json())
-                    .then(roundData => setRoundState({roundData}))
+                    .then(roundData => {
+                        let url = window.location.pathname + "#round=" + roundState.currentSelectedRound;
+                        window.history.replaceState(null, "", url);
+                        setRoundState({roundData});
+                    })
                     .catch(() => {
                         toast.closeAll();
                         toast({
@@ -168,8 +174,8 @@ export default function HomePage() {
             }
         }).catch(() => {
             // blah
-        })
-    }, [roundState.currentSelectedRound])
+        });
+    }, [roundState.currentSelectedRound, roundState.currentRound, roundState.roundData]);
 
     return (
         <Box padding={4}>
