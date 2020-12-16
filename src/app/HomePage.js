@@ -6,11 +6,7 @@ import {
     HStack,
     Icon,
     Link,
-    NumberDecrementStepper,
-    NumberIncrementStepper,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
+    Skeleton,
     SkeletonText,
     Spacer,
     Text,
@@ -63,35 +59,47 @@ function ColorModeButton() {
     );
 }
 
-function RoundInfo() {
+function PreviousRoundInfo() {
     const {roundState} = React.useContext(RoundContext);
-
-    if (roundState.roundData === null) {
-        return (
-            <SkeletonText noOfLines={3} spacing="1" width="180px"/>
-        )
-    }
-
-    if (roundState.currentRound === roundState.currentSelectedRound) {
-        return (
-            <Box textAlign="left">
-                <Text fontSize="xs">
-                    Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
-                </Text>
-                {roundState.roundData.lastChange &&
-                roundState.roundData.lastUpdate !== roundState.roundData.lastChange &&
-                < Text fontSize="xs">
-                    Last Change: <TimeAgo date={roundState.roundData.lastChange}/>
-                </Text>
-                }
-            </Box>
-        )
-    }
 
     return (
         <Text fontSize="xs">
             Round ended <Moment format="YYYY-MM-DD hh:mm:ss A" date={roundState.roundData.lastUpdate}/>
         </Text>
+    )
+
+}
+
+function CurrentRoundInfo() {
+    const {roundState} = React.useContext(RoundContext);
+
+    return (
+        <Box textAlign="left">
+            <Text fontSize="xs">
+                Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
+            </Text>
+            {roundState.roundData.lastChange &&
+            roundState.roundData.lastUpdate !== roundState.roundData.lastChange &&
+            <Text fontSize="xs">
+                Last Change: <TimeAgo date={roundState.roundData.lastChange}/>
+            </Text>
+            }
+        </Box>
+    )
+}
+
+function RoundInfo() {
+    const {roundState} = React.useContext(RoundContext);
+
+    return (
+        <SkeletonText noOfLines={3}
+                      spacing="1"
+                      width="180px"
+                      isLoaded={roundState.roundData !== null}>
+            {roundState.currentRound === roundState.currentSelectedRound ?
+                <CurrentRoundInfo/> : <PreviousRoundInfo/>
+            }
+        </SkeletonText>
     )
 }
 
