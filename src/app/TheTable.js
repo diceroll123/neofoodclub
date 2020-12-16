@@ -91,7 +91,13 @@ function PirateTable() {
                         <Tbody>
                             <Tr>
                                 <Td rowSpan={5}>{arenaName}</Td>
-                                <Td rowSpan={5}>0%</Td>
+                                <Td rowSpan={5}>
+                                    {roundState.roundData ?
+                                        <Text>0%</Text> :
+                                        <Skeleton><Box>&nbsp;</Box></Skeleton>
+                                    }
+
+                                </Td>
                                 <Td colSpan={6}></Td>
                                 {/*<Td colSpan={2}></Td>*/}
                                 {/* Td for FA explanation here */}
@@ -118,7 +124,7 @@ function PirateTable() {
                                     return (
                                         <Tr>
                                             <Td colSpan={100}>
-                                                <Skeleton>&nbsp;</Skeleton>
+                                                <Skeleton height="24px">&nbsp;</Skeleton>
                                             </Td>
                                         </Tr>
                                     )
@@ -193,7 +199,6 @@ function PirateTable() {
 }
 
 export default function TheTable() {
-    const {roundState} = React.useContext(RoundContext);
     // const [amountOfBets, setAmountOfBets] = useState(10); // 15 for Charity Corner
 
     return (
