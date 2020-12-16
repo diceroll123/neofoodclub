@@ -91,15 +91,26 @@ function CurrentRoundInfo() {
 function RoundInfo() {
     const {roundState} = React.useContext(RoundContext);
 
+    let data = <Box width="210px">&nbsp;</Box>;
+
+    if (roundState.roundData !== null) {
+        if(roundState.currentRound === roundState.currentSelectedRound) {
+            data = <CurrentRoundInfo/>
+        } else {
+            data = <PreviousRoundInfo/>
+        }
+    }
+
     return (
-        <SkeletonText noOfLines={3}
-                      spacing="1"
-                      width="180px"
-                      isLoaded={roundState.roundData !== null}>
-            {roundState.currentRound === roundState.currentSelectedRound ?
-                <CurrentRoundInfo/> : <PreviousRoundInfo/>
-            }
-        </SkeletonText>
+        <Skeleton
+            isLoaded={roundState.roundData !== null}>
+            {/*TODO: SkeletonText does not fade in, so don't use that until #2800 is fixed*/}
+            {/*<SkeletonText noOfLines={3}*/}
+            {/*              spacing="1"*/}
+            {/*              width="180px"*/}
+            {data}
+            {/*</SkeletonText>*/}
+        </Skeleton>
     )
 }
 
