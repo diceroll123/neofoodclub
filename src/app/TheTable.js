@@ -1,4 +1,5 @@
 import {
+    Skeleton,
     SkeletonText,
     Box,
     Button,
@@ -79,6 +80,13 @@ function PirateTable() {
             </Thead>
             {
                 ARENA_NAMES.map((arenaName, arenaId) => {
+                    let pirates;
+                    if (roundState.roundData) {
+                        pirates = roundState.roundData.pirates[arenaId];
+                    } else {
+                        pirates = [...Array(4)];
+                    }
+
                     return (
                         <Tbody>
                             <Tr>
@@ -103,9 +111,22 @@ function PirateTable() {
                                 </Td>
                             </Tr>
 
-                            {roundState.roundData.pirates[arenaId].map((pirateId, pirateIndex) => {
+                            {pirates.map((pirateId, pirateIndex) => {
+
+                                if (roundState.roundData === null) {
+                                    // big ol skeleton
+                                    return (
+                                        <Tr>
+                                            <Td colSpan={100}>
+                                                <Skeleton>&nbsp;</Skeleton>
+                                            </Td>
+                                        </Tr>
+                                    )
+                                }
+
                                 let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
                                 let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
+
                                 return (
                                     <Tr>
                                         <Td>{PIRATE_NAMES[pirateId]}</Td>
@@ -177,8 +198,7 @@ export default function TheTable() {
 
     return (
         <Box mt={8}>
-            {roundState.roundData === null ?
-                <SkeletonText noOfLines={40}/> : <PirateTable/>}
+            <PirateTable/>
         </Box>
     )
 }
