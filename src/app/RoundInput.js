@@ -18,11 +18,9 @@ export default function RoundInput() {
                      max={roundState.currentRound || 99999}
                      allowMouseWheel
                      width="90px"
-                     onChange={(r) => setRoundState({
-                         currentSelectedRound: parseInt(r),
-                         roundData: null,
-                         bet: null,
-                         betAmounts: null
+                     onChange={(value) => setRoundState({
+                         currentSelectedRound: parseInt(value),
+                         roundData: null
                      })}>
             <NumberInputField/>
             <NumberInputStepper>

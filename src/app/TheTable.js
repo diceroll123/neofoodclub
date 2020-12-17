@@ -16,7 +16,7 @@ import {
     Tr,
     Th,
     Td,
-    TableCaption
+    TableCaption, useTheme, useColorModeValue
 } from "@chakra-ui/react";
 import React from "react";
 import RoundContext from "./RoundState";
@@ -47,8 +47,31 @@ const PIRATE_NAMES = {
 }
 
 function PirateTable() {
-    const {roundState} = React.useContext(RoundContext);
-    const amountOfBets = 10;
+    const {roundState, setRoundState} = React.useContext(RoundContext);
+    const amountOfBets = Object.keys(roundState.bets).length;
+
+    const theme = useTheme();
+    const zeroRowBgColor = useColorModeValue(
+        theme.colors.gray["100"],
+        theme.colors.gray["700"]
+    );
+
+    function changeBet(betIndex, arenaIndex, pirateValue) {
+        // change a single pirate in a single arena
+        let newBets = roundState.bets;
+        newBets[betIndex][arenaIndex] = pirateValue;
+        setRoundState({bets: newBets});
+    }
+
+    function changeBetLine(arenaIndex, pirateValue) {
+        // change the entire row to pirateValue
+        // for the 10-bet button
+        let newBets = roundState.bets;
+        for (let x = 1; x <= amountOfBets; x++) {
+            newBets[x][arenaIndex] = pirateValue;
+        }
+        setRoundState({bets: newBets});
+    }
 
     return (
         <Table size="sm">
@@ -97,22 +120,29 @@ function PirateTable() {
                                     }
 
                                 </Td>
-                                <Td colSpan={6}></Td>
+                                <Td backgroundColor={zeroRowBgColor} colSpan={6}></Td>
                                 {/*<Td colSpan={2}></Td>*/}
                                 {/* Td for FA explanation here */}
-                                <Td colSpan={2}></Td>
+                                <Td backgroundColor={zeroRowBgColor} colSpan={2}></Td>
                                 {/*<Td colSpan={1}></Td>*/}
                                 {/*<Td>showOddsTimeline</Td>*/}
                                 {roundState.roundData !== null ? <>
                                     {[...Array(amountOfBets)].map((bet, betNum) => {
                                         return (
                                             // TODO: Chakra's Radio component does not play well with this atm
-                                            <Td><input type="radio" name={"bet" + (betNum + 1) + arenaId}
-                                                       value={0}/></Td>
+                                            <Td backgroundColor={zeroRowBgColor}>
+                                                <input type="radio"
+                                                       name={"bet" + (betNum + 1) + arenaId}
+                                                       value={0}
+                                                       onChange={() => changeBet(betNum + 1, arenaId, 0)}
+                                                       checked={roundState.bets[betNum + 1][arenaId] === 0}/>
+                                            </Td>
                                         )
                                     })}
-                                    <Td>
-                                        <Button size="xs">
+                                    <Td backgroundColor={zeroRowBgColor}>
+                                        <Button size="xs" onClick={() => {
+                                            changeBetLine(arenaId, 0)
+                                        }}>
                                             10-Bet
                                         </Button>
                                     </Td>
@@ -158,12 +188,16 @@ function PirateTable() {
                                                 <Td>
                                                     {/*TODO: Chakra's Radio component does not play well with this atm*/}
                                                     <input type="radio" name={"bet" + (betNum + 1) + arenaId}
-                                                           value={pirateIndex + 1}/>
+                                                           value={pirateIndex + 1}
+                                                           onChange={() => changeBet(betNum + 1, arenaId, pirateIndex + 1)}
+                                                           checked={roundState.bets[betNum + 1][arenaId] === pirateIndex + 1}/>
                                                 </Td>
                                             )
                                         })}
                                         <Td>
-                                            <Button size="xs">
+                                            <Button size="xs" onClick={() => {
+                                                changeBetLine(arenaId, pirateIndex + 1)
+                                            }}>
                                                 10-Bet
                                             </Button>
                                         </Td>
@@ -201,7 +235,6 @@ function PirateTable() {
 }
 
 export default function TheTable() {
-    // const [amountOfBets, setAmountOfBets] = useState(10); // 15 for Charity Corner
 
     return (
         <Box mt={8}>

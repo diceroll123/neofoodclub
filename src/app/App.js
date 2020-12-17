@@ -1,20 +1,18 @@
 import React from "react"
 import RoundContext from "./RoundState"
 import HomePage from "./HomePage";
-import {useReducer} from "react";
 import {parseBetUrl, reducer} from "./util"
-
 
 
 function App() {
     const initialState = parseBetUrl();
 
-    const [roundState, setRoundState] = useReducer(reducer, {
+    const [roundState, setRoundState] = React.useReducer(reducer, {
         roundData: null,
         currentRound: null,
         currentSelectedRound: initialState.round,
-        bet: initialState.bet,
-        betAmount: initialState.betAmount,
+        bets: initialState.bets,
+        betAmounts: initialState.betAmounts,
     });
 
     return (
