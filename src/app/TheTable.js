@@ -188,7 +188,12 @@ function PirateTable() {
                                             10-Bet
                                         </Button>
                                     </Td>
-                                </> : <Td colSpan={100}><Skeleton height="24px"><Box>&nbsp;</Box></Skeleton></Td>}
+                                </> : (<>
+                                    <Td colSpan={100} backgroundColor={zeroRowBgColor}>
+                                        <Skeleton height="24px"><Box>&nbsp;</Box></Skeleton>
+                                    </Td>
+                                </>)
+                                }
                             </Tr>
 
                             {pirates.map((pirateId, pirateIndex) => {
