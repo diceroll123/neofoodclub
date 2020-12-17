@@ -102,7 +102,7 @@ function PirateTable() {
         // change a single pirate in a single arena
         let newBets = roundState.bets;
         newBets[betIndex][arenaIndex] = pirateValue;
-        setRoundState({bets: newBets});
+        setRoundState({bets: {...newBets}}); // hacky way to force an object to update useEffect
     }
 
     function changeBetLine(arenaIndex, pirateValue) {
@@ -112,7 +112,7 @@ function PirateTable() {
         for (let x = 1; x <= amountOfBets; x++) {
             newBets[x][arenaIndex] = pirateValue;
         }
-        setRoundState({bets: newBets});
+        setRoundState({bets: {...newBets}}); // hacky way to force an object to update useEffect
     }
 
     return (
