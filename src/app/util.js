@@ -105,3 +105,11 @@ export function makeBetAmountsUrl(betAmounts) {
         return e;
     }).join("");
 }
+
+export function displayAsPercent(value, decimals) {
+    return `${(100 * value).toFixed(decimals)}%`;
+}
+
+export function displayAsPlusMinus(value) {
+    return `${(0 < value ? "+" : "")}${value}`;
+}

@@ -21,10 +21,23 @@ import {
 import React from "react";
 import RoundContext from "./RoundState";
 import RoundInput from "./RoundInput"
+import {calculateArenaRatios, computePirateFAs, computeProbabilities} from "./maths";
+import {displayAsPercent} from "./util";
+import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
 
 function PirateTable() {
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
+
+    let probabilities = {};
+    let pirateFAs = {};
+    let arenaRatios = {};
+
+    if (roundState.roundData) {
+        probabilities = computeProbabilities(roundState.roundData);
+        pirateFAs = computePirateFAs(roundState.roundData);
+        arenaRatios = calculateArenaRatios(roundState.roundData);
+    }
 
     const theme = useTheme();
     const zeroRowBgColor = useColorModeValue(
@@ -105,7 +118,7 @@ function PirateTable() {
                                 <Td rowSpan={5}>{arenaName}</Td>
                                 <Td rowSpan={5} isNumeric>
                                     {roundState.roundData ?
-                                        <Text>0%</Text> :
+                                        <Text>{displayAsPercent(arenaRatios[arenaId], 1)}</Text> :
                                         <Skeleton><Box>&nbsp;</Box></Skeleton>
                                     }
 
@@ -161,21 +174,29 @@ function PirateTable() {
                                 let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
 
                                 let bgColor = "transparent";
-
                                 if (roundState.roundData.winners[arenaId] === pirateIndex + 1) {
                                     bgColor = green;
                                 }
 
+                                let payout = current * probabilities.used[arenaId][pirateIndex + 1] - 1;
+                                let payoutBackground = "transparent";
+                                if (payout > 0) {
+                                    payoutBackground = green;
+                                } else if (payout <= -.1) {
+                                    payoutBackground = red;
+                                }
+
                                 return (
                                     <Tr backgroundColor={bgColor}>
-                                        <Td isNumeric>Min%</Td>
-                                        <Td isNumeric>Max%</Td>
-                                        <Td isNumeric>Std%</Td>
                                         <Td backgroundColor={getPirateBgColor(opening)}>{PIRATE_NAMES[pirateId]}</Td>
+                                        <Td isNumeric>{displayAsPercent(probabilities.min[arenaId][pirateIndex + 1], 1)}</Td>
+                                        <Td isNumeric>{displayAsPercent(probabilities.max[arenaId][pirateIndex + 1], 1)}</Td>
+                                        <Td isNumeric>{displayAsPercent(probabilities.std[arenaId][pirateIndex + 1], 1)}</Td>
                                         {/*<Td>Custom</Td>*/}
                                         {/*<Td>Used</Td>*/}
-                                        <Td isNumeric>Payout%</Td>
-                                        <Td isNumeric>FA</Td>
+                                        <Td backgroundColor={payoutBackground}
+                                            isNumeric>{displayAsPercent(payout, 1)}</Td>
+                                        <Td isNumeric>{pirateFAs[arenaId][pirateIndex]}</Td>
                                         <Td isNumeric>{opening}:1</Td>
                                         <Td isNumeric>
                                             {current > opening && <StatArrow mr={1} type="increase"/>}
