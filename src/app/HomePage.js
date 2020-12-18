@@ -125,7 +125,7 @@ export default function HomePage() {
             if (roundState.currentRound === null) {
                 // first pass-through sets the round, then bails out
                 // which starts useEffect again a second time, with a round number
-                fetch("/next_round.txt", {cache: "no-cache"})
+                fetch("https://neofoodclub.s3.amazonaws.com/next_round.txt", {cache: "no-cache"})
                     .then(response => response.text())
                     .then(data => {
                         let currentRound = parseInt(data);
@@ -154,7 +154,7 @@ export default function HomePage() {
             }
         }).then(() => {
             if (roundState.currentSelectedRound !== null && roundState.roundData === null) {
-                fetch(`/rounds/${roundState.currentSelectedRound}.json`, {
+                fetch(`https://neofoodclub.s3.amazonaws.com/rounds/${roundState.currentSelectedRound}.json`, {
                     cache: "no-cache"
                 })
                     .then(response => response.json())
