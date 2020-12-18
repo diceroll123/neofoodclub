@@ -95,10 +95,10 @@ function RoundInfo() {
     let data = <Box width="210px">&nbsp;</Box>;
 
     if (roundState.roundData !== null) {
-        if (roundState.currentRound === roundState.currentSelectedRound) {
-            data = <CurrentRoundInfo/>
-        } else {
+        if (roundState.roundData.winners.some((x) => x > 0)) {
             data = <PreviousRoundInfo/>
+        } else {
+            data = <CurrentRoundInfo/>
         }
     }
 
