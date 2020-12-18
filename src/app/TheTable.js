@@ -98,6 +98,19 @@ function PirateTable() {
         theme.colors.gray["700"]
     );
 
+    // the dark values are effectively "375"
+    const green = useColorModeValue(theme.colors.green["200"], "#50C17F");
+    const blue = useColorModeValue(theme.colors.blue["200"], "#4BA0E4");
+    const orange = useColorModeValue(theme.colors.orange["200"], "#F0923E");
+    const red = useColorModeValue(theme.colors.red["200"], "#F76C6C");
+
+    function getPirateBgColor(currentOdds) {
+        if ([3, 4, 5].includes(currentOdds)) return blue;
+        if ([6, 7, 8, 9].includes(currentOdds)) return orange;
+        if ([10, 11, 12, 13].includes(currentOdds)) return red;
+        return green;
+    }
+
     function changeBet(betIndex, arenaIndex, pirateValue) {
         // change a single pirate in a single arena
         let newBets = roundState.bets;
@@ -212,9 +225,15 @@ function PirateTable() {
                                 let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
                                 let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
 
+                                let bgColor = "transparent";
+
+                                if (roundState.roundData.winners[arenaId] === pirateIndex + 1) {
+                                    bgColor = green;
+                                }
+
                                 return (
-                                    <Tr>
-                                        <Td>{PIRATE_NAMES[pirateId]}</Td>
+                                    <Tr backgroundColor={bgColor}>
+                                        <Td backgroundColor={getPirateBgColor(current)}>{PIRATE_NAMES[pirateId]}</Td>
                                         <Td isNumeric>Min%</Td>
                                         <Td isNumeric>Max%</Td>
                                         <Td isNumeric>Std%</Td>
