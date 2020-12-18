@@ -64,7 +64,8 @@ function PreviousRoundInfo() {
 
     return (
         <Text fontSize="xs">
-            Round ended <Moment format="YYYY-MM-DD hh:mm:ss A" date={roundState.roundData.lastUpdate}/>
+            Round ended <Moment format="YYYY-MM-DD hh:mm:ss A"
+                                date={roundState.roundData.lastUpdate || roundState.roundData.timestamp}/>
         </Text>
     )
 
