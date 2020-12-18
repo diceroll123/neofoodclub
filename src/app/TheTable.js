@@ -38,10 +38,11 @@ function PirateTable() {
     const orange = useColorModeValue(theme.colors.orange["200"], "#F0923E");
     const red = useColorModeValue(theme.colors.red["200"], "#F76C6C");
 
-    function getPirateBgColor(currentOdds) {
-        if ([3, 4, 5].includes(currentOdds)) return blue;
-        if ([6, 7, 8, 9].includes(currentOdds)) return orange;
-        if ([10, 11, 12, 13].includes(currentOdds)) return red;
+    function getPirateBgColor(openingOdds) {
+        // for the cell that has the pirate name in the big table
+        if ([3, 4, 5].includes(openingOdds)) return blue;
+        if ([6, 7, 8, 9].includes(openingOdds)) return orange;
+        if ([10, 11, 12, 13].includes(openingOdds)) return red;
         return green;
     }
 
@@ -167,10 +168,10 @@ function PirateTable() {
 
                                 return (
                                     <Tr backgroundColor={bgColor}>
-                                        <Td backgroundColor={getPirateBgColor(current)}>{PIRATE_NAMES[pirateId]}</Td>
                                         <Td isNumeric>Min%</Td>
                                         <Td isNumeric>Max%</Td>
                                         <Td isNumeric>Std%</Td>
+                                        <Td backgroundColor={getPirateBgColor(opening)}>{PIRATE_NAMES[pirateId]}</Td>
                                         {/*<Td>Custom</Td>*/}
                                         {/*<Td>Used</Td>*/}
                                         <Td isNumeric>Payout%</Td>
