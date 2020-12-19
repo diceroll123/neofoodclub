@@ -288,6 +288,9 @@ function PayoutTable(props) {
                         let ne = betNetExpected[betIndex + 1];
                         let neBg = (ne - 1) < 0 ? red : "transparent";
 
+                        let betAmount = roundState.betAmounts[betIndex + 1];
+                        let baBg = (betAmount <= 50) ? red : "transparent";
+
                         return (
                             <Tr>
                                 <Td>
@@ -307,6 +310,7 @@ function PayoutTable(props) {
                                         </HStack>
                                     </HStack>
                                 </Td>
+                                <Td isNumeric backgroundColor={baBg}>{betAmount}</Td>
                                 <Td isNumeric>{betOdds[betIndex + 1]}:1</Td>
                                 <Td isNumeric>{numberWithCommas(betPayoffs[betIndex + 1])}</Td>
                                 <Td isNumeric>{displayAsPercent(betProbabilities[betIndex + 1], 3)}</Td>
