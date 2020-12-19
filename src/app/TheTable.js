@@ -351,7 +351,7 @@ function PlaceThisBetButton(props) {
     const {roundState} = React.useContext(RoundContext);
 
     if (roundState.roundData.winners.some((x) => x > 0)) {
-        return <Button size="xs" isDisabled={true}>Round is over!</Button>
+        return <Button size="xs" isDisabled>Round is over!</Button>
     }
 
     if (roundState.betAmounts[betNum] < 50) {
@@ -361,15 +361,19 @@ function PlaceThisBetButton(props) {
     function generate_bet_link(bet, betNum) {
         let urlString = 'http://www.neopets.com/pirates/process_foodclub.phtml?'
         for (let i = 0; i < 5; i++) {
-            if (bet[i] != 0) urlString += 'winner' + (i + 1) + '=' + roundState.roundData.pirates[i][bet[i] - 1] + '&'
+            if (bet[i] !== 0) {
+                urlString += `winner${i + 1}=${roundState.roundData.pirates[i][bet[i] - 1]}&`;
+            }
         }
         for (let i = 0; i < 5; i++) {
-            if (bet[i] != 0) urlString += 'matches[]=' + (i + 1) + '&'
+            if (bet[i] !== 0) {
+                urlString += `matches[]=${i + 1}&`;
+            }
         }
-        urlString += 'bet_amount=' + roundState.betAmounts[betNum] + '&'
-        urlString += 'total_odds=' + betOdds[betNum] + '&'
-        urlString += 'winnings=' + betPayoffs[betNum] + '&'
-        urlString += 'type=bet'
+        urlString += `bet_amount=${roundState.betAmounts[betNum]}&`;
+        urlString += `total_odds=${betOdds[betNum]}&`;
+        urlString += `winnings=${betPayoffs[betNum]}&`;
+        urlString += 'type=bet';
         return window.open(urlString);
     }
 
