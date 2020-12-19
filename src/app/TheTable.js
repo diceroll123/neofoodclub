@@ -2,6 +2,7 @@ import {
     Skeleton,
     Box,
     Button,
+    IconButton,
     StatArrow,
     Text,
     HStack,
@@ -18,6 +19,7 @@ import {
     Td,
     TableCaption, useTheme, useColorModeValue
 } from "@chakra-ui/react";
+import {ArrowUpIcon, ArrowDownIcon} from "@chakra-ui/icons";
 import React from "react";
 import RoundContext from "./RoundState";
 import RoundInput from "./RoundInput"
@@ -239,8 +241,16 @@ function PayoutTable(props) {
         red
     } = props;
 
-    const {roundState} = React.useContext(RoundContext);
+    const {roundState, setRoundState} = React.useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
+
+    function swapBets(index, newIndex) {
+        let bets = roundState.bets;
+        let betAmounts = roundState.betAmounts;
+        [bets[index], bets[newIndex]] = [bets[newIndex], bets[index]];
+        [betAmounts[index], betAmounts[newIndex]] = [betAmounts[newIndex], betAmounts[index]];
+        setRoundState({bets, betAmounts});
+    }
 
     return (
         <Table size="sm">
@@ -280,8 +290,23 @@ function PayoutTable(props) {
 
                         return (
                             <Tr>
-                                <Td>{betIndex + 1}</Td>
-                                <Td isNumeric>{roundState.betAmounts[betIndex + 1]}</Td>
+                                <Td>
+                                    <HStack>
+                                        <Text>{betIndex + 1}</Text>
+                                        <HStack spacing="1px">
+                                            <IconButton size="xs"
+                                                        height="20px"
+                                                        icon={<ArrowUpIcon/>}
+                                                        onClick={() => swapBets(betIndex + 1, betIndex)}
+                                                        isDisabled={betIndex === 0}/>
+                                            <IconButton size="xs"
+                                                        height="20px"
+                                                        icon={<ArrowDownIcon/>}
+                                                        onClick={() => swapBets(betIndex + 1, betIndex + 2)}
+                                                        isDisabled={betIndex === amountOfBets - 1}/>
+                                        </HStack>
+                                    </HStack>
+                                </Td>
                                 <Td isNumeric>{betOdds[betIndex + 1]}:1</Td>
                                 <Td isNumeric>{numberWithCommas(betPayoffs[betIndex + 1])}</Td>
                                 <Td isNumeric>{displayAsPercent(betProbabilities[betIndex + 1], 3)}</Td>
