@@ -1,5 +1,6 @@
 import {
     Skeleton,
+    Spacer,
     Box,
     Button,
     IconButton,
@@ -311,7 +312,7 @@ function PayoutTable(props) {
     }
 
     return (
-        <Table size="sm">
+        <Table size="sm" width="1100px">
             <Thead>
                 <Tr>
                     <Th>Bet</Th>
@@ -357,6 +358,7 @@ function PayoutTable(props) {
                                 <Tr>
                                     <Td backgroundColor={betNumBgColor}>
                                         <HStack>
+                                            <Spacer/>
                                             <Text>{betIndex + 1}</Text>
                                             <HStack spacing="1px">
                                                 <IconButton size="xs"
@@ -413,8 +415,16 @@ function PayoutTable(props) {
                     <Tr>
                         <Th isNumeric>Total:</Th>
                         <Th isNumeric>{numberWithCommas(totalBetAmounts)}</Th>
-                        <Th isNumeric>{numberWithCommas(totalWinningOdds)}:{totalEnabledBets}</Th>
-                        <Th isNumeric>{numberWithCommas(totalWinningPayoff)}</Th>
+                        <Th isNumeric>
+                            {roundState.roundData.winners.some((x) => x > 0) &&
+                                <Text>{numberWithCommas(totalWinningOdds)}:{totalEnabledBets}</Text>
+                            }
+                        </Th>
+                        <Th isNumeric>
+                            {roundState.roundData.winners.some((x) => x > 0) &&
+                                <Text>{numberWithCommas(totalWinningPayoff)}</Text>
+                            }
+                        </Th>
                         <Th></Th>
                         <Th isNumeric>{totalBetExpectedRatios.toFixed(3)}</Th>
                         <Th isNumeric>{totalBetNetExpected.toFixed(2)}</Th>
