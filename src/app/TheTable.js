@@ -238,6 +238,7 @@ function PayoutTable(props) {
         betPayoffs,
         betMaxBets,
         getPirateBgColor,
+        orange,
         red
     } = props;
 
@@ -250,6 +251,18 @@ function PayoutTable(props) {
         [bets[index], bets[newIndex]] = [bets[newIndex], bets[index]];
         [betAmounts[index], betAmounts[newIndex]] = [betAmounts[newIndex], betAmounts[index]];
         setRoundState({bets, betAmounts});
+    }
+
+    function getMaxBetColor(betNum) {
+        let betAmount = roundState.betAmounts[betNum];
+        let div = 1e6 / betOdds[betNum];
+        if (betAmount > Math.ceil(div)) {
+            return orange;
+        }
+        if (betAmount > Math.floor(div)) {
+            return red;
+        }
+        return "transparent";
     }
 
     return (
@@ -289,7 +302,8 @@ function PayoutTable(props) {
                         let neBg = (ne - 1) < 0 ? red : "transparent";
 
                         let betAmount = roundState.betAmounts[betIndex + 1];
-                        let baBg = (betAmount < 50) ? red : "transparent";
+                        let baBg = (betAmount < 50) ? red : getMaxBetColor(betIndex + 1);
+                        let mbBg = getMaxBetColor(betIndex + 1);
 
                         return (
                             <Tr>
@@ -316,7 +330,7 @@ function PayoutTable(props) {
                                 <Td isNumeric>{displayAsPercent(betProbabilities[betIndex + 1], 3)}</Td>
                                 <Td isNumeric backgroundColor={erBg}>{er.toFixed(3)}:1</Td>
                                 <Td isNumeric backgroundColor={neBg}>{ne.toFixed(2)}</Td>
-                                <Td isNumeric>{numberWithCommas(betMaxBets[betIndex + 1])}</Td>
+                                <Td isNumeric backgroundColor={mbBg}>{numberWithCommas(betMaxBets[betIndex + 1])}</Td>
                                 {
                                     [...Array(5)].map((e, arenaIndex) => {
                                         let pirateIndex = roundState.bets[betIndex + 1][arenaIndex];
@@ -482,6 +496,7 @@ export default function TheTable() {
                          betMaxBets={betMaxBets}
                          betPayoffs={betPayoffs}
                          getPirateBgColor={getPirateBgColor}
+                         orange={orange}
                          red={red}/>
         </Box>
     )
