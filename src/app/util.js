@@ -113,3 +113,7 @@ export function displayAsPercent(value, decimals) {
 export function displayAsPlusMinus(value) {
     return `${(0 < value ? "+" : "")}${value}`;
 }
+
+export function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

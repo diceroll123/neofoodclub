@@ -22,7 +22,7 @@ import React from "react";
 import RoundContext from "./RoundState";
 import RoundInput from "./RoundInput"
 import {calculateArenaRatios, calculatePayoutTables, computePirateFAs, computeProbabilities} from "./maths";
-import {displayAsPercent} from "./util";
+import {displayAsPercent, numberWithCommas} from "./util";
 import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
 
 function NormalTable(props) {
@@ -225,7 +225,143 @@ function NormalTable(props) {
     </Table>)
 }
 
-function PirateTable() {
+function PayoutTable(props) {
+    const {
+        payoutTables,
+        betEnabled,
+        betExpectedRatios,
+        betProbabilities,
+        betNetExpected,
+        betOdds,
+        betPayoffs,
+        betMaxBets,
+        getPirateBgColor,
+        red
+    } = props;
+
+    const {roundState} = React.useContext(RoundContext);
+    const amountOfBets = Object.keys(roundState.bets).length;
+
+    return (
+        <Table size="sm">
+            <Thead>
+                <Tr>
+                    <Th>Bet</Th>
+                    <Th>Amount</Th>
+                    <Th>Odds</Th>
+                    <Th>Payoff</Th>
+                    <Th>Probability</Th>
+                    <Th>Expected Ratio</Th>
+                    <Th>Net Expected</Th>
+                    <Th>Maxbet</Th>
+                    <Th>Shipwreck</Th>
+                    <Th>Lagoon</Th>
+                    <Th>Treasure</Th>
+                    <Th>Hidden</Th>
+                    <Th>Harpoon</Th>
+                    <Th>Submit</Th>
+                </Tr>
+            </Thead>
+
+            {roundState.roundData &&
+            <Tbody>
+                {
+                    [...Array(amountOfBets)].map((e, betIndex) => {
+
+                        if (betEnabled[betIndex + 1] === false) {
+                            return <></>;
+                        }
+
+                        let er = betExpectedRatios[betIndex + 1];
+                        let erBg = (er - 1) < 0 ? red : "transparent";
+
+                        let ne = betNetExpected[betIndex + 1];
+                        let neBg = (ne - 1) < 0 ? red : "transparent";
+
+                        return (
+                            <Tr>
+                                <Td>{betIndex + 1}</Td>
+                                <Td isNumeric>{roundState.betAmounts[betIndex + 1]}</Td>
+                                <Td isNumeric>{betOdds[betIndex + 1]}:1</Td>
+                                <Td isNumeric>{numberWithCommas(betPayoffs[betIndex + 1])}</Td>
+                                <Td isNumeric>{displayAsPercent(betProbabilities[betIndex + 1], 3)}</Td>
+                                <Td isNumeric backgroundColor={erBg}>{er.toFixed(3)}:1</Td>
+                                <Td isNumeric backgroundColor={neBg}>{ne.toFixed(2)}</Td>
+                                <Td isNumeric>{numberWithCommas(betMaxBets[betIndex + 1])}</Td>
+                                {
+                                    [...Array(5)].map((e, arenaIndex) => {
+                                        let pirateIndex = roundState.bets[betIndex + 1][arenaIndex];
+                                        let bgColor = "transparent";
+                                        if (pirateIndex) {
+                                            bgColor = getPirateBgColor(roundState.roundData.openingOdds[arenaIndex][pirateIndex]);
+                                        }
+                                        return (
+                                            <Td backgroundColor={bgColor}>
+                                                {PIRATE_NAMES[roundState.roundData.pirates[arenaIndex][pirateIndex - 1]]}
+                                            </Td>
+                                        )
+                                    })
+                                }
+                                <Td>
+                                    <PlaceThisBetButton bet={roundState.bets[betIndex + 1]}
+                                                        betNum={betIndex + 1}
+                                                        betOdds={betOdds}
+                                                        betPayoffs={betPayoffs}/>
+                                </Td>
+                            </Tr>
+                        )
+                    })
+                }
+            </Tbody>}
+        </Table>
+    )
+}
+
+function PlaceThisBetButton(props) {
+    const {betOdds, betPayoffs, bet, betNum} = props;
+    const {roundState} = React.useContext(RoundContext);
+
+    if (roundState.roundData.winners.some((x) => x > 0)) {
+        return <Button size="xs" isDisabled={true}>Round is over!</Button>
+    }
+
+    function generate_bet_link(bet, betNum) {
+        let urlString = 'http://www.neopets.com/pirates/process_foodclub.phtml?'
+        for (let i = 0; i < 5; i++) {
+            if (bet[i] != 0) urlString += 'winner' + (i + 1) + '=' + roundState.roundData.pirates[i][bet[i] - 1] + '&'
+        }
+        for (let i = 0; i < 5; i++) {
+            if (bet[i] != 0) urlString += 'matches[]=' + (i + 1) + '&'
+        }
+        urlString += 'bet_amount=' + roundState.betAmounts[betNum] + '&'
+        urlString += 'total_odds=' + betOdds[betNum] + '&'
+        urlString += 'winnings=' + betPayoffs[betNum] + '&'
+        urlString += 'type=bet'
+        return window.open(urlString);
+    }
+
+    return (
+        <Button size="xs" onClick={() => generate_bet_link(bet, betNum)}>
+            Place this bet!
+        </Button>
+    )
+}
+
+function PirateTable(props) {
+    let {pirateFAs, arenaRatios, probabilities, changeBet, getPirateBgColor, green, red} = props;
+
+    return (
+        <NormalTable pirateFAs={pirateFAs}
+                     arenaRatios={arenaRatios}
+                     probabilities={probabilities}
+                     changeBet={changeBet}
+                     getPirateBgColor={getPirateBgColor}
+                     green={green}
+                     red={red}/>
+    )
+}
+
+export default function TheTable() {
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
     let probabilities = {};
@@ -292,21 +428,24 @@ function PirateTable() {
     }
 
     return (
-        <NormalTable pirateFAs={pirateFAs}
-                     arenaRatios={arenaRatios}
-                     probabilities={probabilities}
-                     changeBet={changeBet}
-                     getPirateBgColor={getPirateBgColor}
-                     green={green}
-                     red={red}/>
-    )
-}
-
-export default function TheTable() {
-
-    return (
         <Box mt={8}>
-            <PirateTable/>
+            <PirateTable pirateFAs={pirateFAs}
+                         arenaRatios={arenaRatios}
+                         probabilities={probabilities}
+                         changeBet={changeBet}
+                         getPirateBgColor={getPirateBgColor}
+                         green={green}
+                         red={red}/>
+            <PayoutTable payoutTables={payoutTables}
+                         betEnabled={betEnabled}
+                         betProbabilities={betProbabilities}
+                         betExpectedRatios={betExpectedRatios}
+                         betNetExpected={betNetExpected}
+                         betOdds={betOdds}
+                         betMaxBets={betMaxBets}
+                         betPayoffs={betPayoffs}
+                         getPirateBgColor={getPirateBgColor}
+                         red={red}/>
         </Box>
     )
 }
