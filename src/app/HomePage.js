@@ -1,8 +1,9 @@
 import React, {useEffect} from "react"
 import RoundContext from "./RoundState"
+import {SunIcon, MoonIcon} from "@chakra-ui/icons"
 import {
     Box,
-    Button,
+    IconButton,
     HStack,
     Icon,
     Link,
@@ -52,9 +53,9 @@ function ColorModeButton() {
 
     return (
         <Tooltip label={label}>
-            <Button onClick={toggleColorMode}>
-                {colorMode === "light" ? "🌙" : "🌞"}
-            </Button>
+            <IconButton onClick={toggleColorMode}
+                        icon={colorMode === "light" ? <MoonIcon/> : <SunIcon/>}
+            />
         </Tooltip>
     );
 }
