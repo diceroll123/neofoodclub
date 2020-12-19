@@ -498,7 +498,7 @@ export default function TheTable() {
         arenaRatios = calculateArenaRatios(roundState.roundData);
 
         // keep the "cache" of bet data up to date
-        for (let betIndex = 1; betIndex <= 10; betIndex++) {
+        for (let betIndex = 1; betIndex <= Object.keys(roundState.bets).length; betIndex++) {
             betEnabled[betIndex] = roundState.bets[betIndex].some((x) => x > 0);
             betOdds[betIndex] = 1;
             betProbabilities[betIndex] = 1;

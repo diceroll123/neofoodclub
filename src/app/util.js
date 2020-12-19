@@ -41,23 +41,28 @@ export function parseBetUrl() {
 
     let bets = {};
     let betAmounts = {};
+    // temp variables so we can make sure it doesn't overflow etc
+    let tempBets = {};
+    let tempBetAmounts = {};
 
     // parse Bets
     let bet = urlParams.get("b");
     if (bet !== null) {
-        bets = parseBets(bet);
+        tempBets = parseBets(bet);
     }
 
     // parse Bet Amounts
     let amounts = urlParams.get("a");
     if (amounts !== null) {
-        betAmounts = parseBetAmounts(amounts);
+        tempBetAmounts = parseBetAmounts(amounts);
     }
 
     // force data if none exists for bets and amounts alike
-    for (let index = 1; index <= 10; index++) {
-        bets[index] = bets[index] || [0, 0, 0, 0, 0];
-        betAmounts[index] = betAmounts[index] || -1000;
+    // allow up to 15 bets
+    let amountOfBets = Math.max(Object.keys(tempBets).length, Object.keys(tempBetAmounts).length, 10) > 10 ? 15 : 10;
+    for (let index = 1; index <= amountOfBets; index++) {
+        bets[index] = tempBets[index] || [0, 0, 0, 0, 0];
+        betAmounts[index] = tempBetAmounts[index] || -1000;
     }
 
     return {
