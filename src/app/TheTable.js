@@ -49,182 +49,194 @@ function NormalTable(props) {
         setRoundState({bets: {...newBets}}); // hacky way to force an object to update useEffect
     }
 
-    return (<Table size="sm">
-        <Thead>
-            <Tr>
-                <Th>Arena</Th>
-                <Th>Ratio</Th>
-                <Th>Pirate</Th>
-                <Th>Min Prob</Th>
-                <Th>Max Prob</Th>
-                <Th>Std Prob</Th>
-                {/*<Th>Custom</Th>*/}
-                {/*<Th>Used</Th>*/}
-                <Th>Payout</Th>
-                <Th>FA</Th>
-                {/*<Th colSpan={10}>FA Explanation</Th>*/}
-                <Th>Open</Th>
-                <Th>Current</Th>
-                {/*<Th>Custom</Th>*/}
-                {/*<Th>Timeline</Th>*/}
-                {
-                    [...Array(amountOfBets)].map((e, i) => {
-                        return <Th>Bet {i + 1}</Th>
-                    })
-                }
-                <Th></Th>
-            </Tr>
-        </Thead>
-        {
-            ARENA_NAMES.map((arenaName, arenaId) => {
-                let pirates;
-                if (roundState.roundData) {
-                    pirates = roundState.roundData.pirates[arenaId];
-                } else {
-                    pirates = [...Array(4)];
-                }
+    function clearBets() {
+        let newBets = roundState.bets;
+        for (let x = 1; x <= amountOfBets; x++) {
+            newBets[x] = [0, 0, 0, 0, 0];
+        }
+        setRoundState({bets: {...newBets}});
+    }
 
-                return (
-                    <Tbody>
-                        <Tr>
-                            <Td rowSpan={5}>{arenaName}</Td>
-                            <Td rowSpan={5} isNumeric>
-                                {roundState.roundData ?
-                                    <Text>{displayAsPercent(arenaRatios[arenaId], 1)}</Text> :
-                                    <Skeleton><Box>&nbsp;</Box></Skeleton>
-                                }
+    return (
+        <Table size="sm">
+            <Thead>
+                <Tr>
+                    <Th>Arena</Th>
+                    <Th>Ratio</Th>
+                    <Th>Pirate</Th>
+                    <Th>Min Prob</Th>
+                    <Th>Max Prob</Th>
+                    <Th>Std Prob</Th>
+                    {/*<Th>Custom</Th>*/}
+                    {/*<Th>Used</Th>*/}
+                    <Th>Payout</Th>
+                    <Th>FA</Th>
+                    {/*<Th colSpan={10}>FA Explanation</Th>*/}
+                    <Th>Open</Th>
+                    <Th>Current</Th>
+                    {/*<Th>Custom</Th>*/}
+                    {/*<Th>Timeline</Th>*/}
+                    {
+                        [...Array(amountOfBets)].map((e, i) => {
+                            return <Th>Bet {i + 1}</Th>
+                        })
+                    }
+                    <Th>
+                        <Button size="xs" onClick={clearBets}>Clear</Button>
+                    </Th>
+                </Tr>
+            </Thead>
+            {
+                ARENA_NAMES.map((arenaName, arenaId) => {
+                    let pirates;
+                    if (roundState.roundData) {
+                        pirates = roundState.roundData.pirates[arenaId];
+                    } else {
+                        pirates = [...Array(4)];
+                    }
 
-                            </Td>
-                            <Td backgroundColor={zeroRowBgColor} colSpan={6}></Td>
-                            {/*<Td colSpan={2}></Td>*/}
-                            {/* Td for FA explanation here */}
-                            <Td backgroundColor={zeroRowBgColor} colSpan={2}></Td>
-                            {/*<Td colSpan={1}></Td>*/}
-                            {/*<Td>showOddsTimeline</Td>*/}
-                            {roundState.roundData !== null ? <>
-                                {[...Array(amountOfBets)].map((bet, betNum) => {
-                                    return (
-                                        // TODO: Chakra's Radio component does not play well with this atm
-                                        <Td backgroundColor={zeroRowBgColor}>
-                                            <input type="radio"
-                                                   name={"bet" + (betNum + 1) + arenaId}
-                                                   value={0}
-                                                   onChange={() => changeBet(betNum + 1, arenaId, 0)}
-                                                   checked={roundState.bets[betNum + 1][arenaId] === 0}/>
-                                        </Td>
-                                    )
-                                })}
-                                <Td backgroundColor={zeroRowBgColor}>
-                                    <Button size="xs" onClick={() => {
-                                        changeBetLine(arenaId, 0)
-                                    }}>
-                                        10-Bet
-                                    </Button>
+                    return (
+                        <Tbody>
+                            <Tr>
+                                <Td rowSpan={5}>{arenaName}</Td>
+                                <Td rowSpan={5} isNumeric>
+                                    {roundState.roundData ?
+                                        <Text>{displayAsPercent(arenaRatios[arenaId], 1)}</Text> :
+                                        <Skeleton><Box>&nbsp;</Box></Skeleton>
+                                    }
+
                                 </Td>
-                            </> : (<>
-                                <Td colSpan={100} backgroundColor={zeroRowBgColor}>
-                                    <Skeleton height="24px"><Box>&nbsp;</Box></Skeleton>
-                                </Td>
-                            </>)
-                            }
-                        </Tr>
-
-                        {pirates.map((pirateId, pirateIndex) => {
-
-                            if (roundState.roundData === null) {
-                                // big ol skeleton
-                                return (
-                                    <Tr>
-                                        <Td colSpan={100}>
-                                            <Skeleton height="24px">&nbsp;</Skeleton>
-                                        </Td>
-                                    </Tr>
-                                )
-                            }
-
-                            let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
-                            let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
-
-                            let bgColor = "transparent";
-                            if (roundState.roundData.winners[arenaId] === pirateIndex + 1) {
-                                bgColor = green;
-                            }
-
-                            let payout = current * probabilities.used[arenaId][pirateIndex + 1] - 1;
-                            let payoutBackground = "transparent";
-                            if (payout > 0) {
-                                payoutBackground = green;
-                            } else if (payout <= -.1) {
-                                payoutBackground = red;
-                            }
-
-                            return (
-                                <Tr backgroundColor={bgColor}>
-                                    <Td backgroundColor={getPirateBgColor(opening)}>{PIRATE_NAMES[pirateId]}</Td>
-                                    <Td isNumeric>{displayAsPercent(probabilities.min[arenaId][pirateIndex + 1], 1)}</Td>
-                                    <Td isNumeric>{displayAsPercent(probabilities.max[arenaId][pirateIndex + 1], 1)}</Td>
-                                    <Td isNumeric>{displayAsPercent(probabilities.std[arenaId][pirateIndex + 1], 1)}</Td>
-                                    {/*<Td>Custom</Td>*/}
-                                    {/*<Td>Used</Td>*/}
-                                    <Td backgroundColor={payoutBackground}
-                                        isNumeric>{displayAsPercent(payout, 1)}</Td>
-                                    <Td isNumeric>{pirateFAs[arenaId][pirateIndex]}</Td>
-                                    <Td isNumeric>{opening}:1</Td>
-                                    <Td isNumeric>
-                                        {current > opening && <StatArrow mr={1} type="increase"/>}
-                                        {current < opening && <StatArrow mr={1} type="decrease"/>}
-                                        <Text as={current === opening ? "" : "b"}>{current}:1</Text>
-                                    </Td>
-                                    {/*<Td>Custom Odds</Td>*/}
-                                    {/* Odds Timeline */}
+                                <Td backgroundColor={zeroRowBgColor} colSpan={6}></Td>
+                                {/*<Td colSpan={2}></Td>*/}
+                                {/* Td for FA explanation here */}
+                                <Td backgroundColor={zeroRowBgColor} colSpan={2}></Td>
+                                {/*<Td colSpan={1}></Td>*/}
+                                {/*<Td>showOddsTimeline</Td>*/}
+                                {roundState.roundData !== null ? <>
                                     {[...Array(amountOfBets)].map((bet, betNum) => {
                                         return (
-                                            <Td>
-                                                {/*TODO: Chakra's Radio component does not play well with this atm*/}
-                                                <input type="radio" name={"bet" + (betNum + 1) + arenaId}
-                                                       value={pirateIndex + 1}
-                                                       onChange={() => changeBet(betNum + 1, arenaId, pirateIndex + 1)}
-                                                       checked={roundState.bets[betNum + 1][arenaId] === pirateIndex + 1}/>
+                                            // TODO: Chakra's Radio component does not play well with this atm
+                                            <Td backgroundColor={zeroRowBgColor}>
+                                                <input type="radio"
+                                                       name={"bet" + (betNum + 1) + arenaId}
+                                                       value={0}
+                                                       onChange={() => changeBet(betNum + 1, arenaId, 0)}
+                                                       checked={roundState.bets[betNum + 1][arenaId] === 0}/>
                                             </Td>
                                         )
                                     })}
-                                    <Td>
+                                    <Td backgroundColor={zeroRowBgColor}>
                                         <Button size="xs" onClick={() => {
-                                            changeBetLine(arenaId, pirateIndex + 1)
+                                            changeBetLine(arenaId, 0)
                                         }}>
                                             {amountOfBets}-Bet
                                         </Button>
                                     </Td>
-                                </Tr>
-                            )
-                        })}
-                    </Tbody>
-                )
-            })
-        }
-        <TableCaption>
-            <HStack>
-                <Text>Round:</Text>
-                <RoundInput/>
+                                </> : (<>
+                                    <Td colSpan={100} backgroundColor={zeroRowBgColor}>
+                                        <Skeleton height="24px"><Box>&nbsp;</Box></Skeleton>
+                                    </Td>
+                                </>)
+                                }
+                            </Tr>
 
-                <Text>•</Text>
-                <Text>Max Bet:</Text>
+                            {pirates.map((pirateId, pirateIndex) => {
 
-                <NumberInput
-                    defaultValue={-1000}
-                    min={-1000}
-                    max={500000}
-                    allowMouseWheel
-                    width="110px">
-                    <NumberInputField/>
-                    <NumberInputStepper>
-                        <NumberIncrementStepper/>
-                        <NumberDecrementStepper/>
-                    </NumberInputStepper>
-                </NumberInput>
-            </HStack>
-        </TableCaption>
-    </Table>)
+                                if (roundState.roundData === null) {
+                                    // big ol skeleton
+                                    return (
+                                        <Tr>
+                                            <Td colSpan={100}>
+                                                <Skeleton height="24px">&nbsp;</Skeleton>
+                                            </Td>
+                                        </Tr>
+                                    )
+                                }
+
+                                let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
+                                let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
+
+                                let bgColor = "transparent";
+                                if (roundState.roundData.winners[arenaId] === pirateIndex + 1) {
+                                    bgColor = green;
+                                }
+
+                                let payout = current * probabilities.used[arenaId][pirateIndex + 1] - 1;
+                                let payoutBackground = "transparent";
+                                if (payout > 0) {
+                                    payoutBackground = green;
+                                } else if (payout <= -.1) {
+                                    payoutBackground = red;
+                                }
+
+                                return (
+                                    <Tr backgroundColor={bgColor}>
+                                        <Td backgroundColor={getPirateBgColor(opening)}>{PIRATE_NAMES[pirateId]}</Td>
+                                        <Td isNumeric>{displayAsPercent(probabilities.min[arenaId][pirateIndex + 1], 1)}</Td>
+                                        <Td isNumeric>{displayAsPercent(probabilities.max[arenaId][pirateIndex + 1], 1)}</Td>
+                                        <Td isNumeric>{displayAsPercent(probabilities.std[arenaId][pirateIndex + 1], 1)}</Td>
+                                        {/*<Td>Custom</Td>*/}
+                                        {/*<Td>Used</Td>*/}
+                                        <Td backgroundColor={payoutBackground}
+                                            isNumeric>{displayAsPercent(payout, 1)}</Td>
+                                        <Td isNumeric>{pirateFAs[arenaId][pirateIndex]}</Td>
+                                        <Td isNumeric>{opening}:1</Td>
+                                        <Td isNumeric>
+                                            {current > opening && <StatArrow mr={1} type="increase"/>}
+                                            {current < opening && <StatArrow mr={1} type="decrease"/>}
+                                            <Text as={current === opening ? "" : "b"}>{current}:1</Text>
+                                        </Td>
+                                        {/*<Td>Custom Odds</Td>*/}
+                                        {/* Odds Timeline */}
+                                        {[...Array(amountOfBets)].map((bet, betNum) => {
+                                            return (
+                                                <Td>
+                                                    {/*TODO: Chakra's Radio component does not play well with this atm*/}
+                                                    <input type="radio" name={"bet" + (betNum + 1) + arenaId}
+                                                           value={pirateIndex + 1}
+                                                           onChange={() => changeBet(betNum + 1, arenaId, pirateIndex + 1)}
+                                                           checked={roundState.bets[betNum + 1][arenaId] === pirateIndex + 1}/>
+                                                </Td>
+                                            )
+                                        })}
+                                        <Td>
+                                            <Button size="xs" onClick={() => {
+                                                changeBetLine(arenaId, pirateIndex + 1)
+                                            }}>
+                                                {amountOfBets}-Bet
+                                            </Button>
+                                        </Td>
+                                    </Tr>
+                                )
+                            })}
+                        </Tbody>
+                    )
+                })
+            }
+            <TableCaption>
+                <HStack>
+                    <Text>Round:</Text>
+                    <RoundInput/>
+
+                    <Text>•</Text>
+                    <Text>Max Bet:</Text>
+
+                    <NumberInput
+                        defaultValue={-1000}
+                        min={-1000}
+                        max={500000}
+                        allowMouseWheel
+                        width="110px">
+                        <NumberInputField/>
+                        <NumberInputStepper>
+                            <NumberIncrementStepper/>
+                            <NumberDecrementStepper/>
+                        </NumberInputStepper>
+                    </NumberInput>
+                </HStack>
+            </TableCaption>
+        </Table>
+    )
 }
 
 function PayoutTable(props) {
@@ -239,11 +251,44 @@ function PayoutTable(props) {
         betMaxBets,
         getPirateBgColor,
         orange,
-        red
+        red,
+        green
     } = props;
 
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
+    let totalBetAmounts = 0;
+    let totalBetExpectedRatios = 0;
+    let totalBetNetExpected = 0;
+    let totalWinningPayoff = 0;
+    let totalWinningOdds = 0;
+    let totalEnabledBets = 0;
+    let betsWon = {};
+
+    for (let betIndex in roundState.bets) {
+        if (betEnabled[betIndex]) {
+            totalEnabledBets += 1;
+            totalBetAmounts += roundState.betAmounts[betIndex];
+            totalBetExpectedRatios += betExpectedRatios[betIndex];
+            totalBetNetExpected += betNetExpected[betIndex];
+            if (didBetWin(betIndex)) {
+                betsWon[betIndex] = true;
+                totalWinningOdds += betOdds[betIndex];
+                totalWinningPayoff += betOdds[betIndex] * roundState.betAmounts[betIndex];
+            }
+        }
+    }
+
+    function didBetWin(betNum) {
+        let returnValue = true;
+        for (let i = 0; i < 5; i++) {
+            let pirateBet = roundState.bets[betNum][i];
+            if (pirateBet !== 0 && pirateBet !== roundState.roundData.winners[i]) {
+                return false;
+            }
+        }
+        return returnValue;
+    }
 
     function swapBets(index, newIndex) {
         let bets = roundState.bets;
@@ -287,75 +332,95 @@ function PayoutTable(props) {
             </Thead>
 
             {roundState.roundData &&
-            <Tbody>
-                {
-                    [...Array(amountOfBets)].map((e, betIndex) => {
+            <>
+                <Tbody>
+                    {
+                        [...Array(amountOfBets)].map((e, betIndex) => {
 
-                        if (betEnabled[betIndex + 1] === false) {
-                            return <></>;
-                        }
+                            if (betEnabled[betIndex + 1] === false) {
+                                return <></>;
+                            }
 
-                        let er = betExpectedRatios[betIndex + 1];
-                        let erBg = (er - 1) < 0 ? red : "transparent";
+                            let er = betExpectedRatios[betIndex + 1];
+                            let erBg = (er - 1) < 0 ? red : "transparent";
 
-                        let ne = betNetExpected[betIndex + 1];
-                        let neBg = (ne - 1) < 0 ? red : "transparent";
+                            let ne = betNetExpected[betIndex + 1];
+                            let neBg = (ne - 1) < 0 ? red : "transparent";
 
-                        let betAmount = roundState.betAmounts[betIndex + 1];
-                        let baBg = (betAmount < 50) ? red : getMaxBetColor(betIndex + 1);
-                        let mbBg = getMaxBetColor(betIndex + 1);
+                            let betAmount = roundState.betAmounts[betIndex + 1];
+                            let baBg = (betAmount < 50) ? red : getMaxBetColor(betIndex + 1);
+                            let mbBg = getMaxBetColor(betIndex + 1);
 
-                        return (
-                            <Tr>
-                                <Td>
-                                    <HStack>
-                                        <Text>{betIndex + 1}</Text>
-                                        <HStack spacing="1px">
-                                            <IconButton size="xs"
-                                                        height="20px"
-                                                        icon={<ArrowUpIcon/>}
-                                                        onClick={() => swapBets(betIndex + 1, betIndex)}
-                                                        isDisabled={betIndex === 0}/>
-                                            <IconButton size="xs"
-                                                        height="20px"
-                                                        icon={<ArrowDownIcon/>}
-                                                        onClick={() => swapBets(betIndex + 1, betIndex + 2)}
-                                                        isDisabled={betIndex === amountOfBets - 1}/>
+                            let betNumBgColor = betsWon[betIndex + 1] ? green : "transparent";
+
+                            return (
+                                <Tr>
+                                    <Td backgroundColor={betNumBgColor}>
+                                        <HStack>
+                                            <Text>{betIndex + 1}</Text>
+                                            <HStack spacing="1px">
+                                                <IconButton size="xs"
+                                                            height="20px"
+                                                            icon={<ArrowUpIcon/>}
+                                                            onClick={() => swapBets(betIndex + 1, betIndex)}
+                                                            isDisabled={betIndex === 0}/>
+                                                <IconButton size="xs"
+                                                            height="20px"
+                                                            icon={<ArrowDownIcon/>}
+                                                            onClick={() => swapBets(betIndex + 1, betIndex + 2)}
+                                                            isDisabled={betIndex === amountOfBets - 1}/>
+                                            </HStack>
                                         </HStack>
-                                    </HStack>
-                                </Td>
-                                <Td isNumeric backgroundColor={baBg}>{betAmount}</Td>
-                                <Td isNumeric>{betOdds[betIndex + 1]}:1</Td>
-                                <Td isNumeric>{numberWithCommas(betPayoffs[betIndex + 1])}</Td>
-                                <Td isNumeric>{displayAsPercent(betProbabilities[betIndex + 1], 3)}</Td>
-                                <Td isNumeric backgroundColor={erBg}>{er.toFixed(3)}:1</Td>
-                                <Td isNumeric backgroundColor={neBg}>{ne.toFixed(2)}</Td>
-                                <Td isNumeric backgroundColor={mbBg}>{numberWithCommas(betMaxBets[betIndex + 1])}</Td>
-                                {
-                                    [...Array(5)].map((e, arenaIndex) => {
-                                        let pirateIndex = roundState.bets[betIndex + 1][arenaIndex];
-                                        let bgColor = "transparent";
-                                        if (pirateIndex) {
-                                            bgColor = getPirateBgColor(roundState.roundData.openingOdds[arenaIndex][pirateIndex]);
-                                        }
-                                        return (
-                                            <Td backgroundColor={bgColor}>
-                                                {PIRATE_NAMES[roundState.roundData.pirates[arenaIndex][pirateIndex - 1]]}
-                                            </Td>
-                                        )
-                                    })
-                                }
-                                <Td>
-                                    <PlaceThisBetButton bet={roundState.bets[betIndex + 1]}
-                                                        betNum={betIndex + 1}
-                                                        betOdds={betOdds}
-                                                        betPayoffs={betPayoffs}/>
-                                </Td>
-                            </Tr>
-                        )
-                    })
-                }
-            </Tbody>}
+                                    </Td>
+                                    <Td isNumeric backgroundColor={baBg}>{numberWithCommas(betAmount)}</Td>
+                                    <Td isNumeric>{numberWithCommas(betOdds[betIndex + 1])}:1</Td>
+                                    <Td isNumeric>{numberWithCommas(betPayoffs[betIndex + 1])}</Td>
+                                    <Td isNumeric>{displayAsPercent(betProbabilities[betIndex + 1], 3)}</Td>
+                                    <Td isNumeric backgroundColor={erBg}>{er.toFixed(3)}:1</Td>
+                                    <Td isNumeric backgroundColor={neBg}>{ne.toFixed(2)}</Td>
+                                    <Td isNumeric
+                                        backgroundColor={mbBg}>{numberWithCommas(betMaxBets[betIndex + 1])}</Td>
+                                    {
+                                        [...Array(5)].map((e, arenaIndex) => {
+                                            let pirateIndex = roundState.bets[betIndex + 1][arenaIndex];
+                                            let bgColor = "transparent";
+                                            if (pirateIndex) {
+                                                if (betsWon[betIndex + 1]) {
+                                                    bgColor = green;
+                                                } else {
+                                                    bgColor = getPirateBgColor(roundState.roundData.openingOdds[arenaIndex][pirateIndex]);
+                                                }
+                                            }
+                                            return (
+                                                <Td backgroundColor={bgColor}>
+                                                    {PIRATE_NAMES[roundState.roundData.pirates[arenaIndex][pirateIndex - 1]]}
+                                                </Td>
+                                            )
+                                        })
+                                    }
+                                    <Td>
+                                        <PlaceThisBetButton bet={roundState.bets[betIndex + 1]}
+                                                            betNum={betIndex + 1}
+                                                            betOdds={betOdds}
+                                                            betPayoffs={betPayoffs}/>
+                                    </Td>
+                                </Tr>
+                            )
+                        })
+                    }
+                </Tbody>
+                <Tbody>
+                    <Tr>
+                        <Th isNumeric>Total:</Th>
+                        <Th isNumeric>{numberWithCommas(totalBetAmounts)}</Th>
+                        <Th isNumeric>{numberWithCommas(totalWinningOdds)}:{totalEnabledBets}</Th>
+                        <Th isNumeric>{numberWithCommas(totalWinningPayoff)}</Th>
+                        <Th></Th>
+                        <Th isNumeric>{totalBetExpectedRatios.toFixed(3)}</Th>
+                        <Th isNumeric>{totalBetNetExpected.toFixed(2)}</Th>
+                    </Tr>
+                </Tbody>
+            </>}
         </Table>
     )
 }
@@ -497,7 +562,8 @@ export default function TheTable() {
                          betPayoffs={betPayoffs}
                          getPirateBgColor={getPirateBgColor}
                          orange={orange}
-                         red={red}/>
+                         red={red}
+                         green={green}/>
         </Box>
     )
 }
