@@ -289,7 +289,7 @@ function PayoutTable(props) {
                         let neBg = (ne - 1) < 0 ? red : "transparent";
 
                         let betAmount = roundState.betAmounts[betIndex + 1];
-                        let baBg = (betAmount <= 50) ? red : "transparent";
+                        let baBg = (betAmount < 50) ? red : "transparent";
 
                         return (
                             <Tr>
