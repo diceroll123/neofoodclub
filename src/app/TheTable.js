@@ -354,6 +354,10 @@ function PlaceThisBetButton(props) {
         return <Button size="xs" isDisabled={true}>Round is over!</Button>
     }
 
+    if (roundState.betAmounts[betNum] < 50) {
+        return <Button size="xs" isDisabled>Invalid bet amount!</Button>
+    }
+
     function generate_bet_link(bet, betNum) {
         let urlString = 'http://www.neopets.com/pirates/process_foodclub.phtml?'
         for (let i = 0; i < 5; i++) {
