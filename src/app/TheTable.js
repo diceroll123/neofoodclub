@@ -21,7 +21,7 @@ import {
 import React from "react";
 import RoundContext from "./RoundState";
 import RoundInput from "./RoundInput"
-import {calculateArenaRatios, computePirateFAs, computeProbabilities} from "./maths";
+import {calculateArenaRatios, calculatePayoutTables, computePirateFAs, computeProbabilities} from "./maths";
 import {displayAsPercent} from "./util";
 import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
 
@@ -32,11 +32,41 @@ function PirateTable() {
     let probabilities = {};
     let pirateFAs = {};
     let arenaRatios = {};
+    let betEnabled = [];
+    let betOdds = [];
+    let betPayoffs = [];
+    let betProbabilities = [];
+    let betExpectedRatios = [];
+    let betNetExpected = [];
+    let betMaxBets = [];
+    let payoutTables = {};
 
     if (roundState.roundData) {
         probabilities = computeProbabilities(roundState.roundData);
         pirateFAs = computePirateFAs(roundState.roundData);
         arenaRatios = calculateArenaRatios(roundState.roundData);
+
+        // keep the "cache" of bet data up to date
+        for (let betIndex = 1; betIndex <= 10; betIndex++) {
+            betEnabled[betIndex] = roundState.bets[betIndex].some((x) => x > 0);
+            betOdds[betIndex] = 1;
+            betProbabilities[betIndex] = 1;
+
+            for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
+                let pirateIndex = roundState.bets[betIndex][arenaIndex];
+                betOdds[betIndex] *= roundState.roundData.currentOdds[arenaIndex][pirateIndex];
+                betProbabilities[betIndex] *= probabilities.used[arenaIndex][pirateIndex];
+            }
+            // yes, the for-loop above had to be separate.
+            for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
+                betPayoffs[betIndex] = Math.min(1_000_000, roundState.betAmounts[betIndex] * betOdds[betIndex]);
+                betExpectedRatios[betIndex] = betOdds[betIndex] * betProbabilities[betIndex];
+                betNetExpected[betIndex] = betPayoffs[betIndex] * betProbabilities[betIndex] - roundState.betAmounts[betIndex];
+                betMaxBets[betIndex] = Math.floor(1_000_000 / betOdds[betIndex]);
+            }
+        }
+
+        payoutTables = calculatePayoutTables(roundState.roundData, probabilities, betOdds, betPayoffs);
     }
 
     const theme = useTheme();
