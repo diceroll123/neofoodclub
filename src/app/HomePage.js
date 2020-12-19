@@ -11,6 +11,8 @@ import {
     Spacer,
     Text,
     Tooltip,
+    CircularProgress,
+    CircularProgressLabel,
     useColorMode,
     VStack,
     useToast
@@ -21,6 +23,7 @@ import TimeAgo from 'react-timeago'
 import TheTable from "./TheTable";
 import RoundInput from "./RoundInput"
 import {makeBetAmountsUrl, makeBetUrl} from "./util";
+import moment from "moment";
 
 const GithubIcon = (props) => (
     <svg viewBox="0 0 20 20" {...props}>
@@ -75,18 +78,36 @@ function PreviousRoundInfo() {
 function CurrentRoundInfo() {
     const {roundState} = React.useContext(RoundContext);
 
+    let now = moment();
+    let start = moment(roundState.roundData.start);
+    let end = moment(roundState.roundData.start).add(1, 'day');
+    let totalMillisInRange = end.valueOf() - start.valueOf();
+    let elapsedMillis = now.valueOf() - start.valueOf();
+    const roundPercentOver = Math.max(0, Math.min(100, 100 * (elapsedMillis / totalMillisInRange)));
+
     return (
-        <Box textAlign="left">
-            <Text fontSize="xs">
-                Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
-            </Text>
-            {roundState.roundData.lastChange &&
-            roundState.roundData.lastUpdate !== roundState.roundData.lastChange &&
-            <Text fontSize="xs">
-                Last Change: <TimeAgo date={roundState.roundData.lastChange}/>
-            </Text>
+        <HStack>
+            <Box textAlign="left">
+                <Text fontSize="xs">
+                    Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
+                </Text>
+                {roundState.roundData.lastChange &&
+                roundState.roundData.lastUpdate !== roundState.roundData.lastChange &&
+                <Text fontSize="xs">
+                    Last Change: <TimeAgo date={roundState.roundData.lastChange}/>
+                </Text>
+                }
+            </Box>
+            {roundPercentOver === 100 ?
+                <CircularProgress isIndeterminate/>
+                :
+                <CircularProgress value={roundPercentOver}>
+                    <CircularProgressLabel>
+                        {Math.floor(roundPercentOver)}%
+                    </CircularProgressLabel>
+                </CircularProgress>
             }
-        </Box>
+        </HStack>
     )
 }
 
