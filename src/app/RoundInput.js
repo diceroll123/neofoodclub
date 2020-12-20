@@ -12,16 +12,18 @@ export default function RoundInput() {
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
     return (
-        <NumberInput isDisabled={roundState.currentSelectedRound === null}
-                     value={roundState.currentSelectedRound || 1}
-                     min={1}
-                     max={roundState.currentRound}
-                     allowMouseWheel
-                     width="90px"
-                     onChange={(value) => setRoundState({
-                         currentSelectedRound: parseInt(value),
-                         roundData: null
-                     })}>
+        <NumberInput
+            size="sm"
+            isDisabled={roundState.currentSelectedRound === null}
+            value={roundState.currentSelectedRound || 1}
+            min={1}
+            max={roundState.currentRound}
+            allowMouseWheel
+            width="80px"
+            onChange={(value) => setRoundState({
+                currentSelectedRound: parseInt(value),
+                roundData: null
+            })}>
             <NumberInputField/>
             <NumberInputStepper>
                 <NumberIncrementStepper/>
