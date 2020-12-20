@@ -1,3 +1,5 @@
+import Cookies from "universal-cookie/es6";
+
 export function reducer(state, item) {
     return {...state, ...item}
 }
@@ -121,4 +123,21 @@ export function displayAsPlusMinus(value) {
 
 export function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function calculateMaxBet(baseMaxBet, round) {
+    return baseMaxBet + 2 * round;
+}
+
+export function calculateBaseMaxBet(maxBet, round) {
+    return maxBet - 2 * round;
+}
+
+export function getMaxBet(currentSelectedRound) {
+    const cookies = new Cookies();
+    let maxBet = cookies.get('baseMaxBet');
+    if (maxBet === undefined) {
+        return -1000;
+    }
+    return calculateMaxBet(parseInt(maxBet), currentSelectedRound);
 }

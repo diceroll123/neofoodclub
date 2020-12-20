@@ -18,27 +18,54 @@ import {
     Tr,
     Th,
     Td as OriginalTd,
-    TableCaption, useTheme, useColorModeValue
+    useTheme,
+    useColorModeValue,
+    useToast
 } from "@chakra-ui/react";
 import {ArrowUpIcon, ArrowDownIcon} from "@chakra-ui/icons";
 import React from "react";
+import moment from "moment";
 import RoundContext from "./RoundState";
 import RoundInput from "./RoundInput";
 import {calculateArenaRatios, calculatePayoutTables, computePirateFAs, computeProbabilities} from "./maths";
-import {displayAsPercent, numberWithCommas} from "./util";
+import {displayAsPercent, calculateBaseMaxBet, numberWithCommas, getMaxBet} from "./util";
 import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
+import Cookies from "universal-cookie/es6";
 
 function Td(props) {
     const {children, ...rest} = props;
     return <OriginalTd py={1} {...rest}>{children}</OriginalTd>
 }
 
+function BetAmountInput(props) {
+    const {...rest} = props;
+    return (
+        <NumberInput
+            {...rest}
+            onFocus={(e) => e.target.select()}
+            size="sm"
+            min={-1000}
+            max={500000}
+            allowMouseWheel
+            width="80px">
+            <NumberInputField/>
+            <NumberInputStepper width="16px">
+                <NumberIncrementStepper/>
+                <NumberDecrementStepper/>
+            </NumberInputStepper>
+        </NumberInput>
+    )
+}
+
 function NormalTable(props) {
     let {pirateFAs, arenaRatios, probabilities, changeBet, getPirateBgColor, green, red} = props;
-
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
 
+    let maxBet = getMaxBet(roundState.currentSelectedRound);
+
+    const cookies = new Cookies();
+    const toast = useToast();
     const theme = useTheme();
     const zeroRowBgColor = useColorModeValue(
         theme.colors.gray["100"],
@@ -61,6 +88,14 @@ function NormalTable(props) {
             newBets[x] = [0, 0, 0, 0, 0];
         }
         setRoundState({bets: {...newBets}});
+    }
+
+    function setAllBets(value) {
+        let betAmounts = roundState.betAmounts;
+        for (let index in roundState.betAmounts) {
+            betAmounts[index] = value;
+        }
+        setRoundState({betAmounts});
     }
 
     return (
@@ -220,28 +255,68 @@ function NormalTable(props) {
                     )
                 })
             }
-            <TableCaption>
-                <HStack>
-                    <Text>Round:</Text>
-                    <RoundInput/>
+            <Tbody>
+                <Tr>
+                    <Td colspan={10} height="10px">
+                        <HStack>
+                            <Spacer/>
+                            <Text>Round:</Text>
+                            <RoundInput/>
 
-                    <Text>•</Text>
-                    <Text>Max Bet:</Text>
+                            <Text>•</Text>
+                            <Text>Max Bet:</Text>
+                            {roundState.roundData === null ?
+                                <Skeleton height="24px" width="80px"><Box>&nbsp;</Box></Skeleton>
+                                :
+                                <BetAmountInput
+                                    defaultValue={maxBet}
+                                    onBlur={(e) => {
+                                        let value = parseInt(e.target.value);
+                                        if (value === maxBet) {
+                                            // don't save over it if it's the same
+                                            return;
+                                        }
 
-                    <NumberInput
-                        defaultValue={-1000}
-                        min={-1000}
-                        max={500000}
-                        allowMouseWheel
-                        width="110px">
-                        <NumberInputField/>
-                        <NumberInputStepper>
-                            <NumberIncrementStepper/>
-                            <NumberDecrementStepper/>
-                        </NumberInputStepper>
-                    </NumberInput>
-                </HStack>
-            </TableCaption>
+                                        if (isNaN(value) || value === 0) {
+                                            value = -1000;
+                                        }
+
+                                        let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
+                                        cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
+
+                                        toast.closeAll();
+                                        toast({
+                                            title: `Max Bet Saved!`,
+                                            status: "success",
+                                            duration: 1200,
+                                            isClosable: true
+                                        })
+                                    }}/>
+                            }
+                            <Text>•</Text>
+                            <Button size="sm" onClick={() => {
+                                setAllBets(getMaxBet(roundState.currentSelectedRound))
+                            }}>Set all</Button>
+                        </HStack>
+                    </Td>
+                    {[...Array(amountOfBets)].map((e, i) => {
+                        return (<Td>
+                            <BetAmountInput
+                                value={roundState.betAmounts[i + 1]}
+                                onChange={(str, value) => {
+                                    let betAmounts = roundState.betAmounts;
+                                    if (isNaN(value) || value === 0) {
+                                        value = -1000;
+                                    }
+                                    betAmounts[i + 1] = value;
+                                    setRoundState({betAmounts});
+                                }}
+                            />
+                        </Td>)
+                    })}
+                    <Td></Td>
+                </Tr>
+            </Tbody>
         </Table>
     )
 }
