@@ -99,9 +99,9 @@ function CurrentRoundInfo() {
                 }
             </Box>
             {roundPercentOver === 100 ?
-                <CircularProgress isIndeterminate/>
+                <CircularProgress isIndeterminate capIsRound/>
                 :
-                <CircularProgress value={roundPercentOver}>
+                <CircularProgress value={roundPercentOver} capIsRound>
                     <CircularProgressLabel>
                         {Math.floor(roundPercentOver)}%
                     </CircularProgressLabel>
