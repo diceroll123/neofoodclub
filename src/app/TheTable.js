@@ -187,8 +187,8 @@ function NormalTable(props) {
                                         <Td isNumeric>{pirateFAs[arenaId][pirateIndex]}</Td>
                                         <Td isNumeric>{opening}:1</Td>
                                         <Td isNumeric>
-                                            {current > opening && <StatArrow mr={1} type="increase"/>}
-                                            {current < opening && <StatArrow mr={1} type="decrease"/>}
+                                            {current > opening && <StatArrow mr={1} type="increase" style={{"stroke": "#000000"}}/>}
+                                            {current < opening && <StatArrow mr={1} type="decrease" style={{"stroke": "#000000"}}/>}
                                             <Text as={current === opening ? "" : "b"}>{current}:1</Text>
                                         </Td>
                                         {/*<Td>Custom Odds</Td>*/}
