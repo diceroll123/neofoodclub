@@ -17,7 +17,7 @@ import {
     Tbody,
     Tr,
     Th,
-    Td,
+    Td as OriginalTd,
     TableCaption, useTheme, useColorModeValue
 } from "@chakra-ui/react";
 import {ArrowUpIcon, ArrowDownIcon} from "@chakra-ui/icons";
@@ -27,6 +27,11 @@ import RoundInput from "./RoundInput"
 import {calculateArenaRatios, calculatePayoutTables, computePirateFAs, computeProbabilities} from "./maths";
 import {displayAsPercent, numberWithCommas} from "./util";
 import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
+
+function Td(props) {
+    const {children, ...rest} = props;
+    return <OriginalTd py={1} {...rest}>{children}</OriginalTd>
+}
 
 function NormalTable(props) {
     let {pirateFAs, arenaRatios, probabilities, changeBet, getPirateBgColor, green, red} = props;
