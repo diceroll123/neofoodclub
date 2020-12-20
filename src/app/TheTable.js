@@ -23,7 +23,7 @@ import {
 import {ArrowUpIcon, ArrowDownIcon} from "@chakra-ui/icons";
 import React from "react";
 import RoundContext from "./RoundState";
-import RoundInput from "./RoundInput"
+import RoundInput from "./RoundInput";
 import {calculateArenaRatios, calculatePayoutTables, computePirateFAs, computeProbabilities} from "./maths";
 import {displayAsPercent, numberWithCommas} from "./util";
 import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
@@ -187,8 +187,10 @@ function NormalTable(props) {
                                         <Td isNumeric>{pirateFAs[arenaId][pirateIndex]}</Td>
                                         <Td isNumeric>{opening}:1</Td>
                                         <Td isNumeric>
-                                            {current > opening && <StatArrow mr={1} type="increase" style={{"stroke": "#000000"}}/>}
-                                            {current < opening && <StatArrow mr={1} type="decrease" style={{"stroke": "#000000"}}/>}
+                                            {current > opening &&
+                                            <StatArrow mr={1} type="increase" style={{"stroke": "#000000"}}/>}
+                                            {current < opening &&
+                                            <StatArrow mr={1} type="decrease" style={{"stroke": "#000000"}}/>}
                                             <Text as={current === opening ? "" : "b"}>{current}:1</Text>
                                         </Td>
                                         {/*<Td>Custom Odds</Td>*/}
@@ -257,7 +259,8 @@ function PayoutTable(props) {
         getPirateBgColor,
         orange,
         red,
-        green
+        green,
+        yellow
     } = props;
 
     const {roundState, setRoundState} = React.useContext(RoundContext);
@@ -310,13 +313,13 @@ function PayoutTable(props) {
             return orange;
         }
         if (betAmount > Math.floor(div)) {
-            return red;
+            return yellow;
         }
         return "transparent";
     }
 
     return (
-        <Table size="sm" width="auto">
+        <Table size="sm" width="auto" mt={4}>
             <Thead>
                 <Tr>
                     <Th>Bet</Th>
@@ -421,17 +424,24 @@ function PayoutTable(props) {
                         <Th isNumeric>{numberWithCommas(totalBetAmounts)}</Th>
                         <Th isNumeric>
                             {roundState.roundData.winners.some((x) => x > 0) &&
-                                <Text>{numberWithCommas(totalWinningOdds)}:{totalEnabledBets}</Text>
+                            <Text>{numberWithCommas(totalWinningOdds)}:{totalEnabledBets}</Text>
                             }
                         </Th>
                         <Th isNumeric>
                             {roundState.roundData.winners.some((x) => x > 0) &&
-                                <Text>{numberWithCommas(totalWinningPayoff)}</Text>
+                            <Text>{numberWithCommas(totalWinningPayoff)}</Text>
                             }
                         </Th>
                         <Th></Th>
                         <Th isNumeric>{totalBetExpectedRatios.toFixed(3)}</Th>
                         <Th isNumeric>{totalBetNetExpected.toFixed(2)}</Th>
+                        <Th></Th>
+                        <Th></Th>
+                        <Th></Th>
+                        <Th></Th>
+                        <Th></Th>
+                        <Th></Th>
+                        <Th></Th>
                     </Tr>
                 </Tbody>
             </>}
@@ -541,6 +551,7 @@ export default function TheTable() {
     const blue = useColorModeValue(theme.colors.blue["200"], "#4BA0E4");
     const orange = useColorModeValue(theme.colors.orange["200"], "#F0923E");
     const red = useColorModeValue(theme.colors.red["200"], "#F76C6C");
+    const yellow = useColorModeValue(theme.colors.yellow["200"], "#EFCF50");
 
     function getPirateBgColor(openingOdds) {
         // for the cell that has the pirate name in the big table
@@ -577,6 +588,7 @@ export default function TheTable() {
                          getPirateBgColor={getPirateBgColor}
                          orange={orange}
                          red={red}
+                         yellow={yellow}
                          green={green}/>
         </Box>
     )
