@@ -3,6 +3,7 @@ import {
     Spacer,
     Box,
     Button,
+    ButtonGroup,
     IconButton,
     StatArrow,
     Text,
@@ -20,15 +21,23 @@ import {
     Td as OriginalTd,
     useTheme,
     useColorModeValue,
-    useToast
+    useToast,
+    useClipboard,
 } from "@chakra-ui/react";
-import {ArrowUpIcon, ArrowDownIcon} from "@chakra-ui/icons";
+import {ArrowUpIcon, ArrowDownIcon, LinkIcon} from "@chakra-ui/icons";
 import React from "react";
 import moment from "moment";
 import RoundContext from "./RoundState";
 import RoundInput from "./RoundInput";
 import {calculateArenaRatios, calculatePayoutTables, computePirateFAs, computeProbabilities} from "./maths";
-import {displayAsPercent, calculateBaseMaxBet, numberWithCommas, getMaxBet} from "./util";
+import {
+    displayAsPercent,
+    calculateBaseMaxBet,
+    numberWithCommas,
+    getMaxBet,
+    makeBetUrl,
+    makeBetAmountsUrl
+} from "./util";
 import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
 import Cookies from "universal-cookie/es6";
 
@@ -54,6 +63,68 @@ function BetAmountInput(props) {
                 <NumberDecrementStepper/>
             </NumberInputStepper>
         </NumberInput>
+    )
+}
+
+function CopyLinkButtons() {
+    const toast = useToast();
+    const {roundState} = React.useContext(RoundContext);
+
+    let betURL = `${window.location.pathname}#round=${roundState.currentSelectedRound}`;
+    let amountsBetUrl;
+    let addBets = false;
+    for (const [, value] of Object.entries(roundState.bets)) {
+        if (addBets === false) {
+            addBets = value.some(x => x > 0);
+        }
+    }
+
+    betURL += '&b=' + makeBetUrl(roundState.bets);
+
+    let addBetAmounts = false;
+    for (const [, value] of Object.entries(roundState.betAmounts)) {
+        if (addBetAmounts === false) {
+            addBetAmounts = value >= 50;
+        }
+    }
+    if (addBetAmounts) {
+        amountsBetUrl = betURL + '&a=' + makeBetAmountsUrl(roundState.betAmounts);
+    }
+
+    const urlClip = useClipboard(betURL);
+    const urlAmountsClip = useClipboard(amountsBetUrl);
+
+    return (
+        <>
+            {addBets &&
+            <ButtonGroup size="sm" isAttached variant="outline">
+                <Button mr="-px"
+                        leftIcon={<LinkIcon/>}
+                        onClick={() => {
+                            urlClip.onCopy();
+                            toast.closeAll();
+                            toast({
+                                title: `Bet URL copied!`,
+                                status: "success",
+                                duration: 1300,
+                                isClosable: true
+                            });
+                        }}>Copy URL</Button>
+                {addBetAmounts &&
+                <Button onClick={() => {
+                    urlAmountsClip.onCopy();
+                    toast.closeAll();
+                    toast({
+                        title: `Bet URL + Amounts copied!`,
+                        status: "success",
+                        duration: 1300,
+                        isClosable: true
+                    });
+                }}>+ Amounts</Button>
+                }
+            </ButtonGroup>
+            }
+        </>
     )
 }
 
@@ -259,6 +330,7 @@ function NormalTable(props) {
                 <Tr>
                     <Td colspan={10} height="10px">
                         <HStack>
+                            <CopyLinkButtons/>
                             <Spacer/>
                             <Text>Round:</Text>
                             <RoundInput/>
@@ -290,7 +362,7 @@ function NormalTable(props) {
                                             status: "success",
                                             duration: 1200,
                                             isClosable: true
-                                        })
+                                        });
                                     }}/>
                             }
                             <Text>•</Text>
