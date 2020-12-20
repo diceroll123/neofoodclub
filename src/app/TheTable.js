@@ -59,7 +59,7 @@ function NormalTable(props) {
     }
 
     return (
-        <Table size="sm">
+        <Table size="sm" width="auto">
             <Thead>
                 <Tr>
                     <Th>Arena</Th>
@@ -83,7 +83,7 @@ function NormalTable(props) {
                         })
                     }
                     <Th>
-                        <Button size="xs" onClick={clearBets}>Clear</Button>
+                        <Button width="100%" size="xs" onClick={clearBets}>Clear</Button>
                     </Th>
                 </Tr>
             </Thead>
@@ -105,7 +105,6 @@ function NormalTable(props) {
                                         <Text>{displayAsPercent(arenaRatios[arenaId], 1)}</Text> :
                                         <Skeleton><Box>&nbsp;</Box></Skeleton>
                                     }
-
                                 </Td>
                                 <Td backgroundColor={zeroRowBgColor} colSpan={6}></Td>
                                 {/*<Td colSpan={2}></Td>*/}
@@ -312,7 +311,7 @@ function PayoutTable(props) {
     }
 
     return (
-        <Table size="sm" width="1100px">
+        <Table size="sm" width="auto">
             <Thead>
                 <Tr>
                     <Th>Bet</Th>

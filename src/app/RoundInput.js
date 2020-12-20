@@ -15,7 +15,7 @@ export default function RoundInput() {
         <NumberInput isDisabled={roundState.currentSelectedRound === null}
                      value={roundState.currentSelectedRound || 1}
                      min={1}
-                     max={roundState.currentRound || 99999}
+                     max={roundState.currentRound}
                      allowMouseWheel
                      width="90px"
                      onChange={(value) => setRoundState({
