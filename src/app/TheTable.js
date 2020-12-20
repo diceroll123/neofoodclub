@@ -378,7 +378,7 @@ function PayoutTable(props) {
         let betAmounts = roundState.betAmounts;
         [bets[index], bets[newIndex]] = [bets[newIndex], bets[index]];
         [betAmounts[index], betAmounts[newIndex]] = [betAmounts[newIndex], betAmounts[index]];
-        setRoundState({bets, betAmounts});
+        setRoundState({bets: {...bets}, betAmounts: {...betAmounts}});
     }
 
     function getMaxBetColor(betNum) {
