@@ -237,7 +237,7 @@ function NormalTable(props) {
                                         )
                                     })}
                                     <Td backgroundColor={zeroRowBgColor}>
-                                        <Button size="xs" onClick={() => {
+                                        <Button size="xs" variant="outline" onClick={() => {
                                             changeBetLine(arenaId, 0)
                                         }}>
                                             {amountOfBets}-Bet
