@@ -92,7 +92,7 @@ function CurrentRoundInfo() {
                     Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
                 </Text>
                 {roundState.roundData.lastChange &&
-                roundState.roundData.lastUpdate !== roundState.roundData.lastChange &&
+                roundState.roundData.start !== roundState.roundData.lastChange &&
                 <Text fontSize="xs">
                     Last Change: <TimeAgo date={roundState.roundData.lastChange}/>
                 </Text>
