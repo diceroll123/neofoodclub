@@ -633,7 +633,7 @@ function PirateTable(props) {
     )
 }
 
-export default function TheTable() {
+export default function TheTable(props) {
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
     let probabilities = {};
@@ -701,7 +701,7 @@ export default function TheTable() {
     }
 
     return (
-        <Box mt={8}>
+        <Box {...props}>
             <PirateTable pirateFAs={pirateFAs}
                          arenaRatios={arenaRatios}
                          probabilities={probabilities}
