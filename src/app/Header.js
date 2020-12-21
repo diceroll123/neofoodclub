@@ -69,7 +69,7 @@ function CurrentRoundInfo() {
                     </CircularProgressLabel>
                 </CircularProgress>
             }
-            <Box textAlign="left">
+            <Box textAlign="left" display={{sm: "none", md: "block"}}>
                 <Text fontSize="xs">
                     Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
                 </Text>
@@ -115,18 +115,22 @@ function HeaderContent() {
         <>
             <Box p={4}>
                 <HStack spacing={5}>
-                    <Heading as="h1" size="lg">
+                    <Heading as="h1" fontSize={{sm: "sm", md: "md", lg: "lg"}}>
                         NeoFoodClub
                     </Heading>
 
-                    <VStack spacing={0}>
-                        <Text fontSize="sm" as="i">
-                            Round:
-                        </Text>
-                        <RoundInput/>
-                    </VStack>
+                    <Box p={2} maxW="lg" borderWidth="1px" borderRadius="md">
+                        <HStack spacing={3}>
+                            <VStack spacing={0}>
+                                <Text fontSize="sm" as="i">
+                                    Round:
+                                </Text>
+                                <RoundInput/>
+                            </VStack>
 
-                    <RoundInfo/>
+                            <RoundInfo/>
+                        </HStack>
+                    </Box>
 
                     <Spacer/>
                     <ColorModeButton/>
