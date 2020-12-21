@@ -28,7 +28,6 @@ import {ArrowUpIcon, ArrowDownIcon, LinkIcon} from "@chakra-ui/icons";
 import React from "react";
 import moment from "moment";
 import RoundContext from "./RoundState";
-import RoundInput from "./RoundInput";
 import {calculateArenaRatios, calculatePayoutTables, computePirateFAs, computeProbabilities} from "./maths";
 import {
     displayAsPercent,
@@ -372,7 +371,6 @@ function BetExtras(props) {
 
 function PayoutTable(props) {
     const {
-        payoutTables,
         betEnabled,
         betExpectedRatios,
         betProbabilities,
@@ -639,13 +637,13 @@ export default function TheTable(props) {
     let probabilities = {};
     let pirateFAs = {};
     let arenaRatios = {};
-    let betEnabled = [];
-    let betOdds = [];
-    let betPayoffs = [];
-    let betProbabilities = [];
-    let betExpectedRatios = [];
-    let betNetExpected = [];
-    let betMaxBets = [];
+    let betEnabled = {};
+    let betOdds = {};
+    let betPayoffs = {};
+    let betProbabilities = {};
+    let betExpectedRatios = {};
+    let betNetExpected = {};
+    let betMaxBets = {};
     let payoutTables = {};
 
     if (roundState.roundData) {
@@ -656,13 +654,15 @@ export default function TheTable(props) {
         // keep the "cache" of bet data up to date
         for (let betIndex = 1; betIndex <= Object.keys(roundState.bets).length; betIndex++) {
             betEnabled[betIndex] = roundState.bets[betIndex].some((x) => x > 0);
-            betOdds[betIndex] = 1;
-            betProbabilities[betIndex] = 1;
+            betOdds[betIndex] = 0;
+            betProbabilities[betIndex] = 0;
 
             for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
                 let pirateIndex = roundState.bets[betIndex][arenaIndex];
-                betOdds[betIndex] *= roundState.roundData.currentOdds[arenaIndex][pirateIndex];
-                betProbabilities[betIndex] *= probabilities.used[arenaIndex][pirateIndex];
+                if (pirateIndex > 0) {
+                    betOdds[betIndex] = (betOdds[betIndex] || 1) * roundState.roundData.currentOdds[arenaIndex][pirateIndex];
+                    betProbabilities[betIndex] = (betProbabilities[betIndex] || 1) * probabilities.used[arenaIndex][pirateIndex];
+                }
             }
             // yes, the for-loop above had to be separate.
             for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
@@ -673,7 +673,7 @@ export default function TheTable(props) {
             }
         }
 
-        payoutTables = calculatePayoutTables(roundState.roundData, probabilities, betOdds, betPayoffs);
+        payoutTables = calculatePayoutTables(roundState, probabilities, betOdds, betPayoffs);
     }
 
     const theme = useTheme();
@@ -714,8 +714,7 @@ export default function TheTable(props) {
             <BetExtras grayAccent={grayAccent}
                        betOdds={betOdds}/>
 
-            <PayoutTable payoutTables={payoutTables}
-                         betEnabled={betEnabled}
+            <PayoutTable betEnabled={betEnabled}
                          betProbabilities={betProbabilities}
                          betExpectedRatios={betExpectedRatios}
                          betNetExpected={betNetExpected}
