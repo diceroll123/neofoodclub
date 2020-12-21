@@ -5,6 +5,7 @@ import 'moment-timezone';
 import TheTable from "./TheTable";
 import {makeBetUrl} from "./util";
 import Header from "./Header";
+import Footer from "./Footer";
 
 export default function HomePage() {
     const {roundState, setRoundState} = React.useContext(RoundContext);
@@ -136,6 +137,8 @@ export default function HomePage() {
             <Header/>
 
             <TheTable p={4} pt="6.5rem"/>
+
+            <Footer mb="3rem"/>
         </>
     )
 }
