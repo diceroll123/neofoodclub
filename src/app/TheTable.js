@@ -129,19 +129,9 @@ function CopyLinkButtons() {
 }
 
 function NormalTable(props) {
-    let {pirateFAs, arenaRatios, probabilities, changeBet, getPirateBgColor, green, red} = props;
+    let {pirateFAs, arenaRatios, probabilities, changeBet, getPirateBgColor, green, red, grayAccent} = props;
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
-
-    let maxBet = getMaxBet(roundState.currentSelectedRound);
-
-    const cookies = new Cookies();
-    const toast = useToast();
-    const theme = useTheme();
-    const zeroRowBgColor = useColorModeValue(
-        theme.colors.gray["100"],
-        theme.colors.gray["700"]
-    );
 
     function changeBetLine(arenaIndex, pirateValue) {
         // change the entire row to pirateValue
@@ -159,14 +149,6 @@ function NormalTable(props) {
             newBets[x] = [0, 0, 0, 0, 0];
         }
         setRoundState({bets: {...newBets}});
-    }
-
-    function setAllBets(value) {
-        let betAmounts = roundState.betAmounts;
-        for (let index in roundState.betAmounts) {
-            betAmounts[index] = value;
-        }
-        setRoundState({betAmounts});
     }
 
     return (
@@ -217,17 +199,17 @@ function NormalTable(props) {
                                         <Skeleton><Box>&nbsp;</Box></Skeleton>
                                     }
                                 </Td>
-                                <Td backgroundColor={zeroRowBgColor} colSpan={6}></Td>
+                                <Td backgroundColor={grayAccent} colSpan={6}></Td>
                                 {/*<Td colSpan={2}></Td>*/}
                                 {/* Td for FA explanation here */}
-                                <Td backgroundColor={zeroRowBgColor} colSpan={2}></Td>
+                                <Td backgroundColor={grayAccent} colSpan={2}></Td>
                                 {/*<Td colSpan={1}></Td>*/}
                                 {/*<Td>showOddsTimeline</Td>*/}
                                 {roundState.roundData !== null ? <>
                                     {[...Array(amountOfBets)].map((bet, betNum) => {
                                         return (
                                             // TODO: Chakra's Radio component does not play well with this atm
-                                            <Td backgroundColor={zeroRowBgColor}>
+                                            <Td backgroundColor={grayAccent}>
                                                 <input type="radio"
                                                        name={"bet" + (betNum + 1) + arenaId}
                                                        value={0}
@@ -236,7 +218,7 @@ function NormalTable(props) {
                                             </Td>
                                         )
                                     })}
-                                    <Td backgroundColor={zeroRowBgColor}>
+                                    <Td backgroundColor={grayAccent}>
                                         <Button size="xs" variant="outline" onClick={() => {
                                             changeBetLine(arenaId, 0)
                                         }}>
@@ -244,7 +226,7 @@ function NormalTable(props) {
                                         </Button>
                                     </Td>
                                 </> : (<>
-                                    <Td colSpan={100} backgroundColor={zeroRowBgColor}>
+                                    <Td colSpan={100} backgroundColor={grayAccent}>
                                         <Skeleton height="24px"><Box>&nbsp;</Box></Skeleton>
                                     </Td>
                                 </>)
@@ -326,54 +308,65 @@ function NormalTable(props) {
                     )
                 })
             }
-            <Tbody>
-                <Tr>
-                    <Td colspan={10} height="10px">
-                        <HStack>
-                            <CopyLinkButtons/>
-                            <Spacer/>
-                            <Text>Round:</Text>
-                            <RoundInput/>
-
-                            <Text>•</Text>
-                            <Text>Max Bet:</Text>
-                            {roundState.roundData === null ?
-                                <Skeleton height="24px" width="80px"><Box>&nbsp;</Box></Skeleton>
-                                :
-                                <BetAmountInput
-                                    defaultValue={maxBet}
-                                    onBlur={(e) => {
-                                        let value = parseInt(e.target.value);
-                                        if (value === maxBet) {
-                                            // don't save over it if it's the same
-                                            return;
-                                        }
-
-                                        if (isNaN(value) || value === 0) {
-                                            value = -1000;
-                                        }
-
-                                        let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
-                                        cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
-
-                                        toast.closeAll();
-                                        toast({
-                                            title: `Max Bet Saved!`,
-                                            status: "success",
-                                            duration: 1200,
-                                            isClosable: true
-                                        });
-                                    }}/>
-                            }
-                            <Text>•</Text>
-                            <Button size="sm" onClick={() => {
-                                setAllBets(getMaxBet(roundState.currentSelectedRound))
-                            }}>Set all</Button>
-                        </HStack>
-                    </Td>
-                </Tr>
-            </Tbody>
         </Table>
+    )
+}
+
+function BetExtras(props) {
+    const {grayAccent, betOdds} = props;
+    const {roundState, setRoundState} = React.useContext(RoundContext);
+    const cookies = new Cookies();
+    const toast = useToast();
+
+    let maxBet = getMaxBet(roundState.currentSelectedRound);
+
+    function setAllBets(value) {
+        let betAmounts = roundState.betAmounts;
+        for (let index in roundState.betAmounts) {
+            betAmounts[index] = Math.min(value, Math.floor(1_000_000 / betOdds[index]) + 1);
+        }
+        setRoundState({betAmounts});
+    }
+
+    return (
+        <Box backgroundColor={grayAccent} mt={4} p={4} maxW="lg" borderWidth="1px" borderRadius="lg">
+            <HStack spacing={4}>
+                <Text>Max Bet:</Text>
+                {roundState.roundData === null ?
+                    <Skeleton height="24px" width="80px"><Box>&nbsp;</Box></Skeleton>
+                    :
+                    <BetAmountInput
+                        defaultValue={maxBet}
+                        onBlur={(e) => {
+                            let value = parseInt(e.target.value);
+                            if (value === maxBet) {
+                                // don't save over it if it's the same
+                                return;
+                            }
+
+                            if (isNaN(value) || value === 0) {
+                                value = -1000;
+                            }
+
+                            let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
+                            cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
+
+                            toast.closeAll();
+                            toast({
+                                title: `Max Bet Saved!`,
+                                status: "success",
+                                duration: 1200,
+                                isClosable: true
+                            });
+                        }}/>
+                }
+                <Button variant="outline" size="sm" onClick={() => {
+                    setAllBets(getMaxBet(roundState.currentSelectedRound))
+                }}>Set all</Button>
+                <Spacer/>
+                <CopyLinkButtons/>
+            </HStack>
+        </Box>
     )
 }
 
@@ -439,7 +432,7 @@ function PayoutTable(props) {
 
     function getMaxBetColor(betNum) {
         let betAmount = roundState.betAmounts[betNum];
-        let div = 1e6 / betOdds[betNum];
+        let div = 1_000_000 / betOdds[betNum];
         if (betAmount > Math.ceil(div)) {
             return orange;
         }
@@ -633,16 +626,10 @@ function PlaceThisBetButton(props) {
 }
 
 function PirateTable(props) {
-    let {pirateFAs, arenaRatios, probabilities, changeBet, getPirateBgColor, green, red} = props;
+    let {...rest} = props;
 
     return (
-        <NormalTable pirateFAs={pirateFAs}
-                     arenaRatios={arenaRatios}
-                     probabilities={probabilities}
-                     changeBet={changeBet}
-                     getPirateBgColor={getPirateBgColor}
-                     green={green}
-                     red={red}/>
+        <NormalTable {...rest}/>
     )
 }
 
@@ -690,7 +677,7 @@ export default function TheTable() {
     }
 
     const theme = useTheme();
-
+    const grayAccent = useColorModeValue(theme.colors.gray["50"], theme.colors.gray["700"]);
     // the dark values are effectively "375"
     const green = useColorModeValue(theme.colors.green["200"], "#50C17F");
     const blue = useColorModeValue(theme.colors.blue["200"], "#4BA0E4");
@@ -721,7 +708,12 @@ export default function TheTable() {
                          changeBet={changeBet}
                          getPirateBgColor={getPirateBgColor}
                          green={green}
-                         red={red}/>
+                         red={red}
+                         grayAccent={grayAccent}/>
+
+            <BetExtras grayAccent={grayAccent}
+                       betOdds={betOdds}/>
+
             <PayoutTable payoutTables={payoutTables}
                          betEnabled={betEnabled}
                          betProbabilities={betProbabilities}
@@ -734,7 +726,8 @@ export default function TheTable() {
                          orange={orange}
                          red={red}
                          yellow={yellow}
-                         green={green}/>
+                         green={green}
+                         grayAccent={grayAccent}/>
         </Box>
     )
 }
