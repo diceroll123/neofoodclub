@@ -631,6 +631,58 @@ function PirateTable(props) {
     )
 }
 
+function PayoutExtras(props) {
+    const {payoutTables, grayAccent} = props;
+
+    if (payoutTables.odds === undefined) {
+        return (<></>)
+    }
+
+    function makeTable(title, data) {
+        let tableRows = Object.keys(data).map(key => {
+            const dataObj = data[key];
+
+            return (
+                <Tr>
+                    <Td isNumeric>{numberWithCommas(dataObj.value)}</Td>
+                    <Td isNumeric>{displayAsPercent(dataObj.probability, 3)}</Td>
+                    <Td isNumeric>{displayAsPercent(dataObj.cumulative, 3)}</Td>
+                    <Td isNumeric>{displayAsPercent(dataObj.tail, 3)}</Td>
+                </Tr>
+            )
+        });
+
+        return (
+            <Table size="sm"
+                   width="auto"
+                   backgroundColor={grayAccent}
+                   style={{
+                       "border-top-left-radius": "0.5rem",
+                       "border-top-right-radius": "0.5rem",
+                   }}>
+                <Thead>
+                    <Tr>
+                        <Th>{title}</Th>
+                        <Th>Probability</Th>
+                        <Th>Cumulative</Th>
+                        <Th>Tail</Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
+                    {tableRows}
+                </Tbody>
+            </Table>
+        )
+    }
+
+    return (
+        <HStack mt={4}>
+            {makeTable("Odds", payoutTables.odds)}
+            {makeTable("Winnings", payoutTables.winnings)}
+        </HStack>
+    )
+}
+
 export default function TheTable(props) {
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
@@ -727,6 +779,9 @@ export default function TheTable(props) {
                          yellow={yellow}
                          green={green}
                          grayAccent={grayAccent}/>
+
+            <PayoutExtras payoutTables={payoutTables}
+                          grayAccent={grayAccent}/>
         </Box>
     )
 }
