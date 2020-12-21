@@ -76,7 +76,7 @@ function CurrentRoundInfo() {
                     </CircularProgressLabel>
                 </CircularProgress>
             }
-            <Box textAlign="left" display={{sm: "none", md: "block"}}>
+            <Box textAlign="left" display={{sm: "none", lg: "block"}}>
                 <Text fontSize="xs">
                     Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
                 </Text>
@@ -179,6 +179,7 @@ function HeaderContent() {
                 <HStack spacing={5}>
                     <TitleHeading/>
 
+                    <Spacer/>
                     <Box p={2} h="4.5rem" maxW="lg" borderWidth="1px" borderRadius="md">
                         <HStack spacing={3} h="100%">
                             <VStack spacing={0}>
