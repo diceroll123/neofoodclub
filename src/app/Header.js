@@ -3,6 +3,7 @@ import {
     chakra,
     CircularProgress,
     CircularProgressLabel,
+    Divider,
     Heading,
     Tooltip,
     HStack,
@@ -13,6 +14,7 @@ import {
     useColorMode,
     useColorModeValue,
     VStack,
+    useToast,
 } from "@chakra-ui/react"
 import Moment from "react-moment";
 import {SunIcon, MoonIcon} from "@chakra-ui/icons"
@@ -22,6 +24,9 @@ import RoundContext from "./RoundState";
 import moment from "moment";
 import TimeAgo from "react-timeago";
 import {useViewportScroll} from "framer-motion";
+import {calculateBaseMaxBet, getMaxBet} from "./util";
+import BetAmountInput from "./BetAmountInput";
+import Cookies from "universal-cookie/es6";
 
 function ColorModeButton() {
     const {colorMode, toggleColorMode} = useColorMode();
@@ -40,12 +45,14 @@ function PreviousRoundInfo() {
     const {roundState} = React.useContext(RoundContext);
 
     return (
-        <Text fontSize="xs">
-            Round ended <Moment format="YYYY-MM-DD hh:mm:ss A"
-                                date={roundState.roundData.lastUpdate || roundState.roundData.timestamp}/>
+        <Text fontSize="xs" display={{sm: "none", md: "block"}}>
+            <VStack>
+                <>Round ended</>
+                <Moment format="YYYY-MM-DD hh:mm:ss A"
+                        date={roundState.roundData.lastUpdate || roundState.roundData.timestamp}/>
+            </VStack>
         </Text>
     )
-
 }
 
 function CurrentRoundInfo() {
@@ -110,17 +117,70 @@ function RoundInfo() {
     )
 }
 
+function MaxBetInput() {
+    const {roundState} = React.useContext(RoundContext);
+    const cookies = new Cookies();
+    const toast = useToast();
+
+    let maxBet = getMaxBet(roundState.currentSelectedRound);
+
+    return (
+        <>
+            {roundState.roundData === null ?
+                <Skeleton height="24px" width="80px"><Box>&nbsp;</Box></Skeleton>
+                :
+                <BetAmountInput
+                    defaultValue={maxBet}
+                    onBlur={(e) => {
+                        let value = parseInt(e.target.value);
+                        if (value === maxBet) {
+                            // don't save over it if it's the same
+                            return;
+                        }
+
+                        if (isNaN(value) || value === 0) {
+                            value = -1000;
+                        }
+
+                        let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
+                        cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
+
+                        toast.closeAll();
+                        toast({
+                            title: `Max Bet Saved!`,
+                            status: "success",
+                            duration: 1200,
+                            isClosable: true
+                        });
+                    }}/>
+            }
+        </>
+    )
+}
+
+function TitleHeading() {
+    return (
+        <>
+            <Heading as="h1" fontSize="lg" display={{base: "none", lg: "block"}}>
+                NeoFoodClub
+            </Heading>
+
+            <Heading as="h1" fontSize="md" display={{base: "block", lg: "none"}}>
+                NFC
+            </Heading>
+        </>
+    )
+}
+
 function HeaderContent() {
     return (
         <>
             <Box p={4}>
                 <HStack spacing={5}>
-                    <Heading as="h1" fontSize={{sm: "sm", md: "md", lg: "lg"}}>
-                        NeoFoodClub
-                    </Heading>
+                    <TitleHeading/>
 
-                    <Box p={2} maxW="lg" borderWidth="1px" borderRadius="md">
-                        <HStack spacing={3}>
+                    <Box p={2} h="4.5rem" maxW="lg" borderWidth="1px" borderRadius="md">
+                        <HStack spacing={3} h="100%">
                             <VStack spacing={0}>
                                 <Text fontSize="sm" as="i">
                                     Round:
@@ -129,6 +189,15 @@ function HeaderContent() {
                             </VStack>
 
                             <RoundInfo/>
+
+                            <Divider orientation="vertical"/>
+
+                            <VStack spacing={0}>
+                                <Text fontSize="sm" as="i">
+                                    Max Bet:
+                                </Text>
+                                <MaxBetInput/>
+                            </VStack>
                         </HStack>
                     </Box>
 

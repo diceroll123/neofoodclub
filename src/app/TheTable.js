@@ -8,11 +8,6 @@ import {
     StatArrow,
     Text,
     HStack,
-    NumberInputField,
-    NumberInputStepper,
-    NumberIncrementStepper,
-    NumberDecrementStepper,
-    NumberInput,
     Table,
     Thead,
     Tbody,
@@ -26,43 +21,21 @@ import {
 } from "@chakra-ui/react";
 import {ArrowUpIcon, ArrowDownIcon, LinkIcon} from "@chakra-ui/icons";
 import React from "react";
-import moment from "moment";
 import RoundContext from "./RoundState";
 import {calculateArenaRatios, calculatePayoutTables, computePirateFAs, computeProbabilities} from "./maths";
 import {
     displayAsPercent,
-    calculateBaseMaxBet,
     numberWithCommas,
     getMaxBet,
     makeBetUrl,
     makeBetAmountsUrl
 } from "./util";
 import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
-import Cookies from "universal-cookie/es6";
+import BetAmountInput from "./BetAmountInput";
 
 function Td(props) {
     const {children, ...rest} = props;
     return <OriginalTd py={1} {...rest}>{children}</OriginalTd>
-}
-
-function BetAmountInput(props) {
-    const {...rest} = props;
-    return (
-        <NumberInput
-            {...rest}
-            onFocus={(e) => e.target.select()}
-            size="sm"
-            min={-1000}
-            max={500000}
-            allowMouseWheel
-            width="80px">
-            <NumberInputField/>
-            <NumberInputStepper width="16px">
-                <NumberIncrementStepper/>
-                <NumberDecrementStepper/>
-            </NumberInputStepper>
-        </NumberInput>
-    )
 }
 
 function CopyLinkButtons() {
@@ -314,10 +287,6 @@ function NormalTable(props) {
 function BetExtras(props) {
     const {grayAccent, betOdds} = props;
     const {roundState, setRoundState} = React.useContext(RoundContext);
-    const cookies = new Cookies();
-    const toast = useToast();
-
-    let maxBet = getMaxBet(roundState.currentSelectedRound);
 
     function setAllBets(value) {
         let betAmounts = roundState.betAmounts;
@@ -330,38 +299,9 @@ function BetExtras(props) {
     return (
         <Box backgroundColor={grayAccent} mt={4} p={4} maxW="lg" borderWidth="1px" borderRadius="lg">
             <HStack spacing={4}>
-                <Text>Max Bet:</Text>
-                {roundState.roundData === null ?
-                    <Skeleton height="24px" width="80px"><Box>&nbsp;</Box></Skeleton>
-                    :
-                    <BetAmountInput
-                        defaultValue={maxBet}
-                        onBlur={(e) => {
-                            let value = parseInt(e.target.value);
-                            if (value === maxBet) {
-                                // don't save over it if it's the same
-                                return;
-                            }
-
-                            if (isNaN(value) || value === 0) {
-                                value = -1000;
-                            }
-
-                            let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
-                            cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
-
-                            toast.closeAll();
-                            toast({
-                                title: `Max Bet Saved!`,
-                                status: "success",
-                                duration: 1200,
-                                isClosable: true
-                            });
-                        }}/>
-                }
                 <Button variant="outline" size="sm" onClick={() => {
                     setAllBets(getMaxBet(roundState.currentSelectedRound))
-                }}>Set all</Button>
+                }}>Set all to max</Button>
                 <Spacer/>
                 <CopyLinkButtons/>
             </HStack>
