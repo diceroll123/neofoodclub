@@ -371,22 +371,6 @@ function NormalTable(props) {
                             }}>Set all</Button>
                         </HStack>
                     </Td>
-                    {[...Array(amountOfBets)].map((e, i) => {
-                        return (<Td>
-                            <BetAmountInput
-                                value={roundState.betAmounts[i + 1]}
-                                onChange={(str, value) => {
-                                    let betAmounts = roundState.betAmounts;
-                                    if (isNaN(value) || value === 0) {
-                                        value = -1000;
-                                    }
-                                    betAmounts[i + 1] = value;
-                                    setRoundState({betAmounts});
-                                }}
-                            />
-                        </Td>)
-                    })}
-                    <Td></Td>
                 </Tr>
             </Tbody>
         </Table>
@@ -528,7 +512,21 @@ function PayoutTable(props) {
                                             </HStack>
                                         </HStack>
                                     </Td>
-                                    <Td isNumeric backgroundColor={baBg}>{numberWithCommas(betAmount)}</Td>
+                                    <Td>
+                                        <BetAmountInput
+                                            value={roundState.betAmounts[betIndex + 1]}
+                                            onChange={(str, value) => {
+                                                let betAmounts = roundState.betAmounts;
+                                                if (isNaN(value) || value === 0) {
+                                                    value = -1000;
+                                                }
+                                                betAmounts[betIndex + 1] = value;
+                                                setRoundState({betAmounts});
+                                            }}
+                                            isInvalid={baBg !== "transparent"}
+                                            errorBorderColor={baBg}
+                                        />
+                                    </Td>
                                     <Td isNumeric>{numberWithCommas(betOdds[betIndex + 1])}:1</Td>
                                     <Td isNumeric>{numberWithCommas(betPayoffs[betIndex + 1])}</Td>
                                     <Td isNumeric>{displayAsPercent(betProbabilities[betIndex + 1], 3)}</Td>
