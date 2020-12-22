@@ -563,11 +563,82 @@ function PlaceThisBetButton(props) {
     )
 }
 
+function DropDownTable(props) {
+    let {changeBet, getPirateBgColor, green} = props;
+    const {roundState, setRoundState} = React.useContext(RoundContext);
+
+    // a special little Td override for this component only
+    const Pd = (props) => (<Td px={1} {...props}>{props.children}</Td>);
+
+    return (
+        <Table size="sm" width="auto">
+            <Thead>
+                <Th>Shipwreck</Th>
+                <Th>Lagoon</Th>
+                <Th>Treasure</Th>
+                <Th>Hidden</Th>
+                <Th>Harpoon</Th>
+                <Th><Button size="xs">Clear</Button></Th>
+            </Thead>
+            <Tbody>
+                <Tr>
+                    {
+                        [...Array(5)].map((_, arenaId) => {
+                            let pirates;
+                            if (roundState.roundData) {
+                                pirates = roundState.roundData.pirates[arenaId];
+                            } else {
+                                pirates = [...Array(4)];
+                            }
+
+                            return (
+                                <Td>
+                                    <Table size="sm" maxW="150px">
+                                        {
+                                            pirates.map((pirateId, pirateIndex) => {
+
+                                                if (roundState.roundData === null) {
+                                                    // big ol skeleton
+                                                    return (
+                                                        <Tr>
+                                                            <Td colSpan={100}>
+                                                                <Skeleton height="24px">&nbsp;</Skeleton>
+                                                            </Td>
+                                                        </Tr>
+                                                    )
+                                                }
+
+                                                let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
+                                                let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
+                                                return (
+                                                    <Tr backgroundColor={getPirateBgColor(opening)}>
+                                                        <Pd>{PIRATE_NAMES[pirateId]}</Pd>
+                                                        <Pd isNumeric>{opening}:1</Pd>
+                                                        <Pd isNumeric>
+                                                            <Text
+                                                                as={current === opening ? "" : "b"}>{current}:1</Text>
+                                                        </Pd>
+                                                    </Tr>
+                                                )
+                                            })
+                                        }
+                                    </Table>
+                                </Td>
+                            )
+                        })
+                    }
+                </Tr>
+            </Tbody>
+        </Table>
+    )
+}
+
 function PirateTable(props) {
     let {...rest} = props;
 
     return (
-        <NormalTable {...rest}/>
+        <DropDownTable {...rest}/>
+        // <NormalTable {...rest}/>
     )
 }
 
