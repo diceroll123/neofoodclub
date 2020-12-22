@@ -52,7 +52,7 @@ function ClearBetsButton() {
     }
 
     return (
-        <Button width="100%" size="xs" onClick={clearBets}>Clear All</Button>
+        <Button width="100%" size="xs" onClick={clearBets}>Clear</Button>
     )
 }
 
@@ -166,9 +166,7 @@ function NormalTable(props) {
                             return <Th>Bet {i + 1}</Th>
                         })
                     }
-                    <Th>
-                        <ClearBetsButton/>
-                    </Th>
+                    <Th><ClearBetsButton/></Th>
                 </Tr>
             </Thead>
             {
@@ -749,10 +747,8 @@ function PayoutExtras(props) {
             <Table size="sm"
                    width="auto"
                    backgroundColor={grayAccent}
-                   style={{
-                       "border-top-left-radius": "0.5rem",
-                       "border-top-right-radius": "0.5rem",
-                   }}>
+                   borderTopLeftRadius="0.5rem"
+                   borderTopRightRadius="0.5rem">
                 <Thead>
                     <Tr>
                         <Th>{title}</Th>
