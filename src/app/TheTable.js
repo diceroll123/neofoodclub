@@ -171,10 +171,10 @@ function NormalTable(props) {
                                         <Skeleton><Box>&nbsp;</Box></Skeleton>
                                     }
                                 </Td>
-                                <Td backgroundColor={grayAccent} colSpan={6}></Td>
+                                <Td backgroundColor={grayAccent} colSpan={6}/>
                                 {/*<Td colSpan={2}></Td>*/}
                                 {/* Td for FA explanation here */}
-                                <Td backgroundColor={grayAccent} colSpan={2}></Td>
+                                <Td backgroundColor={grayAccent} colSpan={2}/>
                                 {/*<Td colSpan={1}></Td>*/}
                                 {/*<Td>showOddsTimeline</Td>*/}
                                 {roundState.roundData !== null ? <>
@@ -508,16 +508,16 @@ function PayoutTable(props) {
                             <Text>{numberWithCommas(totalWinningPayoff)}</Text>
                             }
                         </Th>
-                        <Th></Th>
+                        <Th/>
                         <Th isNumeric>{totalBetExpectedRatios.toFixed(3)}</Th>
                         <Th isNumeric>{totalBetNetExpected.toFixed(2)}</Th>
-                        <Th></Th>
-                        <Th></Th>
-                        <Th></Th>
-                        <Th></Th>
-                        <Th></Th>
-                        <Th></Th>
-                        <Th></Th>
+                        <Th/>
+                        <Th/>
+                        <Th/>
+                        <Th/>
+                        <Th/>
+                        <Th/>
+                        <Th/>
                     </Tr>
                 </Tbody>
             </>}
