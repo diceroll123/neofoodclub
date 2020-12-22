@@ -614,42 +614,45 @@ function DropDownTable(props) {
                             return (
                                 <Pd>
                                     <Table size="sm" maxW="150px">
-                                        {
-                                            pirates.map((pirateId, pirateIndex) => {
+                                        <Tbody>
+                                            {
+                                                pirates.map((pirateId, pirateIndex) => {
 
-                                                if (roundState.roundData === null) {
-                                                    // big ol skeleton
+                                                    if (roundState.roundData === null) {
+                                                        // big ol skeleton
+                                                        return (
+                                                            <Tr>
+                                                                <Pd>
+                                                                    <Skeleton width="150px"
+                                                                              height="24px">&nbsp;</Skeleton>
+                                                                </Pd>
+                                                            </Tr>
+                                                        )
+                                                    }
+
+                                                    let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
+                                                    let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
+
+                                                    let pirateBg = getPirateBgColor(opening);
+                                                    let trBg = "transparent";
+                                                    if (roundState.roundData.winners[arenaId] === pirateIndex + 1) {
+                                                        trBg = green;
+                                                        pirateBg = green;
+                                                    }
+
                                                     return (
-                                                        <Tr>
-                                                            <Pd>
-                                                                <Skeleton width="150px" height="24px">&nbsp;</Skeleton>
+                                                        <Tr backgroundColor={trBg}>
+                                                            <Pd backgroundColor={pirateBg}>{PIRATE_NAMES[pirateId]}</Pd>
+                                                            <Pd isNumeric>{opening}:1</Pd>
+                                                            <Pd isNumeric>
+                                                                <Text
+                                                                    as={current === opening ? "" : "b"}>{current}:1</Text>
                                                             </Pd>
                                                         </Tr>
                                                     )
-                                                }
-
-                                                let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
-                                                let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
-
-                                                let pirateBg = getPirateBgColor(opening);
-                                                let trBg = "transparent";
-                                                if (roundState.roundData.winners[arenaId] === pirateIndex + 1) {
-                                                    trBg = green;
-                                                    pirateBg = green;
-                                                }
-
-                                                return (
-                                                    <Tr backgroundColor={trBg}>
-                                                        <Pd backgroundColor={pirateBg}>{PIRATE_NAMES[pirateId]}</Pd>
-                                                        <Pd isNumeric>{opening}:1</Pd>
-                                                        <Pd isNumeric>
-                                                            <Text
-                                                                as={current === opening ? "" : "b"}>{current}:1</Text>
-                                                        </Pd>
-                                                    </Tr>
-                                                )
-                                            })
-                                        }
+                                                })
+                                            }
+                                        </Tbody>
                                     </Table>
                                 </Pd>
                             )
