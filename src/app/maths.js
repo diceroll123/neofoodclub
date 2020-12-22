@@ -126,7 +126,7 @@ export function calculateArenaRatios(roundData) {
 function tableToList(oddsTable) {
     let oddsList = [];
     for (let odds in oddsTable) {
-        oddsList.push({ value: odds, probability: oddsTable[odds] });
+        oddsList.push({value: odds, probability: oddsTable[odds]});
     }
     oddsList.sort((a, b) => a.value - b.value);
     let cumulative = 0;
@@ -195,6 +195,7 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
         ...
     }
     */
+
     /*
     expandIbObject takes an ibObj and returns an ibObj.
     The returned bet set "res" satisfies the following properties:
@@ -258,6 +259,7 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
         }
         return tableToList(winTable);
     }
+
     // making the ibObjs
     let ibObjOdds = {};
     let ibObjWinnings = {};
@@ -283,6 +285,18 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
     };
 }
 
-export function pirateBinary(arenaIndex, pirateIndex) {
+export function computePirateBinary(arenaIndex, pirateIndex) {
     return 1 << (19 - (pirateIndex - 1 + arenaIndex * 4));
+}
+
+export function computePiratesBinary(piratesArray) {
+    // transform a 5-length list to a bet-shaped binary number to process wins faster
+    let value = 0;
+    for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
+        let pirateIndex = piratesArray[arenaIndex];
+        if (pirateIndex > 0) {
+            value |= computePirateBinary(arenaIndex, pirateIndex)
+        }
+    }
+    return value;
 }

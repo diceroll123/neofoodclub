@@ -97,7 +97,7 @@ function RoundInfo() {
     let data = <Box width="210px">&nbsp;</Box>;
 
     if (roundState.roundData !== null) {
-        if (roundState.roundData.winners.some((x) => x > 0)) {
+        if (roundState.roundData.winners[0] > 0) {
             data = <PreviousRoundInfo/>
         } else {
             data = <CurrentRoundInfo/>

@@ -59,7 +59,7 @@ export default function HomePage() {
                 .then(roundData => {
                     let currentRound = roundState.currentRound;
                     // if winning pirates were just added, increase the in-memory current round
-                    if (currentRound === roundState.currentSelectedRound && roundData.winners.some((x) => x > 0)) {
+                    if (currentRound === roundState.currentSelectedRound && roundData.winners[0] > 0) {
                         currentRound += 1;
                     }
                     setRoundState({roundData, currentRound});

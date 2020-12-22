@@ -28,7 +28,8 @@ import {
     calculatePayoutTables,
     computePirateFAs,
     computeProbabilities,
-    pirateBinary
+    computePirateBinary,
+    computePiratesBinary
 } from "./maths";
 import {
     displayAsPercent,
@@ -44,6 +45,9 @@ function Td(props) {
     const {children, ...rest} = props;
     return <OriginalTd py={1} {...rest}>{children}</OriginalTd>
 }
+
+// A special Td with minimal x-axis padding to cut down on giant tables
+const Pd = (props) => (<Td px={1} {...props}>{props.children}</Td>);
 
 function ClearBetsButton() {
     const {roundState, setRoundState} = React.useContext(RoundContext);
@@ -131,6 +135,7 @@ function NormalTable(props) {
         probabilities,
         changeBet,
         getPirateBgColor,
+        winningBetBinary,
         green,
         red,
         grayAccent
@@ -245,7 +250,8 @@ function NormalTable(props) {
                                 let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
 
                                 let bgColor = "transparent";
-                                if (roundState.roundData.winners[arenaId] === pirateIndex + 1) {
+                                let pirateBin = computePirateBinary(arenaId, pirateIndex + 1);
+                                if ((winningBetBinary & pirateBin) === pirateBin) {
                                     bgColor = green;
                                 }
 
@@ -335,13 +341,13 @@ function BetExtras(props) {
 function PayoutTable(props) {
     const {
         betBinaries,
-        betEnabled,
         betExpectedRatios,
         betProbabilities,
         betNetExpected,
         betOdds,
         betPayoffs,
         betMaxBets,
+        winningBetBinary,
         getPirateBgColor,
         orange,
         red,
@@ -360,28 +366,18 @@ function PayoutTable(props) {
     let betsWon = {};
 
     for (let betIndex in roundState.bets) {
-        if (betEnabled[betIndex]) {
+        let betBinary = betBinaries[betIndex];
+        if (betBinary > 0) {
             totalEnabledBets += 1;
             totalBetAmounts += roundState.betAmounts[betIndex];
             totalBetExpectedRatios += betExpectedRatios[betIndex];
             totalBetNetExpected += betNetExpected[betIndex];
-            if (didBetWin(betIndex)) {
+            if ((winningBetBinary & betBinary) === betBinary) { // bet won
                 betsWon[betIndex] = true;
                 totalWinningOdds += betOdds[betIndex];
                 totalWinningPayoff += betOdds[betIndex] * roundState.betAmounts[betIndex];
             }
         }
-    }
-
-    function didBetWin(betNum) {
-        let returnValue = true;
-        for (let i = 0; i < 5; i++) {
-            let pirateBet = roundState.bets[betNum][i];
-            if (pirateBet !== 0 && pirateBet !== roundState.roundData.winners[i]) {
-                return false;
-            }
-        }
-        return returnValue;
     }
 
     function swapBets(index, newIndex) {
@@ -431,7 +427,7 @@ function PayoutTable(props) {
                     {
                         [...Array(amountOfBets)].map((e, betIndex) => {
 
-                            if (betEnabled[betIndex + 1] === false) {
+                            if (betBinaries[betIndex + 1] === 0) {
                                 return <></>;
                             }
 
@@ -449,7 +445,7 @@ function PayoutTable(props) {
 
                             return (
                                 <Tr>
-                                    <Td backgroundColor={betNumBgColor}>
+                                    <Pd backgroundColor={betNumBgColor}>
                                         <HStack>
                                             <Spacer/>
                                             <Text>{betIndex + 1}</Text>
@@ -466,8 +462,8 @@ function PayoutTable(props) {
                                                             isDisabled={betIndex === amountOfBets - 1}/>
                                             </HStack>
                                         </HStack>
-                                    </Td>
-                                    <Td>
+                                    </Pd>
+                                    <Pd>
                                         <BetAmountInput
                                             value={roundState.betAmounts[betIndex + 1]}
                                             onChange={(str, value) => {
@@ -481,7 +477,7 @@ function PayoutTable(props) {
                                             isInvalid={baBg !== "transparent"}
                                             errorBorderColor={baBg}
                                         />
-                                    </Td>
+                                    </Pd>
                                     <Td isNumeric>{numberWithCommas(betOdds[betIndex + 1])}:1</Td>
                                     <Td isNumeric>{numberWithCommas(betPayoffs[betIndex + 1])}</Td>
                                     <Td isNumeric>{displayAsPercent(betProbabilities[betIndex + 1], 3)}</Td>
@@ -512,7 +508,8 @@ function PayoutTable(props) {
                                                             betNum={betIndex + 1}
                                                             betOdds={betOdds}
                                                             betPayoffs={betPayoffs}
-                                                            betBinaries={betBinaries}/>
+                                                            betBinaries={betBinaries}
+                                                            winningBetBinary={winningBetBinary}/>
                                     </Td>
                                 </Tr>
                             )
@@ -524,12 +521,12 @@ function PayoutTable(props) {
                         <Th isNumeric>Total:</Th>
                         <Th isNumeric>{numberWithCommas(totalBetAmounts)}</Th>
                         <Th isNumeric>
-                            {roundState.roundData.winners.some((x) => x > 0) &&
+                            {winningBetBinary > 0 &&
                             <Text>{numberWithCommas(totalWinningOdds)}:{totalEnabledBets}</Text>
                             }
                         </Th>
                         <Th isNumeric>
-                            {roundState.roundData.winners.some((x) => x > 0) &&
+                            {winningBetBinary > 0 &&
                             <Text>{numberWithCommas(totalWinningPayoff)}</Text>
                             }
                         </Th>
@@ -551,7 +548,7 @@ function PayoutTable(props) {
 }
 
 function PlaceThisBetButton(props) {
-    const {betOdds, betPayoffs, bet, betNum, betBinaries} = props;
+    const {betOdds, betPayoffs, bet, betNum, betBinaries, winningBetBinary} = props;
     const {roundState} = React.useContext(RoundContext);
     const [clicked, setClicked] = useState(false);
 
@@ -559,7 +556,7 @@ function PlaceThisBetButton(props) {
         setClicked(false);
     }, [roundState.bets]);
 
-    if (roundState.roundData.winners.some((x) => x > 0)) {
+    if (winningBetBinary > 0) {
         return <Button size="xs" isDisabled>Round is over!</Button>
     }
 
@@ -601,12 +598,9 @@ function PlaceThisBetButton(props) {
 }
 
 function DropDownTable(props) {
-    let {changeBet, getPirateBgColor, green} = props;
+    let {changeBet, getPirateBgColor, green, winningBetBinary} = props;
     const {roundState} = React.useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
-
-    // a special little Td override for this component only
-    const Pd = (props) => (<Td px={1} {...props}>{props.children}</Td>);
 
     return (
         <Table size="sm" width="auto">
@@ -653,7 +647,8 @@ function DropDownTable(props) {
 
                                                     let pirateBg = getPirateBgColor(opening);
                                                     let trBg = "transparent";
-                                                    if (roundState.roundData.winners[arenaId] === pirateIndex + 1) {
+                                                    let pirateBin = computePirateBinary(arenaId, pirateIndex + 1);
+                                                    if ((winningBetBinary & pirateBin) === pirateBin) {
                                                         trBg = green;
                                                         pirateBg = green;
                                                     }
@@ -798,7 +793,6 @@ export default function TheTable(props) {
     let probabilities = {};
     let pirateFAs = {};
     let arenaRatios = {};
-    let betEnabled = {};
     let betOdds = {};
     let betPayoffs = {};
     let betProbabilities = {};
@@ -807,28 +801,27 @@ export default function TheTable(props) {
     let betMaxBets = {};
     let betBinaries = {};
     let payoutTables = {};
+    let winningBetBinary = 0;
 
     if (roundState.roundData) {
         probabilities = computeProbabilities(roundState.roundData);
         pirateFAs = computePirateFAs(roundState.roundData);
         arenaRatios = calculateArenaRatios(roundState.roundData);
+        winningBetBinary = computePiratesBinary(roundState.roundData.winners);
 
         // keep the "cache" of bet data up to date
         for (let betIndex = 1; betIndex <= Object.keys(roundState.bets).length; betIndex++) {
-            betEnabled[betIndex] = roundState.bets[betIndex].some((x) => x > 0);
+            betBinaries[betIndex] = computePiratesBinary(roundState.bets[betIndex])
             betOdds[betIndex] = 0;
             betProbabilities[betIndex] = 0;
 
-            let betBinary = 0;
             for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
                 let pirateIndex = roundState.bets[betIndex][arenaIndex];
                 if (pirateIndex > 0) {
-                    betBinary |= pirateBinary(arenaIndex, pirateIndex);
                     betOdds[betIndex] = (betOdds[betIndex] || 1) * roundState.roundData.currentOdds[arenaIndex][pirateIndex];
                     betProbabilities[betIndex] = (betProbabilities[betIndex] || 1) * probabilities.used[arenaIndex][pirateIndex];
                 }
             }
-            betBinaries[betIndex] = betBinary;
             // yes, the for-loop above had to be separate.
             for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
                 betPayoffs[betIndex] = Math.min(1_000_000, roundState.betAmounts[betIndex] * betOdds[betIndex]);
@@ -872,6 +865,7 @@ export default function TheTable(props) {
                          probabilities={probabilities}
                          changeBet={changeBet}
                          getPirateBgColor={getPirateBgColor}
+                         winningBetBinary={winningBetBinary}
                          green={green}
                          red={red}
                          grayAccent={grayAccent}/>
@@ -879,14 +873,14 @@ export default function TheTable(props) {
             <BetExtras grayAccent={grayAccent}
                        betOdds={betOdds}/>
 
-            <PayoutTable betEnabled={betEnabled}
-                         betBinaries={betBinaries}
+            <PayoutTable betBinaries={betBinaries}
                          betProbabilities={betProbabilities}
                          betExpectedRatios={betExpectedRatios}
                          betNetExpected={betNetExpected}
                          betOdds={betOdds}
                          betMaxBets={betMaxBets}
                          betPayoffs={betPayoffs}
+                         winningBetBinary={winningBetBinary}
                          getPirateBgColor={getPirateBgColor}
                          orange={orange}
                          red={red}
