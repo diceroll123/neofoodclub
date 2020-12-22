@@ -1,23 +1,24 @@
 import {
-    Skeleton,
-    Spacer,
     Box,
     Button,
     ButtonGroup,
-    IconButton,
-    StatArrow,
-    Text,
     HStack,
+    IconButton,
+    Select,
+    Skeleton,
+    Spacer,
+    StatArrow,
     Table,
-    Thead,
     Tbody,
-    Tr,
-    Th,
     Td as OriginalTd,
-    useTheme,
-    useColorModeValue,
-    useToast,
+    Text,
+    Th,
+    Thead,
+    Tr,
     useClipboard,
+    useColorModeValue,
+    useTheme,
+    useToast,
 } from "@chakra-ui/react";
 import {ArrowUpIcon, ArrowDownIcon, LinkIcon} from "@chakra-ui/icons";
 import React from "react";
@@ -36,6 +37,23 @@ import BetAmountInput from "./BetAmountInput";
 function Td(props) {
     const {children, ...rest} = props;
     return <OriginalTd py={1} {...rest}>{children}</OriginalTd>
+}
+
+function ClearBetsButton() {
+    const {roundState, setRoundState} = React.useContext(RoundContext);
+    const amountOfBets = Object.keys(roundState.bets).length;
+
+    function clearBets() {
+        let newBets = roundState.bets;
+        for (let x = 1; x <= amountOfBets; x++) {
+            newBets[x] = [0, 0, 0, 0, 0];
+        }
+        setRoundState({bets: {...newBets}});
+    }
+
+    return (
+        <Button width="100%" size="xs" onClick={clearBets}>Clear All</Button>
+    )
 }
 
 function CopyLinkButtons() {
@@ -101,7 +119,16 @@ function CopyLinkButtons() {
 }
 
 function NormalTable(props) {
-    let {pirateFAs, arenaRatios, probabilities, changeBet, getPirateBgColor, green, red, grayAccent} = props;
+    let {
+        pirateFAs,
+        arenaRatios,
+        probabilities,
+        changeBet,
+        getPirateBgColor,
+        green,
+        red,
+        grayAccent
+    } = props;
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
 
@@ -113,14 +140,6 @@ function NormalTable(props) {
             newBets[x][arenaIndex] = pirateValue;
         }
         setRoundState({bets: {...newBets}}); // hacky way to force an object to update useEffect
-    }
-
-    function clearBets() {
-        let newBets = roundState.bets;
-        for (let x = 1; x <= amountOfBets; x++) {
-            newBets[x] = [0, 0, 0, 0, 0];
-        }
-        setRoundState({bets: {...newBets}});
     }
 
     return (
@@ -148,7 +167,7 @@ function NormalTable(props) {
                         })
                     }
                     <Th>
-                        <Button width="100%" size="xs" onClick={clearBets}>Clear</Button>
+                        <ClearBetsButton/>
                     </Th>
                 </Tr>
             </Thead>
@@ -565,7 +584,8 @@ function PlaceThisBetButton(props) {
 
 function DropDownTable(props) {
     let {changeBet, getPirateBgColor, green} = props;
-    const {roundState, setRoundState} = React.useContext(RoundContext);
+    const {roundState} = React.useContext(RoundContext);
+    const amountOfBets = Object.keys(roundState.bets).length;
 
     // a special little Td override for this component only
     const Pd = (props) => (<Td px={1} {...props}>{props.children}</Td>);
@@ -578,7 +598,7 @@ function DropDownTable(props) {
                 <Th>Treasure</Th>
                 <Th>Hidden</Th>
                 <Th>Harpoon</Th>
-                <Th><Button size="xs">Clear</Button></Th>
+                <Th><ClearBetsButton/></Th>
             </Thead>
             <Tbody>
                 <Tr>
@@ -592,7 +612,7 @@ function DropDownTable(props) {
                             }
 
                             return (
-                                <Td>
+                                <Pd>
                                     <Table size="sm" maxW="150px">
                                         {
                                             pirates.map((pirateId, pirateIndex) => {
@@ -601,18 +621,26 @@ function DropDownTable(props) {
                                                     // big ol skeleton
                                                     return (
                                                         <Tr>
-                                                            <Td colSpan={100}>
-                                                                <Skeleton height="24px">&nbsp;</Skeleton>
-                                                            </Td>
+                                                            <Pd>
+                                                                <Skeleton width="150px" height="24px">&nbsp;</Skeleton>
+                                                            </Pd>
                                                         </Tr>
                                                     )
                                                 }
 
                                                 let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
                                                 let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
+
+                                                let pirateBg = getPirateBgColor(opening);
+                                                let trBg = "transparent";
+                                                if (roundState.roundData.winners[arenaId] === pirateIndex + 1) {
+                                                    trBg = green;
+                                                    pirateBg = green;
+                                                }
+
                                                 return (
-                                                    <Tr backgroundColor={getPirateBgColor(opening)}>
-                                                        <Pd>{PIRATE_NAMES[pirateId]}</Pd>
+                                                    <Tr backgroundColor={trBg}>
+                                                        <Pd backgroundColor={pirateBg}>{PIRATE_NAMES[pirateId]}</Pd>
                                                         <Pd isNumeric>{opening}:1</Pd>
                                                         <Pd isNumeric>
                                                             <Text
@@ -623,11 +651,62 @@ function DropDownTable(props) {
                                             })
                                         }
                                     </Table>
-                                </Td>
+                                </Pd>
                             )
                         })
                     }
                 </Tr>
+            </Tbody>
+            <Tbody>
+                {
+                    [...Array(amountOfBets)].map((bet, betNum) => {
+                        return (
+                            <Tr>
+                                {
+                                    [...Array(5)].map((_, arenaId) => {
+                                        if (roundState.roundData === null) {
+                                            return (
+                                                <Pd>
+                                                    <Skeleton height="24px"><Box>&nbsp;</Box></Skeleton>
+                                                </Pd>
+                                            )
+                                        }
+                                        let pirates = roundState.roundData.pirates[arenaId];
+                                        let pirateIndex = roundState.bets[betNum + 1][arenaId];
+                                        let opening = roundState.roundData.openingOdds[arenaId][pirateIndex];
+
+                                        let pirateBg = "transparent";
+
+                                        if (opening > 1) {
+                                            pirateBg = getPirateBgColor(opening);
+                                        }
+
+                                        return (
+                                            <Pd>
+                                                <Select size="sm"
+                                                        height="1.5rem"
+                                                        backgroundColor={pirateBg}
+                                                        value={pirateIndex}
+                                                        onChange={(e) => changeBet(betNum + 1, arenaId, e.target.value)}>
+                                                    <option value="0"/>
+                                                    {
+                                                        pirates.map((pirateId, pirateIndex) => {
+                                                            return (
+                                                                <option
+                                                                    style={{"background": getPirateBgColor(roundState.roundData.openingOdds[arenaId][pirateIndex + 1])}}
+                                                                    value={pirateIndex + 1}>{PIRATE_NAMES[pirateId]}</option>
+                                                            )
+                                                        })
+                                                    }
+                                                </Select>
+                                            </Pd>
+                                        )
+                                    })
+                                }
+                            </Tr>
+                        )
+                    })
+                }
             </Tbody>
         </Table>
     )
@@ -756,10 +835,10 @@ export default function TheTable(props) {
         return green;
     }
 
-    function changeBet(betIndex, arenaIndex, pirateValue) {
+    function changeBet(betIndex, arenaIndex, pirateIndex) {
         // change a single pirate in a single arena
         let newBets = roundState.bets;
-        newBets[betIndex][arenaIndex] = pirateValue;
+        newBets[betIndex][arenaIndex] = pirateIndex;
         setRoundState({bets: {...newBets}}); // hacky way to force an object to update useEffect
     }
 
