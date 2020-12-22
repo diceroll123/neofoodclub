@@ -23,7 +23,13 @@ import {
 import {ArrowUpIcon, ArrowDownIcon, LinkIcon} from "@chakra-ui/icons";
 import React, {useEffect, useState} from "react";
 import RoundContext from "./RoundState";
-import {calculateArenaRatios, calculatePayoutTables, computePirateFAs, computeProbabilities} from "./maths";
+import {
+    calculateArenaRatios,
+    calculatePayoutTables,
+    computePirateFAs,
+    computeProbabilities,
+    pirateBinary
+} from "./maths";
 import {
     displayAsPercent,
     numberWithCommas,
@@ -328,6 +334,7 @@ function BetExtras(props) {
 
 function PayoutTable(props) {
     const {
+        betBinaries,
         betEnabled,
         betExpectedRatios,
         betProbabilities,
@@ -504,7 +511,8 @@ function PayoutTable(props) {
                                         <PlaceThisBetButton bet={roundState.bets[betIndex + 1]}
                                                             betNum={betIndex + 1}
                                                             betOdds={betOdds}
-                                                            betPayoffs={betPayoffs}/>
+                                                            betPayoffs={betPayoffs}
+                                                            betBinaries={betBinaries}/>
                                     </Td>
                                 </Tr>
                             )
@@ -543,7 +551,7 @@ function PayoutTable(props) {
 }
 
 function PlaceThisBetButton(props) {
-    const {betOdds, betPayoffs, bet, betNum} = props;
+    const {betOdds, betPayoffs, bet, betNum, betBinaries} = props;
     const {roundState} = React.useContext(RoundContext);
     const [clicked, setClicked] = useState(false);
 
@@ -557,6 +565,10 @@ function PlaceThisBetButton(props) {
 
     if (roundState.betAmounts[betNum] < 50) {
         return <Button size="xs" isDisabled>Invalid bet amount!</Button>
+    }
+
+    if (Object.values(betBinaries).filter((b) => b === betBinaries[betNum]).length > 1) {
+        return <Button size="xs" isDisabled>Duplicate bet!</Button>
     }
 
     function generate_bet_link(bet, betNum) {
@@ -793,6 +805,7 @@ export default function TheTable(props) {
     let betExpectedRatios = {};
     let betNetExpected = {};
     let betMaxBets = {};
+    let betBinaries = {};
     let payoutTables = {};
 
     if (roundState.roundData) {
@@ -806,13 +819,16 @@ export default function TheTable(props) {
             betOdds[betIndex] = 0;
             betProbabilities[betIndex] = 0;
 
+            let betBinary = 0;
             for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
                 let pirateIndex = roundState.bets[betIndex][arenaIndex];
                 if (pirateIndex > 0) {
+                    betBinary |= pirateBinary(arenaIndex, pirateIndex);
                     betOdds[betIndex] = (betOdds[betIndex] || 1) * roundState.roundData.currentOdds[arenaIndex][pirateIndex];
                     betProbabilities[betIndex] = (betProbabilities[betIndex] || 1) * probabilities.used[arenaIndex][pirateIndex];
                 }
             }
+            betBinaries[betIndex] = betBinary;
             // yes, the for-loop above had to be separate.
             for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
                 betPayoffs[betIndex] = Math.min(1_000_000, roundState.betAmounts[betIndex] * betOdds[betIndex]);
@@ -864,6 +880,7 @@ export default function TheTable(props) {
                        betOdds={betOdds}/>
 
             <PayoutTable betEnabled={betEnabled}
+                         betBinaries={betBinaries}
                          betProbabilities={betProbabilities}
                          betExpectedRatios={betExpectedRatios}
                          betNetExpected={betNetExpected}

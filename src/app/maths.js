@@ -282,3 +282,7 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
         winnings: winTblWinnings
     };
 }
+
+export function pirateBinary(arenaIndex, pirateIndex) {
+    return 1 << (19 - (pirateIndex - 1 + arenaIndex * 4));
+}
