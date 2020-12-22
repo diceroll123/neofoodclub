@@ -690,7 +690,7 @@ function DropDownTable(props) {
                                                         height="1.5rem"
                                                         backgroundColor={pirateBg}
                                                         value={pirateIndex}
-                                                        onChange={(e) => changeBet(betNum + 1, arenaId, e.target.value)}>
+                                                        onChange={(e) => changeBet(betNum + 1, arenaId, parseInt(e.target.value))}>
                                                     <option value="0"/>
                                                     {
                                                         pirates.map((pirateId, pirateIndex) => {
