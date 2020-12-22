@@ -21,7 +21,7 @@ import {
     useToast,
 } from "@chakra-ui/react";
 import {ArrowUpIcon, ArrowDownIcon, LinkIcon} from "@chakra-ui/icons";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import RoundContext from "./RoundState";
 import {calculateArenaRatios, calculatePayoutTables, computePirateFAs, computeProbabilities} from "./maths";
 import {
@@ -545,6 +545,11 @@ function PayoutTable(props) {
 function PlaceThisBetButton(props) {
     const {betOdds, betPayoffs, bet, betNum} = props;
     const {roundState} = React.useContext(RoundContext);
+    const [clicked, setClicked] = useState(false);
+
+    useEffect(() => {
+        setClicked(false);
+    }, [roundState.bets]);
 
     if (roundState.roundData.winners.some((x) => x > 0)) {
         return <Button size="xs" isDisabled>Round is over!</Button>
@@ -574,8 +579,11 @@ function PlaceThisBetButton(props) {
     }
 
     return (
-        <Button size="xs" onClick={() => generate_bet_link(bet, betNum)}>
-            Place this bet!
+        <Button size="xs" isDisabled={clicked} onClick={() => {
+            generate_bet_link(bet, betNum);
+            setClicked(true);
+        }}>
+            {clicked ? "Bet placed!" : "Place this bet!"}
         </Button>
     )
 }
