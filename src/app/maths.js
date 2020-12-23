@@ -154,20 +154,12 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
     */
 
     // arIb[i] will accept pirates from arena i and only them. arIb[4] == 1111, arIb[3] == 11110000, etc...
-    let arIb = [];
+    let arIb = [15 << 16, 15 << 12, 15 << 8, 15 << 4, 15];
     // allIb will accept all pirates. allIb = 11111111111111111111 (should be 20 '1's)
-    let allIb = 0;
+    let allIb = (1 << 20) - 1;
     // pirIb[i] will accept pirates of index i (from 0 to 3) pirIb[0] = 10001000100010001000, pirIb[1] = 01000100010001000100, pirIb[2] = 00100010001000100010, pirIb[3] = 00010001000100010001
-    let pirIb = [0, 0, 0, 0];
-    // this computes the 3 previous variables.
-    for (let i = 0; i < 5; i++) {
-        let ar = 15 << ((4 - i) * 4);
-        arIb.push(ar);
-        allIb |= ar;
-        for (let j = 0; j < 4; j++) {
-            pirIb[j] |= 1 << ((4 - i) * 4 + (3 - j));
-        }
-    }
+    let pirIb = [69905 << 3, 69905 << 2, 69905 << 1, 69905];
+
     // this will allow an easier conversion from the old bet format to the new
     let convrtPirIb = [allIb].concat(pirIb);
 
