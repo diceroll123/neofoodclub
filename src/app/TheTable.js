@@ -2,6 +2,7 @@ import {
     Box,
     Button,
     ButtonGroup,
+    Flex,
     HStack,
     IconButton,
     Select,
@@ -326,15 +327,14 @@ function BetExtras(props) {
     }
 
     return (
-        <Box backgroundColor={grayAccent} mt={4} p={4} maxW="lg" borderWidth="1px" borderRadius="lg">
-            <HStack spacing={4}>
-                <Button variant="outline" size="sm" onClick={() => {
-                    setAllBets(getMaxBet(roundState.currentSelectedRound))
-                }}>Set all to max</Button>
-                <Spacer/>
-                <CopyLinkButtons/>
-            </HStack>
-        </Box>
+        <Flex w="100%" h="100%" px="6" align="center" justify="space-between" mt={4} p={4} backgroundColor={grayAccent}
+              borderWidth="1px">
+            <Button variant="outline" size="sm" onClick={() => {
+                setAllBets(getMaxBet(roundState.currentSelectedRound))
+            }}>Set all to max</Button>
+            <Spacer/>
+            <CopyLinkButtons/>
+        </Flex>
     )
 }
 
@@ -546,6 +546,9 @@ function PayoutTable(props) {
         </Table>
     )
 }
+
+const HorizontalScrollingBox = (props) => (
+    <Box style={{"overflow-x": "auto"}} pb={2} {...props}>{props.children}</Box>);
 
 function PlaceThisBetButton(props) {
     const {betOdds, betPayoffs, bet, betNum, betBinaries, winningBetBinary} = props;
@@ -859,37 +862,43 @@ export default function TheTable(props) {
     }
 
     return (
-        <Box {...props}>
-            <PirateTable pirateFAs={pirateFAs}
-                         arenaRatios={arenaRatios}
-                         probabilities={probabilities}
-                         changeBet={changeBet}
-                         getPirateBgColor={getPirateBgColor}
-                         winningBetBinary={winningBetBinary}
-                         green={green}
-                         red={red}
-                         grayAccent={grayAccent}/>
+        <Box {...props} m={4}>
+            <HorizontalScrollingBox>
+                <PirateTable pirateFAs={pirateFAs}
+                             arenaRatios={arenaRatios}
+                             probabilities={probabilities}
+                             changeBet={changeBet}
+                             getPirateBgColor={getPirateBgColor}
+                             winningBetBinary={winningBetBinary}
+                             green={green}
+                             red={red}
+                             grayAccent={grayAccent}/>
+            </HorizontalScrollingBox>
 
             <BetExtras grayAccent={grayAccent}
                        betOdds={betOdds}/>
 
-            <PayoutTable betBinaries={betBinaries}
-                         betProbabilities={betProbabilities}
-                         betExpectedRatios={betExpectedRatios}
-                         betNetExpected={betNetExpected}
-                         betOdds={betOdds}
-                         betMaxBets={betMaxBets}
-                         betPayoffs={betPayoffs}
-                         winningBetBinary={winningBetBinary}
-                         getPirateBgColor={getPirateBgColor}
-                         orange={orange}
-                         red={red}
-                         yellow={yellow}
-                         green={green}
-                         grayAccent={grayAccent}/>
+            <HorizontalScrollingBox>
+                <PayoutTable betBinaries={betBinaries}
+                             betProbabilities={betProbabilities}
+                             betExpectedRatios={betExpectedRatios}
+                             betNetExpected={betNetExpected}
+                             betOdds={betOdds}
+                             betMaxBets={betMaxBets}
+                             betPayoffs={betPayoffs}
+                             winningBetBinary={winningBetBinary}
+                             getPirateBgColor={getPirateBgColor}
+                             orange={orange}
+                             red={red}
+                             yellow={yellow}
+                             green={green}
+                             grayAccent={grayAccent}/>
+            </HorizontalScrollingBox>
 
-            <PayoutExtras payoutTables={payoutTables}
-                          grayAccent={grayAccent}/>
+            <HorizontalScrollingBox>
+                <PayoutExtras payoutTables={payoutTables}
+                              grayAccent={grayAccent}/>
+            </HorizontalScrollingBox>
         </Box>
     )
 }

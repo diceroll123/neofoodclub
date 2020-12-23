@@ -136,7 +136,7 @@ export default function HomePage() {
         <>
             <Header/>
 
-            <TheTable p={4} pt="6.5rem"/>
+            <TheTable pt="5.5rem"/>
 
             <Footer mb="3rem"/>
         </>

@@ -1,5 +1,6 @@
 import {
     Box,
+    Flex,
     chakra,
     CircularProgress,
     CircularProgressLabel,
@@ -76,7 +77,7 @@ function CurrentRoundInfo() {
                     </CircularProgressLabel>
                 </CircularProgress>
             }
-            <Box textAlign="left" display={{sm: "none", lg: "block"}}>
+            <Box textAlign="left">
                 <Text fontSize="xs">
                     Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
                 </Text>
@@ -105,8 +106,8 @@ function RoundInfo() {
     }
 
     return (
-        <Skeleton
-            isLoaded={roundState.roundData !== null}>
+        <Skeleton display={{base: "none", md: "block"}}
+                  isLoaded={roundState.roundData !== null}>
             {/*TODO: SkeletonText does not fade in, so don't use that until #2800 is fixed*/}
             {/*<SkeletonText noOfLines={3}*/}
             {/*              spacing="1"*/}
@@ -165,7 +166,7 @@ function TitleHeading() {
                 NeoFoodClub
             </Heading>
 
-            <Heading as="h1" fontSize="md" display={{base: "block", lg: "none"}}>
+            <Heading as="h1" fontSize="sm" display={{base: "block", lg: "none"}}>
                 NFC
             </Heading>
         </>
@@ -175,37 +176,35 @@ function TitleHeading() {
 function HeaderContent() {
     return (
         <>
-            <Box p={4}>
-                <HStack spacing={5}>
-                    <TitleHeading/>
+            <Flex w="100%" h="100%" p={4} align="center">
+                <TitleHeading/>
 
-                    <Spacer/>
-                    <Box p={2} h="4.5rem" maxW="lg" borderWidth="1px" borderRadius="md">
-                        <HStack spacing={3} h="100%">
-                            <VStack spacing={0}>
-                                <Text fontSize="sm" as="i">
-                                    Round:
-                                </Text>
-                                <RoundInput/>
-                            </VStack>
+                <Spacer/>
+                <Box p={2} h="4.5rem" maxW="lg" borderWidth="1px" borderRadius="md">
+                    <HStack spacing={3} h="100%">
+                        <VStack spacing={0}>
+                            <Text fontSize="sm" as="i">
+                                Round:
+                            </Text>
+                            <RoundInput/>
+                        </VStack>
 
-                            <RoundInfo/>
+                        <RoundInfo/>
 
-                            <Divider orientation="vertical"/>
+                        <Divider orientation="vertical"/>
 
-                            <VStack spacing={0}>
-                                <Text fontSize="sm" as="i">
-                                    Max Bet:
-                                </Text>
-                                <MaxBetInput/>
-                            </VStack>
-                        </HStack>
-                    </Box>
+                        <VStack spacing={0}>
+                            <Text fontSize="sm" as="i">
+                                Max Bet:
+                            </Text>
+                            <MaxBetInput/>
+                        </VStack>
+                    </HStack>
+                </Box>
 
-                    <Spacer/>
-                    <ColorModeButton/>
-                </HStack>
-            </Box>
+                <Spacer/>
+                <ColorModeButton/>
+            </Flex>
         </>
     )
 }
@@ -214,10 +213,10 @@ function Header(props) {
     const bg = useColorModeValue("white", "gray.800");
     const [y, setY] = React.useState(0);
 
-    const {scrollY} = useViewportScroll()
+    const {scrollY} = useViewportScroll();
     React.useEffect(() => {
-        return scrollY.onChange(() => setY(scrollY.get()))
-    }, [scrollY])
+        return scrollY.onChange(() => setY(scrollY.get()));
+    }, [scrollY]);
 
     return (
         <chakra.header
