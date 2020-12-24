@@ -1,7 +1,7 @@
 import React from "react"
 import RoundContext from "./RoundState"
 import HomePage from "./HomePage";
-import {parseBetUrl, reducer} from "./util"
+import {getTableMode, parseBetUrl, reducer} from "./util"
 
 
 function App() {
@@ -13,6 +13,7 @@ function App() {
         currentSelectedRound: initialState.round,
         bets: initialState.bets,
         betAmounts: initialState.betAmounts,
+        tableMode: getTableMode(),
     });
 
     return (

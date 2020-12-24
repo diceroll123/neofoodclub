@@ -141,3 +141,13 @@ export function getMaxBet(currentSelectedRound) {
     }
     return calculateMaxBet(parseInt(maxBet), currentSelectedRound);
 }
+
+export function getTableMode() {
+    const validModes = ["normal", "dropdown"]; // TODO: Add custom mode
+    const cookies = new Cookies();
+    let mode = cookies.get("tableMode");
+    if (validModes.includes(mode) === false) {
+        mode = "normal";
+    }
+    return mode;
+}

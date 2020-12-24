@@ -9,6 +9,9 @@ import {
     Skeleton,
     Spacer,
     StatArrow,
+    RadioGroup,
+    Stack,
+    Radio,
     Table,
     Tbody,
     Td as OriginalTd,
@@ -37,10 +40,12 @@ import {
     numberWithCommas,
     getMaxBet,
     makeBetUrl,
-    makeBetAmountsUrl
+    makeBetAmountsUrl,
+    getTableMode
 } from "./util";
 import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
 import BetAmountInput from "./BetAmountInput";
+import Cookies from "universal-cookie/es6";
 
 const Td = (props) => (<OriginalTd py={1} {...props}>{props.children}</OriginalTd>);
 
@@ -324,7 +329,7 @@ const BetExtras = (props) => {
     }
 
     return (
-        <SettingsBox {...rest}>
+        <SettingsBox mt={4} {...rest}>
             <Button variant="outline" size="sm" onClick={() => {
                 setAllBets(getMaxBet(roundState.currentSelectedRound))
             }}>Set all to max</Button>
@@ -335,14 +340,14 @@ const BetExtras = (props) => {
 }
 
 const SettingsBox = (props) => {
-    const {grayAccent, children, ...rest} = props;
+    const {background, children, ...rest} = props;
     return (
         <Flex align="center"
               justify="space-between"
               mx={4}
               mb={4}
               p={4}
-              backgroundColor={grayAccent}
+              backgroundColor={background}
               borderWidth="1px"
               {...rest}>
             {children}
@@ -745,10 +750,13 @@ const DropDownTable = (props) => {
 }
 
 const PirateTable = (props) => {
-    return (
-        <DropDownTable {...props}/>
-        // <NormalTable {...props}/>
-    )
+    const {roundState} = React.useContext(RoundContext);
+
+    if (roundState.tableMode === "dropdown") {
+        return <DropDownTable {...props}/>;
+    }
+
+    return <NormalTable {...props}/>
 }
 
 const PayoutExtras = (props) => {
@@ -799,6 +807,45 @@ const PayoutExtras = (props) => {
             {makeTable("Winnings", payoutTables.winnings)}
         </HStack>
     )
+}
+
+const TableModes = () => {
+    const {setRoundState} = React.useContext(RoundContext);
+    const cookies = new Cookies();
+    const [value, setValue] = useState(getTableMode());
+
+    return (
+        <RadioGroup onChange={(v) => {
+            setValue(v);
+            cookies.set("tableMode", v);
+            setRoundState({tableMode: v});
+        }} value={value}>
+            <Stack>
+                <Radio value="normal">Normal Mode</Radio>
+                <Radio isDisabled>Custom mode</Radio>
+                <Radio value="dropdown">Dropdown Mode</Radio>
+            </Stack>
+        </RadioGroup>
+    )
+}
+
+const TableExtras = (props) => {
+    const theme = useTheme();
+    const defaultBgColor = useColorModeValue(theme.colors.white, theme.colors.gray["800"]);
+
+    const ExtraBox = (props) => {
+        return (
+            <Box p={2} borderWidth="1px" borderRadius="md" backgroundColor={defaultBgColor}>{props.children}</Box>
+        )
+    }
+
+    return (
+        <SettingsBox {...props}>
+            <ExtraBox>
+                <TableModes/>
+            </ExtraBox>
+        </SettingsBox>
+    );
 }
 
 export default function TheTable(props) {
@@ -874,6 +921,8 @@ export default function TheTable(props) {
 
     return (
         <Box {...props}>
+            <TableExtras background={grayAccent}/>
+
             <HorizontalScrollingBox>
                 <PirateTable m={4}
                              pirateFAs={pirateFAs}
@@ -887,7 +936,7 @@ export default function TheTable(props) {
                              grayAccent={grayAccent}/>
             </HorizontalScrollingBox>
 
-            <BetExtras grayAccent={grayAccent}
+            <BetExtras background={grayAccent}
                        betOdds={betOdds}/>
 
             <HorizontalScrollingBox>
