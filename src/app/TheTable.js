@@ -42,15 +42,12 @@ import {
 import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
 import BetAmountInput from "./BetAmountInput";
 
-function Td(props) {
-    const {children, ...rest} = props;
-    return <OriginalTd py={1} {...rest}>{children}</OriginalTd>
-}
+const Td = (props) => (<OriginalTd py={1} {...props}>{props.children}</OriginalTd>);
 
 // A special Td with minimal x-axis padding to cut down on giant tables
 const Pd = (props) => (<Td px={1} {...props}>{props.children}</Td>);
 
-function ClearBetsButton() {
+const ClearBetsButton = () => {
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
 
@@ -67,7 +64,7 @@ function ClearBetsButton() {
     )
 }
 
-function CopyLinkButtons() {
+const CopyLinkButtons = () => {
     const toast = useToast();
     const {roundState} = React.useContext(RoundContext);
 
@@ -129,7 +126,7 @@ function CopyLinkButtons() {
     )
 }
 
-function NormalTable(props) {
+const NormalTable = (props) => {
     let {
         pirateFAs,
         arenaRatios,
@@ -314,8 +311,8 @@ function NormalTable(props) {
     )
 }
 
-function BetExtras(props) {
-    const {grayAccent, betOdds} = props;
+const BetExtras = (props) => {
+    const {betOdds, ...rest} = props;
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
     function setAllBets(value) {
@@ -327,18 +324,33 @@ function BetExtras(props) {
     }
 
     return (
-        <Flex w="100%" h="100%" px="6" align="center" justify="space-between" mt={4} p={4} backgroundColor={grayAccent}
-              borderWidth="1px">
+        <SettingsBox {...rest}>
             <Button variant="outline" size="sm" onClick={() => {
                 setAllBets(getMaxBet(roundState.currentSelectedRound))
             }}>Set all to max</Button>
             <Spacer/>
             <CopyLinkButtons/>
+        </SettingsBox>
+    )
+}
+
+const SettingsBox = (props) => {
+    const {grayAccent, children, ...rest} = props;
+    return (
+        <Flex align="center"
+              justify="space-between"
+              mx={4}
+              mb={4}
+              p={4}
+              backgroundColor={grayAccent}
+              borderWidth="1px"
+              {...rest}>
+            {children}
         </Flex>
     )
 }
 
-function PayoutTable(props) {
+const PayoutTable = (props) => {
     const {
         betBinaries,
         betExpectedRatios,
@@ -352,7 +364,8 @@ function PayoutTable(props) {
         orange,
         red,
         green,
-        yellow
+        yellow,
+        ...rest
     } = props;
 
     const {roundState, setRoundState} = React.useContext(RoundContext);
@@ -401,7 +414,7 @@ function PayoutTable(props) {
     }
 
     return (
-        <Table size="sm" width="auto" mt={4}>
+        <Table size="sm" width="auto" {...rest}>
             <Thead>
                 <Tr>
                     <Th>Bet</Th>
@@ -547,10 +560,9 @@ function PayoutTable(props) {
     )
 }
 
-const HorizontalScrollingBox = (props) => (
-    <Box style={{"overflow-x": "auto"}} pb={2} {...props}>{props.children}</Box>);
+const HorizontalScrollingBox = (props) => (<Box style={{"overflow-x": "auto"}} {...props}>{props.children}</Box>);
 
-function PlaceThisBetButton(props) {
+const PlaceThisBetButton = (props) => {
     const {betOdds, betPayoffs, bet, betNum, betBinaries, winningBetBinary} = props;
     const {roundState} = React.useContext(RoundContext);
     const [clicked, setClicked] = useState(false);
@@ -600,13 +612,13 @@ function PlaceThisBetButton(props) {
     )
 }
 
-function DropDownTable(props) {
-    let {changeBet, getPirateBgColor, green, winningBetBinary} = props;
+const DropDownTable = (props) => {
+    let {changeBet, getPirateBgColor, green, winningBetBinary, ...rest} = props;
     const {roundState} = React.useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
 
     return (
-        <Table size="sm" width="auto">
+        <Table size="sm" width="auto" {...rest}>
             <Thead>
                 <Th>Shipwreck</Th>
                 <Th>Lagoon</Th>
@@ -658,7 +670,8 @@ function DropDownTable(props) {
 
                                                     return (
                                                         <Tr backgroundColor={trBg}>
-                                                            <Pd backgroundColor={pirateBg}>{PIRATE_NAMES[pirateId]}</Pd>
+                                                            <Pd style={{"white-space": "nowrap"}}
+                                                                backgroundColor={pirateBg}>{PIRATE_NAMES[pirateId]}</Pd>
                                                             <Pd isNumeric>{opening}:1</Pd>
                                                             <Pd isNumeric>
                                                                 <Text
@@ -731,16 +744,14 @@ function DropDownTable(props) {
     )
 }
 
-function PirateTable(props) {
-    let {...rest} = props;
-
+const PirateTable = (props) => {
     return (
-        <DropDownTable {...rest}/>
-        // <NormalTable {...rest}/>
+        <DropDownTable {...props}/>
+        // <NormalTable {...props}/>
     )
 }
 
-function PayoutExtras(props) {
+const PayoutExtras = (props) => {
     const {payoutTables, grayAccent} = props;
 
     if (payoutTables.odds === undefined) {
@@ -783,7 +794,7 @@ function PayoutExtras(props) {
     }
 
     return (
-        <HStack mt={4}>
+        <HStack m={4}>
             {makeTable("Odds", payoutTables.odds)}
             {makeTable("Winnings", payoutTables.winnings)}
         </HStack>
@@ -862,9 +873,10 @@ export default function TheTable(props) {
     }
 
     return (
-        <Box {...props} m={4}>
+        <Box {...props}>
             <HorizontalScrollingBox>
-                <PirateTable pirateFAs={pirateFAs}
+                <PirateTable m={4}
+                             pirateFAs={pirateFAs}
                              arenaRatios={arenaRatios}
                              probabilities={probabilities}
                              changeBet={changeBet}
@@ -879,20 +891,21 @@ export default function TheTable(props) {
                        betOdds={betOdds}/>
 
             <HorizontalScrollingBox>
-                <PayoutTable betBinaries={betBinaries}
-                             betProbabilities={betProbabilities}
-                             betExpectedRatios={betExpectedRatios}
-                             betNetExpected={betNetExpected}
-                             betOdds={betOdds}
-                             betMaxBets={betMaxBets}
-                             betPayoffs={betPayoffs}
-                             winningBetBinary={winningBetBinary}
-                             getPirateBgColor={getPirateBgColor}
-                             orange={orange}
-                             red={red}
-                             yellow={yellow}
-                             green={green}
-                             grayAccent={grayAccent}/>
+                <PayoutTable
+                    betBinaries={betBinaries}
+                    betProbabilities={betProbabilities}
+                    betExpectedRatios={betExpectedRatios}
+                    betNetExpected={betNetExpected}
+                    betOdds={betOdds}
+                    betMaxBets={betMaxBets}
+                    betPayoffs={betPayoffs}
+                    winningBetBinary={winningBetBinary}
+                    getPirateBgColor={getPirateBgColor}
+                    orange={orange}
+                    red={red}
+                    yellow={yellow}
+                    green={green}
+                    grayAccent={grayAccent}/>
             </HorizontalScrollingBox>
 
             <HorizontalScrollingBox>
