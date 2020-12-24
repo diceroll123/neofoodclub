@@ -143,6 +143,8 @@ function MaxBetInput() {
                             value = -1000;
                         }
 
+                        maxBet = value;
+
                         let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
                         cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
 
