@@ -565,7 +565,7 @@ const PayoutTable = (props) => {
     )
 }
 
-const HorizontalScrollingBox = (props) => (<Box style={{"overflow-x": "auto"}} {...props}>{props.children}</Box>);
+const HorizontalScrollingBox = (props) => (<Box overflowX="auto" {...props}>{props.children}</Box>);
 
 const PlaceThisBetButton = (props) => {
     const {betOdds, betPayoffs, bet, betNum, betBinaries, winningBetBinary} = props;
@@ -625,12 +625,14 @@ const DropDownTable = (props) => {
     return (
         <Table size="sm" width="auto" {...rest}>
             <Thead>
-                <Th>Shipwreck</Th>
-                <Th>Lagoon</Th>
-                <Th>Treasure</Th>
-                <Th>Hidden</Th>
-                <Th>Harpoon</Th>
-                <Th><ClearBetsButton/></Th>
+                <Tr>
+                    <Th>Shipwreck</Th>
+                    <Th>Lagoon</Th>
+                    <Th>Treasure</Th>
+                    <Th>Hidden</Th>
+                    <Th>Harpoon</Th>
+                    <Th><ClearBetsButton/></Th>
+                </Tr>
             </Thead>
             <Tbody>
                 <Tr>
@@ -675,7 +677,7 @@ const DropDownTable = (props) => {
 
                                                     return (
                                                         <Tr backgroundColor={trBg}>
-                                                            <Pd style={{"white-space": "nowrap"}}
+                                                            <Pd whiteSpace="nowrap"
                                                                 backgroundColor={pirateBg}>{PIRATE_NAMES[pirateId]}</Pd>
                                                             <Pd isNumeric>{opening}:1</Pd>
                                                             <Pd isNumeric>
