@@ -365,12 +365,18 @@ const BetExtras = (props) => {
     }
 
     return (
-        <SettingsBox p={4} mt={4} {...rest}>
-            <Button variant="outline" size="sm" onClick={() => {
-                setAllBets(getMaxBet(roundState.currentSelectedRound))
-            }}>Set all to max</Button>
-            <Spacer/>
-            <CopyLinkButtons/>
+        <SettingsBox mt={4} {...rest}>
+            <HorizontalScrollingBox whiteSpace="nowrap" p={4}>
+                <HStack>
+                    <Button minWidth="unset" // weird, but it fixes an issue that this layout structure does
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                setAllBets(getMaxBet(roundState.currentSelectedRound));
+                            }}>Set all to max</Button>
+                    <CopyLinkButtons/>
+                </HStack>
+            </HorizontalScrollingBox>
         </SettingsBox>
     )
 }
