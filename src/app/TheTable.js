@@ -359,7 +359,7 @@ const BetExtras = (props) => {
     function setAllBets(value) {
         let betAmounts = roundState.betAmounts;
         for (let index in roundState.betAmounts) {
-            betAmounts[index] = Math.min(value, Math.floor(1_000_000 / betOdds[index]) + 1);
+            betAmounts[index] = Math.min(value, Math.max(Math.floor(1_000_000 / betOdds[index]) + 1, 50));
         }
         setRoundState({betAmounts});
     }
