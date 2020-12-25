@@ -842,7 +842,7 @@ const PayoutExtras = (props) => {
 }
 
 const TableModes = () => {
-    const {roundState, setRoundState} = React.useContext(RoundContext);
+    const {setRoundState} = React.useContext(RoundContext);
     const cookies = new Cookies();
     const [value, setValue] = useState(getTableMode());
 
@@ -859,26 +859,26 @@ const TableModes = () => {
                     <Radio value="dropdown">Dropdown Mode</Radio>
                 </Stack>
             </RadioGroup>
-            <Checkbox mt={1}
-                      isChecked={Object.keys(roundState.bets).length === 15}
-                      onChange={(e) => {
-                          const bets = roundState.bets;
-                          const betAmounts = roundState.betAmounts;
-                          if (e.target.checked) {
-                              for (let betNum = 11; betNum <= 15; betNum++) {
-                                  bets[betNum] = [0, 0, 0, 0, 0];
-                                  betAmounts[betNum] = -1000;
-                              }
-                          } else {
-                              for (let betNum = 11; betNum <= 15; betNum++) {
-                                  delete bets[betNum];
-                                  delete betAmounts[betNum];
-                              }
-                          }
-                          setRoundState({bets: {...bets}, betAmounts: {...betAmounts}});
-                      }}>
-                15-bet mode
-            </Checkbox>
+            {/*<Checkbox mt={1}*/}
+            {/*          isChecked={Object.keys(roundState.bets).length === 15}*/}
+            {/*          onChange={(e) => {*/}
+            {/*              const bets = roundState.bets;*/}
+            {/*              const betAmounts = roundState.betAmounts;*/}
+            {/*              if (e.target.checked) {*/}
+            {/*                  for (let betNum = 11; betNum <= 15; betNum++) {*/}
+            {/*                      bets[betNum] = [0, 0, 0, 0, 0];*/}
+            {/*                      betAmounts[betNum] = -1000;*/}
+            {/*                  }*/}
+            {/*              } else {*/}
+            {/*                  for (let betNum = 11; betNum <= 15; betNum++) {*/}
+            {/*                      delete bets[betNum];*/}
+            {/*                      delete betAmounts[betNum];*/}
+            {/*                  }*/}
+            {/*              }*/}
+            {/*              setRoundState({bets: {...bets}, betAmounts: {...betAmounts}});*/}
+            {/*          }}>*/}
+            {/*    15-bet mode*/}
+            {/*</Checkbox>*/}
         </ExtraBox>
     )
 }
