@@ -864,7 +864,7 @@ const TableModes = () => {
                                   delete betAmounts[betNum];
                               }
                           }
-                          setRoundState({bets: bets, betAmounts: betAmounts});
+                          setRoundState({bets: {...bets}, betAmounts: {...betAmounts}});
                       }}>
                 15-bet mode
             </Checkbox>
