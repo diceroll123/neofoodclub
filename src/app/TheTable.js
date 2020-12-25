@@ -834,7 +834,7 @@ const PayoutExtras = (props) => {
     }
 
     return (
-        <HStack m={4}>
+        <HStack mx={4}>
             {makeTable("Odds", payoutTables.odds)}
             {makeTable("Winnings", payoutTables.winnings)}
         </HStack>
@@ -988,11 +988,14 @@ const CopyPayouts = (props) => {
 
     const urlClip = useClipboard(tableCode);
 
+    // disable if there's not a bet url in the code
+    let disabled = tableCode === null || tableCode.includes("&b=") === false;
+
     return (
         <SettingsBox mt={4} {...rest}>
             <Box p={4}>
                 <Button
-                    isDisabled={tableCode === null}
+                    isDisabled={disabled}
                     leftIcon={<Icon as={redditIcon}
                                     w="1.8em"
                                     h="1.8em"/>}
