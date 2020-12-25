@@ -2,6 +2,7 @@
   "name": "foodclub",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/",
   "dependencies": {
     "@chakra-ui/icons": "^1.0.2",
     "@chakra-ui/react": "^1.0.3",
