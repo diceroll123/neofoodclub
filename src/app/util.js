@@ -74,7 +74,7 @@ export function parseBetUrl() {
     };
 }
 
-export function makeBetUrl(bets) {
+function makeBetUrl(bets) {
     return Object.keys(bets).sort((t, e) => {
         return t - e
     }).map((t) => {
@@ -96,7 +96,7 @@ export function makeBetUrl(bets) {
     }).join("");
 }
 
-export function makeBetAmountsUrl(betAmounts) {
+function makeBetAmountsUrl(betAmounts) {
     return Object.keys(betAmounts).sort((t, e) => {
         return t - e;
     }).map((t) => {
@@ -150,4 +150,46 @@ export function getTableMode() {
         mode = "normal";
     }
     return mode;
+}
+
+export function createBetURL(roundState, ignoreBetAmounts) {
+    // for this function:
+    // bets will only be added if any bets are valid
+    // bet amounts will only be added if ignoreBetAmounts is false AND valid bet amounts are found
+
+    // that aside, this only returns the hash, shaped like so:
+    // "/#round=7018&b=gmkhmgklhkfmlfmbkkhkgkacm"
+
+    if (ignoreBetAmounts === undefined) {
+        ignoreBetAmounts = true;
+    }
+
+    let betURL = `/#round=${roundState.currentSelectedRound}`;
+    let addBets = false;
+    for (const [, value] of Object.entries(roundState.bets)) {
+        if (addBets === false) {
+            addBets = value.some(x => x > 0);
+        }
+    }
+
+    if (addBets === false) {
+        return betURL;
+    }
+
+    betURL += '&b=' + makeBetUrl(roundState.bets);
+
+    if (ignoreBetAmounts) {
+        return betURL;
+    }
+
+    let addBetAmounts = false;
+    for (const [, value] of Object.entries(roundState.betAmounts)) {
+        if (addBetAmounts === false) {
+            addBetAmounts = value >= 50;
+        }
+    }
+    if (addBetAmounts) {
+        return betURL + '&a=' + makeBetAmountsUrl(roundState.betAmounts);
+    }
+    return betURL;
 }

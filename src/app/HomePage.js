@@ -3,7 +3,7 @@ import RoundContext from "./RoundState"
 import {useToast} from "@chakra-ui/react";
 import 'moment-timezone';
 import TheTable from "./TheTable";
-import {makeBetUrl} from "./util";
+import {createBetURL, makeBetUrl} from "./util";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -93,36 +93,7 @@ export default function HomePage() {
                 return;
             }
 
-            let url = window.location.pathname + "#";
-            url += "round=" + roundState.currentSelectedRound;
-
-            // check if the bet is empty before putting it in the url
-            let addBets = false;
-            for (const [, value] of Object.entries(roundState.bets)) {
-                if (addBets === false) {
-                    addBets = value.some(x => x > 0);
-                }
-            }
-
-            if (addBets) {
-                url += '&b=' + makeBetUrl(roundState.bets);
-            }
-
-            // TODO: Decide if the bet amounts in the url is even desired
-            // TODO: add roundState.betAmounts to deps array below if so
-            // check if the bet amount is valid before putting it in the url
-            // let addBetAmounts = false;
-            // for (const [, value] of Object.entries(roundState.betAmounts)) {
-            //     if (addBetAmounts === false) {
-            //         addBetAmounts = value >= 50;
-            //     }
-            // }
-            //
-            // if(addBetAmounts) {
-            //     url += '&a=' + makeBetAmountsUrl(roundState.betAmounts);
-            // }
-
-            window.history.replaceState(null, "", url);
+            window.history.replaceState(null, "", createBetURL(roundState));
         });
     }, [
         roundState.currentSelectedRound,

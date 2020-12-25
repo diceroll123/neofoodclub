@@ -41,13 +41,20 @@ import {
     displayAsPercent,
     numberWithCommas,
     getMaxBet,
-    makeBetUrl,
-    makeBetAmountsUrl,
-    getTableMode
+    getTableMode,
+    createBetURL
 } from "./util";
 import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
 import BetAmountInput from "./BetAmountInput";
 import Cookies from "universal-cookie/es6";
+
+const redditIcon = (props) => (
+    <svg viewBox="0 0 20 20" {...props}>
+        <circle cx="10" cy="10" r="10" fill="#FF4500"/>
+        <path fill="#FFF"
+              d="M16.67 10a1.46 1.46 0 00-2.47-1 7.12 7.12 0 00-3.85-1.23L11 4.65l2.14.45a1 1 0 10.13-.61L10.82 4a.31.31 0 00-.37.24l-.74 3.47a7.14 7.14 0 00-3.9 1.23 1.46 1.46 0 10-1.61 2.39 2.87 2.87 0 000 .44c0 2.24 2.61 4.06 5.83 4.06s5.83-1.82 5.83-4.06a2.87 2.87 0 000-.44 1.46 1.46 0 00.81-1.33zm-10 1a1 1 0 111 1 1 1 0 01-1-1zm5.81 2.75a3.84 3.84 0 01-2.47.77 3.84 3.84 0 01-2.47-.77.27.27 0 01.38-.38A3.27 3.27 0 0010 14a3.28 3.28 0 002.09-.61.27.27 0 11.39.4zm-.18-1.71a1 1 0 111-1 1 1 0 01-1.01 1.04z"/>
+    </svg>
+)
 
 const BrainIcon = (props) => (
     <svg viewBox="0 0 36 36" {...props}>
@@ -92,33 +99,15 @@ const CopyLinkButtons = () => {
     const toast = useToast();
     const {roundState} = React.useContext(RoundContext);
 
-    let betURL = `${window.location.pathname}#round=${roundState.currentSelectedRound}`;
-    let amountsBetUrl;
-    let addBets = false;
-    for (const [, value] of Object.entries(roundState.bets)) {
-        if (addBets === false) {
-            addBets = value.some(x => x > 0);
-        }
-    }
-
-    betURL += '&b=' + makeBetUrl(roundState.bets);
-
-    let addBetAmounts = false;
-    for (const [, value] of Object.entries(roundState.betAmounts)) {
-        if (addBetAmounts === false) {
-            addBetAmounts = value >= 50;
-        }
-    }
-    if (addBetAmounts) {
-        amountsBetUrl = betURL + '&a=' + makeBetAmountsUrl(roundState.betAmounts);
-    }
+    let betURL = createBetURL(roundState);
+    let amountsBetUrl = createBetURL(roundState, false);
 
     const urlClip = useClipboard(betURL);
     const urlAmountsClip = useClipboard(amountsBetUrl);
 
     return (
         <>
-            {addBets &&
+            {betURL.includes("&b=") &&
             <ButtonGroup size="sm" isAttached variant="outline">
                 <Button mr="-px"
                         leftIcon={<LinkIcon/>}
@@ -132,7 +121,7 @@ const CopyLinkButtons = () => {
                                 isClosable: true
                             });
                         }}>Copy URL</Button>
-                {addBetAmounts &&
+                {amountsBetUrl.includes("&a=") &&
                 <Button onClick={() => {
                     urlAmountsClip.onCopy();
                     toast.closeAll();
@@ -918,8 +907,8 @@ const NormalExtras = (props) => {
                                         style={{"transition": "width 0.3s ease-in-out, height 0.3s ease-in-out"}}
                         />}
                         size="sm"
-                        w="185px">
-                    Big Brain Mode {bigBrain === true ? "ON" : "OFF"}
+                        w="190px">
+                    Big Brain Mode is {bigBrain === true ? "ON" : "OFF"}
                 </Button>
                 <Checkbox isDisabled>FA Details</Checkbox>
                 <Checkbox isDisabled>Odds Timeline</Checkbox>
@@ -948,6 +937,81 @@ const TableExtras = (props) => {
             </HorizontalScrollingBox>
         </SettingsBox>
     );
+}
+
+const CopyPayouts = (props) => {
+    const {payoutTables, betBinaries, betExpectedRatios, betOdds, ...rest} = props;
+    const {roundState} = React.useContext(RoundContext);
+    const toast = useToast();
+
+    function createRedditTables() {
+        if (payoutTables.odds === undefined) {
+            return null;
+        }
+
+        let totalTER = 0;
+        let betCount = 0;
+        let lines = [];
+        // bet table
+        lines.push(`[${roundState.currentSelectedRound}](${window.location.origin}${createBetURL(roundState)})|Shipwreck|Lagoon|Treasure|Hidden|Harpoon|Odds`);
+        lines.push(':-:|-|-|-|-|-|-:');
+
+        for (let betNum in roundState.bets) {
+            totalTER += betExpectedRatios[betNum];
+            if (betBinaries[betNum] > 0) {
+                betCount += 1;
+                let str = `${betNum}`;
+                for (let i = 0; i < 5; i++) {
+                    str += "|";
+                    let pirateId = roundState.roundData.pirates[i][roundState.bets[betNum][i] - 1];
+                    if (pirateId) {
+                        str += PIRATE_NAMES[pirateId];
+                    }
+                }
+                lines.push(`${str}|${betOdds[betNum]}:1`);
+            }
+        }
+        lines.push("\n");
+        // stats
+        lines.push(`TER: ${totalTER.toFixed(3)}`);
+        lines.push("\n");
+        lines.push("Odds|Probability|Cumulative|Tail");
+        lines.push("--:|--:|--:|--:");
+        payoutTables.odds.forEach((item) => {
+            lines.push(`${item.value}:${betCount}|${displayAsPercent(item.probability, 3)}|${displayAsPercent(item.cumulative, 3)}|${displayAsPercent(item.tail, 3)}`)
+        });
+
+        return lines.join("\n");
+    }
+
+    const tableCode = createRedditTables();
+
+    const urlClip = useClipboard(tableCode);
+
+    return (
+        <SettingsBox mt={4} {...rest}>
+            <Box p={4}>
+                <Button
+                    isDisabled={tableCode === null}
+                    leftIcon={<Icon as={redditIcon}
+                                    w="1.8em"
+                                    h="1.8em"/>}
+                    variant="outline"
+                    onClick={() => {
+                        urlClip.onCopy();
+                        toast.closeAll();
+                        toast({
+                            title: `reddit code copied!`,
+                            status: "success",
+                            duration: 1200,
+                            isClosable: true
+                        });
+                    }}>
+                    Copy reddit table codes
+                </Button>
+            </Box>
+        </SettingsBox>
+    )
 }
 
 export default function TheTable(props) {
@@ -1058,6 +1122,12 @@ export default function TheTable(props) {
                     green={green}
                     grayAccent={grayAccent}/>
             </HorizontalScrollingBox>
+
+            <CopyPayouts background={grayAccent}
+                         betBinaries={betBinaries}
+                         betOdds={betOdds}
+                         betExpectedRatios={betExpectedRatios}
+                         payoutTables={payoutTables}/>
 
             <HorizontalScrollingBox>
                 <PayoutExtras payoutTables={payoutTables}
