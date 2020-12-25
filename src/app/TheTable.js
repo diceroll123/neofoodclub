@@ -150,6 +150,19 @@ const CopyLinkButtons = () => {
     )
 }
 
+const BigBrainElement = (props) => {
+    const {roundState} = React.useContext(RoundContext);
+    const {children, ...rest} = props;
+
+    if (roundState.advanced === false) {
+        return null;
+    }
+
+    return (
+        <Box {...rest}>{children}</Box>
+    )
+}
+
 const NormalTable = (props) => {
     let {
         pirateFAs,
@@ -180,15 +193,15 @@ const NormalTable = (props) => {
             <Thead>
                 <Tr>
                     <Th>Arena</Th>
-                    <Th>Ratio</Th>
+                    <BigBrainElement as={Th}>Ratio</BigBrainElement>
                     <Th>Pirate</Th>
-                    <Th>Min Prob</Th>
-                    <Th>Max Prob</Th>
-                    <Th>Std Prob</Th>
+                    <BigBrainElement as={Th}>Min Prob</BigBrainElement>
+                    <BigBrainElement as={Th}>Max Prob</BigBrainElement>
+                    <BigBrainElement as={Th}>Std Prob</BigBrainElement>
                     {/*<Th>Custom</Th>*/}
                     {/*<Th>Used</Th>*/}
-                    <Th>Payout</Th>
-                    <Th>FA</Th>
+                    <BigBrainElement as={Th}>Payout</BigBrainElement>
+                    <BigBrainElement as={Th}>FA</BigBrainElement>
                     {/*<Th colSpan={10}>FA Explanation</Th>*/}
                     <Th>Open</Th>
                     <Th>Current</Th>
@@ -215,13 +228,13 @@ const NormalTable = (props) => {
                         <Tbody>
                             <Tr>
                                 <Td rowSpan={5}>{arenaName}</Td>
-                                <Td rowSpan={5} isNumeric>
+                                <BigBrainElement as={Td} rowSpan={5} isNumeric>
                                     {roundState.roundData ?
                                         <Text>{displayAsPercent(arenaRatios[arenaId], 1)}</Text> :
                                         <Skeleton><Box>&nbsp;</Box></Skeleton>
                                     }
-                                </Td>
-                                <Td backgroundColor={grayAccent} colSpan={6}/>
+                                </BigBrainElement>
+                                <Td backgroundColor={grayAccent} colSpan={roundState.advanced ? 6 : 1}/>
                                 {/*<Td colSpan={2}></Td>*/}
                                 {/* Td for FA explanation here */}
                                 <Td backgroundColor={grayAccent} colSpan={2}/>
@@ -288,14 +301,18 @@ const NormalTable = (props) => {
                                 return (
                                     <Tr backgroundColor={bgColor}>
                                         <Td backgroundColor={getPirateBgColor(opening)}>{PIRATE_NAMES[pirateId]}</Td>
-                                        <Td isNumeric>{displayAsPercent(probabilities.min[arenaId][pirateIndex + 1], 1)}</Td>
-                                        <Td isNumeric>{displayAsPercent(probabilities.max[arenaId][pirateIndex + 1], 1)}</Td>
-                                        <Td isNumeric>{displayAsPercent(probabilities.std[arenaId][pirateIndex + 1], 1)}</Td>
+                                        <BigBrainElement as={Td}
+                                                         isNumeric>{displayAsPercent(probabilities.min[arenaId][pirateIndex + 1], 1)}</BigBrainElement>
+                                        <BigBrainElement as={Td}
+                                                         isNumeric>{displayAsPercent(probabilities.max[arenaId][pirateIndex + 1], 1)}</BigBrainElement>
+                                        <BigBrainElement as={Td}
+                                                         isNumeric>{displayAsPercent(probabilities.std[arenaId][pirateIndex + 1], 1)}</BigBrainElement>
                                         {/*<Td>Custom</Td>*/}
                                         {/*<Td>Used</Td>*/}
-                                        <Td backgroundColor={payoutBackground}
-                                            isNumeric>{displayAsPercent(payout, 1)}</Td>
-                                        <Td isNumeric>{pirateFAs[arenaId][pirateIndex]}</Td>
+                                        <BigBrainElement as={Td} backgroundColor={payoutBackground}
+                                                         isNumeric>{displayAsPercent(payout, 1)}</BigBrainElement>
+                                        <BigBrainElement as={Td}
+                                                         isNumeric>{pirateFAs[arenaId][pirateIndex]}</BigBrainElement>
                                         <Td isNumeric>{opening}:1</Td>
                                         <Td isNumeric>
                                             {current > opening &&
@@ -348,7 +365,7 @@ const BetExtras = (props) => {
     }
 
     return (
-        <SettingsBox mt={4} {...rest}>
+        <SettingsBox p={4} mt={4} {...rest}>
             <Button variant="outline" size="sm" onClick={() => {
                 setAllBets(getMaxBet(roundState.currentSelectedRound))
             }}>Set all to max</Button>
@@ -365,7 +382,6 @@ const SettingsBox = (props) => {
               justify="space-between"
               mx={4}
               mb={4}
-              p={4}
               backgroundColor={background}
               borderWidth="1px"
               {...rest}>
@@ -465,7 +481,7 @@ const PayoutTable = (props) => {
                         [...Array(amountOfBets)].map((e, betIndex) => {
 
                             if (betBinaries[betIndex + 1] === 0) {
-                                return <></>;
+                                return null;
                             }
 
                             let er = betExpectedRatios[betIndex + 1];
@@ -836,7 +852,7 @@ const TableModes = () => {
     const [value, setValue] = useState(getTableMode());
 
     return (
-        <ExtraBox>
+        <ExtraBox whiteSpace="nowrap">
             <RadioGroup onChange={(v) => {
                 setValue(v);
                 cookies.set("tableMode", v);
@@ -873,24 +889,28 @@ const TableModes = () => {
 }
 
 const NormalExtras = (props) => {
-    const {roundState, setRoundState} = React.useContext(RoundContext);
+    const {setRoundState} = React.useContext(RoundContext);
 
     const [bigBrain, setBigBrain] = useState(true);
 
     if (getTableMode() !== "normal") {
-        return <></>;
+        return null;
     }
 
     const brainSize = bigBrain ? "2em" : "1em";
 
     return (
-        <ExtraBox>
+        <ExtraBox {...props}>
             <Stack>
                 <Button onClick={() => {
                     setBigBrain(v => !v);
                     setRoundState({advanced: !bigBrain});
                 }}
-                        leftIcon={<Icon as={BrainIcon} w={brainSize} h={brainSize}/>}
+                        leftIcon={<Icon as={BrainIcon}
+                                        w={brainSize}
+                                        h={brainSize}
+                                        style={{"transition": "width 0.3s ease-in-out, height 0.3s ease-in-out"}}
+                        />}
                         size="sm"
                         w="185px">
                     Big Brain Mode {bigBrain === true ? "ON" : "OFF"}
@@ -903,20 +923,23 @@ const NormalExtras = (props) => {
 }
 
 const ExtraBox = (props) => {
+    const {children, ...rest} = props;
     const theme = useTheme();
     const defaultBgColor = useColorModeValue(theme.colors.white, theme.colors.gray["800"]);
     return (
-        <Box p={2} borderWidth="1px" borderRadius="md" backgroundColor={defaultBgColor}>{props.children}</Box>
+        <Box p={2} borderWidth="1px" borderRadius="md" backgroundColor={defaultBgColor} {...rest}>{children}</Box>
     )
 }
 
 const TableExtras = (props) => {
     return (
         <SettingsBox {...props}>
-            <HStack>
-                <TableModes/>
-                <NormalExtras/>
-            </HStack>
+            <HorizontalScrollingBox>
+                <HStack p={4}>
+                    <TableModes/>
+                    <NormalExtras/>
+                </HStack>
+            </HorizontalScrollingBox>
         </SettingsBox>
     );
 }
