@@ -20,6 +20,7 @@ import {
     Text,
     Th,
     Thead,
+    Tooltip,
     Tr,
     useClipboard,
     useColorModeValue,
@@ -77,6 +78,11 @@ const Td = (props) => (<OriginalTd py={1} {...props}>{props.children}</OriginalT
 
 // A special Td with minimal x-axis padding to cut down on giant tables
 const Pd = (props) => (<Td px={1} {...props}>{props.children}</Td>);
+
+const TextTooltip = (props) => {
+    const {text, label, ...rest} = props;
+    return <Tooltip label={label || text} aria-label={label || text} {...rest}>{text}</Tooltip>
+};
 
 const ClearBetsButton = () => {
     const {roundState, setRoundState} = React.useContext(RoundContext);
@@ -198,10 +204,10 @@ const NormalTable = (props) => {
                     {/*<Th>Custom</Th>*/}
                     {/*<Th>Used</Th>*/}
                     <BigBrainElement as={Th}>Payout</BigBrainElement>
-                    <BigBrainElement as={Th}>FA</BigBrainElement>
+                    <BigBrainElement as={Th}><TextTooltip text="FA" label="Food Adjustment"/></BigBrainElement>
                     {/*<Th colSpan={10}>FA Explanation</Th>*/}
-                    <Th>Open</Th>
-                    <Th>Current</Th>
+                    <Th><TextTooltip text="Open" label="Opening Odds"/></Th>
+                    <Th><TextTooltip text="Curr" label="Current Odds"/></Th>
                     {/*<Th>Custom</Th>*/}
                     {/*<Th>Timeline</Th>*/}
                     {
@@ -463,9 +469,9 @@ const PayoutTable = (props) => {
                     <Th>Amount</Th>
                     <Th>Odds</Th>
                     <Th>Payoff</Th>
-                    <Th>Probability</Th>
-                    <Th>Expected Ratio</Th>
-                    <Th>Net Expected</Th>
+                    <Th><TextTooltip text="Prob." label="Probability"/></Th>
+                    <Th><TextTooltip text="E.R." label="Expected Ratio"/></Th>
+                    <Th><TextTooltip text="N.E." label="Net Expected"/></Th>
                     <Th>Maxbet</Th>
                     <Th>Shipwreck</Th>
                     <Th>Lagoon</Th>
