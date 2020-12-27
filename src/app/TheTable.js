@@ -613,7 +613,7 @@ const PlaceThisBetButton = (props) => {
         setClicked(false);
     }, [roundState.bets]);
 
-    if (winningBetBinary > 0) {
+    if (winningBetBinary > 0 || roundState.currentSelectedRound < roundState.currentRound) {
         return <Button size="xs" isDisabled>Round is over!</Button>
     }
 
