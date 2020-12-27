@@ -240,13 +240,12 @@ const NormalTable = (props) => {
                                 {roundState.roundData !== null ? <>
                                     {[...Array(amountOfBets)].map((bet, betNum) => {
                                         return (
-                                            // TODO: Chakra's Radio component does not play well with this atm
                                             <Td backgroundColor={grayAccent}>
-                                                <input type="radio"
+                                                <Radio
                                                        name={"bet" + (betNum + 1) + arenaId}
                                                        value={0}
                                                        onChange={() => changeBet(betNum + 1, arenaId, 0)}
-                                                       checked={roundState.bets[betNum + 1][arenaId] === 0}/>
+                                                       isChecked={roundState.bets[betNum + 1][arenaId] === 0}/>
                                             </Td>
                                         )
                                     })}
@@ -324,11 +323,10 @@ const NormalTable = (props) => {
                                         {[...Array(amountOfBets)].map((bet, betNum) => {
                                             return (
                                                 <Td>
-                                                    {/*TODO: Chakra's Radio component does not play well with this atm*/}
-                                                    <input type="radio" name={"bet" + (betNum + 1) + arenaId}
+                                                    <Radio name={"bet" + (betNum + 1) + arenaId}
                                                            value={pirateIndex + 1}
                                                            onChange={() => changeBet(betNum + 1, arenaId, pirateIndex + 1)}
-                                                           checked={roundState.bets[betNum + 1][arenaId] === pirateIndex + 1}/>
+                                                           isChecked={roundState.bets[betNum + 1][arenaId] === pirateIndex + 1}/>
                                                 </Td>
                                             )
                                         })}
