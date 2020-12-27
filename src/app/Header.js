@@ -25,7 +25,7 @@ import RoundContext from "./RoundState";
 import moment from "moment";
 import TimeAgo from "react-timeago";
 import {useViewportScroll} from "framer-motion";
-import {calculateBaseMaxBet, getMaxBet} from "./util";
+import {calculateBaseMaxBet, calculateRoundOverPercentage, getMaxBet} from "./util";
 import BetAmountInput from "./BetAmountInput";
 import Cookies from "universal-cookie/es6";
 
@@ -58,13 +58,7 @@ function PreviousRoundInfo() {
 
 function CurrentRoundInfo() {
     const {roundState} = React.useContext(RoundContext);
-
-    let now = moment();
-    let start = moment(roundState.roundData.start);
-    let end = moment(roundState.roundData.start).add(1, 'day');
-    let totalMillisInRange = end.valueOf() - start.valueOf();
-    let elapsedMillis = now.valueOf() - start.valueOf();
-    const roundPercentOver = Math.max(0, Math.min(100, 100 * (elapsedMillis / totalMillisInRange)));
+    const roundPercentOver = calculateRoundOverPercentage(roundState);
 
     return (
         <HStack>

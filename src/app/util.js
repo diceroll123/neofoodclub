@@ -1,4 +1,5 @@
 import Cookies from "universal-cookie/es6";
+import moment from "moment";
 
 export function reducer(state, item) {
     return {...state, ...item}
@@ -192,4 +193,13 @@ export function createBetURL(roundState, ignoreBetAmounts) {
         return betURL + '&a=' + makeBetAmountsUrl(roundState.betAmounts);
     }
     return betURL;
+}
+
+export function calculateRoundOverPercentage(roundState) {
+    let now = moment();
+    let start = moment(roundState.roundData.start);
+    let end = moment(roundState.roundData.start).add(1, 'day');
+    let totalMillisInRange = end.valueOf() - start.valueOf();
+    let elapsedMillis = now.valueOf() - start.valueOf();
+    return Math.max(0, Math.min(100, 100 * (elapsedMillis / totalMillisInRange)));
 }
