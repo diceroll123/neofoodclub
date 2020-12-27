@@ -143,7 +143,7 @@ const BigBrainElement = (props) => {
     const {roundState} = React.useContext(RoundContext);
     const {children, ...rest} = props;
 
-    if (roundState.advanced === false) {
+    if (roundState.advanced.bigBrain === false) {
         return null;
     }
 
@@ -231,7 +231,7 @@ const NormalTable = (props) => {
                                         <Skeleton><Box>&nbsp;</Box></Skeleton>
                                     }
                                 </BigBrainElement>
-                                <Td backgroundColor={grayAccent} colSpan={roundState.advanced ? 6 : 1}/>
+                                <Td backgroundColor={grayAccent} colSpan={roundState.advanced.bigBrain ? 6 : 1}/>
                                 {/*<Td colSpan={2}></Td>*/}
                                 {/* Td for FA explanation here */}
                                 <Td backgroundColor={grayAccent} colSpan={2}/>
@@ -891,7 +891,7 @@ const TableModes = () => {
 }
 
 const NormalExtras = (props) => {
-    const {setRoundState} = React.useContext(RoundContext);
+    const {roundState, setRoundState} = React.useContext(RoundContext);
 
     const [bigBrain, setBigBrain] = useState(true);
 
@@ -906,7 +906,8 @@ const NormalExtras = (props) => {
             <Stack>
                 <Button onClick={() => {
                     setBigBrain(v => !v);
-                    setRoundState({advanced: !bigBrain});
+                    let currentAdvanced = roundState.advanced;
+                    setRoundState({advanced: {...currentAdvanced, bigBrain: !bigBrain}});
                 }}
                         leftIcon={<Icon as={BrainIcon}
                                         w={brainSize}

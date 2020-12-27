@@ -14,7 +14,11 @@ function App() {
         bets: initialState.bets,
         betAmounts: initialState.betAmounts,
         tableMode: getTableMode(),
-        advanced: true, // "big brain mode"
+        advanced: {
+            bigBrain: true,
+            faDetails: false,
+            oddsTimeline: false
+        },
     });
 
     return (
