@@ -177,6 +177,14 @@ const NormalTable = (props) => {
         setRoundState({bets: {...newBets}}); // hacky way to force an object to update useEffect
     }
 
+    const StickyTd = (props) => {
+        const {children, ...rest} = props;
+        return (
+            <Td style={{"position": "sticky", "left": "0"}}
+                {...rest}>{children}</Td>
+        )
+    }
+
     return (
         <Table size="sm" width="auto">
             <Thead>
@@ -289,7 +297,8 @@ const NormalTable = (props) => {
 
                                 return (
                                     <Tr backgroundColor={bgColor}>
-                                        <Td backgroundColor={getPirateBgColor(opening)}>{PIRATE_NAMES[pirateId]}</Td>
+                                        <StickyTd
+                                            backgroundColor={getPirateBgColor(opening)}>{PIRATE_NAMES[pirateId]}</StickyTd>
                                         <BigBrainElement as={Td}
                                                          isNumeric>{displayAsPercent(probabilities.min[arenaId][pirateIndex + 1], 1)}</BigBrainElement>
                                         <BigBrainElement as={Td}
