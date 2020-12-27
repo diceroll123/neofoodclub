@@ -11,6 +11,7 @@
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.5.0",
+    "chakra-ui": "git://github.com/chakra-ui/chakra-ui.git#develop",
     "framer-motion": "^2.9.5",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.32",
