@@ -393,7 +393,7 @@ const NormalTable = (props) => {
                                                 </> : null
                                         }
                                         <Td isNumeric>{opening}:1</Td>
-                                        <Td isNumeric>
+                                        <Td isNumeric whiteSpace="nowrap">
                                             {current > opening &&
                                             <StatArrow mr={1} type="increase" style={{"stroke": "#000000"}}/>}
                                             {current < opening &&
