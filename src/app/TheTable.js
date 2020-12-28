@@ -162,6 +162,10 @@ const FaDetailsElement = (props) => {
     const {roundState} = React.useContext(RoundContext);
     const {children, ...rest} = props;
 
+    if (roundState.advanced.bigBrain === false) {
+        return null;
+    }
+
     if (roundState.advanced.faDetails === false) {
         return null;
     }
@@ -1008,7 +1012,7 @@ const NormalExtras = (props) => {
                 </Button>
                 <Checkbox
                     isChecked={faDetails}
-                    isDisabled={!faExists}
+                    isDisabled={!faExists ^ !bigBrain}
                     onChange={(e) => {
                         let checked = e.target.checked;
                         toggleFaDetails(checked);
