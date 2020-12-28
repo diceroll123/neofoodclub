@@ -45,7 +45,7 @@ import {
     getTableMode,
     createBetURL
 } from "./util";
-import {ARENA_NAMES, PIRATE_NAMES} from "./constants";
+import {ARENA_NAMES, FOODS, NEGATIVE_FAS, PIRATE_NAMES, POSITIVE_FAS} from "./constants";
 import BetAmountInput from "./BetAmountInput";
 import Cookies from "universal-cookie/es6";
 
@@ -158,6 +158,23 @@ const BigBrainElement = (props) => {
     )
 }
 
+const FaDetailsElement = (props) => {
+    const {roundState} = React.useContext(RoundContext);
+    const {children, ...rest} = props;
+
+    if (roundState.advanced.faDetails === false) {
+        return null;
+    }
+
+    if (roundState.roundData === null || roundState.roundData.foods === undefined) {
+        return null;
+    }
+
+    return (
+        <Box maxWidth="55px" {...rest}>{children}</Box>
+    )
+}
+
 const NormalTable = (props) => {
     let {
         pirateFAs,
@@ -168,6 +185,7 @@ const NormalTable = (props) => {
         winningBetBinary,
         green,
         red,
+        yellow,
         grayAccent
     } = props;
     const {roundState, setRoundState} = React.useContext(RoundContext);
@@ -191,6 +209,36 @@ const NormalTable = (props) => {
         )
     }
 
+    function calculatePirateFA(pirateId, foodId) {
+        // returns the FA <td> element for the associated pirate/food
+        let pos = POSITIVE_FAS[pirateId][foodId];
+        let neg = NEGATIVE_FAS[pirateId][foodId];
+
+        // by default, transparent + empty string if FA is 0
+        let color = "transparent";
+        let indicator = "";
+
+        if (pos && neg) {
+            color = yellow;
+            indicator = `+${pos}/-${neg}`;
+        } else if (pos) {
+            color = green;
+            indicator = `+${pos}`;
+        } else if (neg) {
+            color = red;
+            indicator = `-${neg}`;
+        }
+
+        return (
+            <FaDetailsElement as={Pd}
+                              isNumeric
+                              backgroundColor={color}
+                              whiteSpace="nowrap">
+                <Text as={"b"}>{indicator}</Text>
+            </FaDetailsElement>
+        );
+    }
+
     return (
         <Table size="sm" width="auto">
             <Thead>
@@ -204,8 +252,11 @@ const NormalTable = (props) => {
                     {/*<Th>Custom</Th>*/}
                     {/*<Th>Used</Th>*/}
                     <BigBrainElement as={Th}>Payout</BigBrainElement>
-                    <BigBrainElement as={Th}><TextTooltip text="FA" label="Food Adjustment"/></BigBrainElement>
-                    {/*<Th colSpan={10}>FA Explanation</Th>*/}
+                    {roundState.roundData && roundState.roundData.foods !== undefined ?
+                        <BigBrainElement as={Th}><TextTooltip text="FA" label="Food Adjustment"/></BigBrainElement>
+                        : null
+                    }
+                    <FaDetailsElement as={Th} colSpan={10}>FA Explanation</FaDetailsElement>
                     <Th><TextTooltip text="Open" label="Opening Odds"/></Th>
                     <Th><TextTooltip text="Curr" label="Current Odds"/></Th>
                     {/*<Th>Custom</Th>*/}
@@ -239,7 +290,24 @@ const NormalTable = (props) => {
                                 </BigBrainElement>
                                 <Td backgroundColor={grayAccent} colSpan={roundState.advanced.bigBrain ? 6 : 1}/>
                                 {/*<Td colSpan={2}></Td>*/}
-                                {/* Td for FA explanation here */}
+
+                                {roundState.roundData !== null && roundState.roundData.foods !== undefined ? <>
+
+                                    {roundState.roundData.foods[arenaId].map((foodId) => {
+                                        const food = FOODS[foodId];
+                                        return (
+                                            <FaDetailsElement as={Pd}
+                                                              whiteSpace="nowrap"
+                                                              overflow="hidden"
+                                                              textOverflow="ellipsis"
+                                                              backgroundColor={grayAccent}>
+                                                <TextTooltip text={food}/>
+                                            </FaDetailsElement>
+                                        )
+                                    })}
+
+                                </> : null}
+
                                 <Td backgroundColor={grayAccent} colSpan={2}/>
                                 {/*<Td colSpan={1}></Td>*/}
                                 {/*<Td>showOddsTimeline</Td>*/}
@@ -248,10 +316,10 @@ const NormalTable = (props) => {
                                         return (
                                             <Td backgroundColor={grayAccent}>
                                                 <Radio
-                                                       name={"bet" + (betNum + 1) + arenaId}
-                                                       value={0}
-                                                       onChange={() => changeBet(betNum + 1, arenaId, 0)}
-                                                       isChecked={roundState.bets[betNum + 1][arenaId] === 0}/>
+                                                    name={"bet" + (betNum + 1) + arenaId}
+                                                    value={0}
+                                                    onChange={() => changeBet(betNum + 1, arenaId, 0)}
+                                                    isChecked={roundState.bets[betNum + 1][arenaId] === 0}/>
                                             </Td>
                                         )
                                     })}
@@ -314,8 +382,16 @@ const NormalTable = (props) => {
                                         {/*<Td>Used</Td>*/}
                                         <BigBrainElement as={Td} backgroundColor={payoutBackground}
                                                          isNumeric>{displayAsPercent(payout, 1)}</BigBrainElement>
-                                        <BigBrainElement as={Td}
-                                                         isNumeric>{pirateFAs[arenaId][pirateIndex]}</BigBrainElement>
+                                        {
+                                            roundState.roundData && roundState.roundData.foods !== undefined ?
+                                                <>
+                                                    <BigBrainElement as={Td}
+                                                                     isNumeric>{pirateFAs[arenaId][pirateIndex]}</BigBrainElement>
+                                                    {roundState.roundData.foods[arenaId].map((foodId) => {
+                                                        return calculatePirateFA(pirateId, foodId)
+                                                    })}
+                                                </> : null
+                                        }
                                         <Td isNumeric>{opening}:1</Td>
                                         <Td isNumeric>
                                             {current > opening &&
@@ -900,6 +976,9 @@ const NormalExtras = (props) => {
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
     const [bigBrain, setBigBrain] = useState(true);
+    const [faDetails, toggleFaDetails] = useState(false);
+
+    const faExists = roundState.roundData !== null && roundState.roundData.foods !== undefined;
 
     if (getTableMode() !== "normal") {
         return null;
@@ -924,7 +1003,17 @@ const NormalExtras = (props) => {
                         w="190px">
                     Big Brain Mode is {bigBrain === true ? "ON" : "OFF"}
                 </Button>
-                <Checkbox isDisabled>FA Details</Checkbox>
+                <Checkbox
+                    isChecked={faDetails}
+                    isDisabled={!faExists}
+                    onChange={(e) => {
+                        let checked = e.target.checked;
+                        toggleFaDetails(checked);
+                        let currentAdvanced = roundState.advanced;
+                        setRoundState({advanced: {...currentAdvanced, faDetails: checked}});
+
+                    }}
+                >FA Details</Checkbox>
                 <Checkbox isDisabled>Odds Timeline</Checkbox>
             </Stack>
         </ExtraBox>
@@ -1116,6 +1205,7 @@ export default function TheTable(props) {
                              winningBetBinary={winningBetBinary}
                              green={green}
                              red={red}
+                             yellow={yellow}
                              grayAccent={grayAccent}/>
             </HorizontalScrollingBox>
 
