@@ -684,7 +684,10 @@ const PayoutTable = (props) => {
     )
 }
 
-const HorizontalScrollingBox = (props) => (<Box overflowX="auto" {...props}>{props.children}</Box>);
+const HorizontalScrollingBox = (props) => {
+    const {children, ...rest} = props;
+    return (<Box overflowX="auto" {...rest}>{children}</Box>);
+}
 
 const PlaceThisBetButton = (props) => {
     const {betOdds, betPayoffs, bet, betNum, betBinaries, winningBetBinary} = props;
