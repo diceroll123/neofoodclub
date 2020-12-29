@@ -2,6 +2,7 @@ import React from "react"
 import RoundContext from "./RoundState"
 import HomePage from "./HomePage";
 import {getTableMode, parseBetUrl, reducer} from "./util"
+import {RoundManager} from "./RoundManager";
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
     return (
         <RoundContext.Provider value={{roundState, setRoundState}}>
             <HomePage/>
+            <RoundManager/>
         </RoundContext.Provider>
     );
 }
