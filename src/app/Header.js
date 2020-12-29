@@ -89,7 +89,7 @@ function CurrentRoundInfo() {
 function RoundInfo() {
     const {roundState} = React.useContext(RoundContext);
 
-    let data = <Box width="210px">&nbsp;</Box>;
+    let data = <Box width="130px">&nbsp;</Box>;
 
     if (roundState.roundData !== null) {
         if (roundState.roundData.winners[0] > 0) {
