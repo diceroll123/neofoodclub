@@ -1,5 +1,5 @@
 import React from "react"
-import {Box, Icon, Text, HStack, Link, Tooltip} from "@chakra-ui/react"
+import {Box, Divider, Icon, Text, HStack, Link, Tooltip} from "@chakra-ui/react"
 
 
 const GithubIcon = (props) => (
@@ -33,14 +33,17 @@ const links = [
 function Footer(props) {
     return (
         <Box as="footer" mt={12} textAlign="center" {...props}>
-            <Text fontSize="sm">
-                Made by <Link href="https://www.reddit.com/user/diceroll123" isExternal>u/diceroll123</Link>
-            </Text>
-            <HStack mt={4} spacing="12px" justify="center">
-                {links.map((link) => (
-                    <FooterLink key={link.href} {...link} />
-                ))}
-            </HStack>
+            <Divider/>
+            <Box pt={6}>
+                <Text fontSize="sm">
+                    Made by <Link href="https://www.reddit.com/user/diceroll123" isExternal>u/diceroll123</Link>
+                </Text>
+                <HStack mt={4} spacing="12px" justify="center">
+                    {links.map((link) => (
+                        <FooterLink key={link.href} {...link} />
+                    ))}
+                </HStack>
+            </Box>
         </Box>
     )
 }
