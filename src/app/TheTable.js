@@ -49,6 +49,9 @@ import {ARENA_NAMES, FOODS, NEGATIVE_FAS, PIRATE_NAMES, POSITIVE_FAS} from "./co
 import BetAmountInput from "./BetAmountInput";
 import Cookies from "universal-cookie/es6";
 
+import moment from "moment";
+moment.relativeTimeThreshold('ss', 0);
+
 const redditIcon = (props) => (
     <svg viewBox="0 0 20 20" {...props}>
         <circle cx="10" cy="10" r="10" fill="#FF4500"/>

@@ -23,7 +23,6 @@ import React from "react"
 import RoundInput from "./RoundInput";
 import RoundContext from "./RoundState";
 import moment from "moment";
-import TimeAgo from "react-timeago";
 import {useViewportScroll} from "framer-motion";
 import {calculateBaseMaxBet, calculateRoundOverPercentage, getMaxBet} from "./util";
 import BetAmountInput from "./BetAmountInput";
@@ -60,6 +59,15 @@ function CurrentRoundInfo() {
     const {roundState} = React.useContext(RoundContext);
     const roundPercentOver = calculateRoundOverPercentage(roundState);
 
+    const timestamp = moment(roundState.roundData.timestamp);
+
+    let element = "span";
+
+    if (moment().diff(timestamp) > 3e5) {
+        // highlight the current last update if it hasn't been updated in 30+s
+        element = "mark";
+    }
+
     return (
         <HStack>
             {roundPercentOver === 100 ?
@@ -72,15 +80,23 @@ function CurrentRoundInfo() {
                 </CircularProgress>
             }
             <Box textAlign="left">
-                <Text fontSize="xs">
-                    Last Update: <TimeAgo date={roundState.roundData.lastUpdate}/>
+                <Text fontSize="xs" as={element}>
+                    Last Update: <Moment date={roundState.roundData.lastUpdate}
+                                         fromNow
+                                         withTitle
+                                         titleFormat="LLL"
+                                         interval={1}/>
                 </Text>
                 {roundState.roundData.lastChange &&
                 roundState.roundData.start !== roundState.roundData.lastChange &&
                 <>
                     <Divider my={1}/>
                     <Text fontSize="xs">
-                        Last Change: <TimeAgo date={roundState.roundData.lastChange}/>
+                        Last Change: <Moment date={roundState.roundData.lastChange}
+                                             fromNow
+                                             withTitle
+                                             titleFormat="LLL"
+                                             interval={1}/>
                     </Text>
                 </>
                 }
