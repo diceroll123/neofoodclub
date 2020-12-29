@@ -77,9 +77,12 @@ function CurrentRoundInfo() {
                 </Text>
                 {roundState.roundData.lastChange &&
                 roundState.roundData.start !== roundState.roundData.lastChange &&
-                <Text fontSize="xs">
-                    Last Change: <TimeAgo date={roundState.roundData.lastChange}/>
-                </Text>
+                <>
+                    <Divider my={1}/>
+                    <Text fontSize="xs">
+                        Last Change: <TimeAgo date={roundState.roundData.lastChange}/>
+                    </Text>
+                </>
                 }
             </Box>
         </HStack>
