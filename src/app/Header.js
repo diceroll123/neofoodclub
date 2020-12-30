@@ -45,7 +45,7 @@ function PreviousRoundInfo() {
     const {roundState} = React.useContext(RoundContext);
 
     return (
-        <Text fontSize="xs" display={{sm: "none", md: "block"}}>
+        <Text as={Box} fontSize="xs" display={{sm: "none", md: "block"}}>
             <VStack>
                 <>Round ended</>
                 <Moment format="YYYY-MM-DD hh:mm:ss A"
