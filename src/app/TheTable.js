@@ -1118,8 +1118,9 @@ const CopyPayouts = (props) => {
                         toast.closeAll();
                         toast({
                             title: `reddit code copied!`,
+                            description: "Don't forget to switch to Markdown mode before you post it on reddit!",
                             status: "success",
-                            duration: 1200,
+                            duration: 5000,
                             isClosable: true
                         });
                     }}>
