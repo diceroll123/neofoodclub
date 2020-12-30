@@ -10,6 +10,7 @@ import {
     HStack,
     IconButton,
     Skeleton,
+    SkeletonText,
     Spacer,
     Text,
     useColorMode,
@@ -108,26 +109,20 @@ function CurrentRoundInfo() {
 function RoundInfo() {
     const {roundState} = React.useContext(RoundContext);
 
-    let data = <Box width="130px">&nbsp;</Box>;
+    let element = <SkeletonText noOfLines={3} minWidth="190px"/>;
 
     if (roundState.roundData !== null) {
         if (roundState.roundData.winners[0] > 0) {
-            data = <PreviousRoundInfo/>
+            element = <PreviousRoundInfo/>;
         } else {
-            data = <CurrentRoundInfo/>
+            element = <CurrentRoundInfo/>;
         }
     }
 
     return (
-        <Skeleton display={{base: "none", md: "block"}}
-                  isLoaded={roundState.roundData !== null}>
-            {/*TODO: SkeletonText does not fade in, so don't use that until #2800 is fixed*/}
-            {/*<SkeletonText noOfLines={3}*/}
-            {/*              spacing="1"*/}
-            {/*              width="180px"*/}
-            {data}
-            {/*</SkeletonText>*/}
-        </Skeleton>
+        <Box display={{base: "none", md: "block"}}>
+            {element}
+        </Box>
     )
 }
 
