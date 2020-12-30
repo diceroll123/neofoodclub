@@ -15,13 +15,16 @@ export default function RoundInput() {
     const [roundNumber, setRoundNumber] = useState(roundState.currentSelectedRound || 0);
 
     function changeCurrentSelectedRound(value) {
-        value = parseInt(value);
         if (value > 0) {
             setRoundState({
                 currentSelectedRound: value,
                 roundData: null
             });
         }
+    }
+
+    if (roundState.currentSelectedRound !== roundNumber && roundNumber === 0) {
+        setRoundNumber(roundState.currentSelectedRound);
     }
 
     return (
@@ -34,6 +37,7 @@ export default function RoundInput() {
             allowMouseWheel
             width="80px"
             onChange={(value) => {
+                value = parseInt(value);
                 setRoundNumber(value);
 
                 // debounce number input to 300ms
