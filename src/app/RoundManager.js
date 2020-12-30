@@ -51,10 +51,13 @@ export const RoundManager = () => {
             forceUpdate = false;
         }
 
+        // if the current selected round is a round older than 2 days ago, force cache
+        let cache = roundState.currentSelectedRound < (roundState.currentRound - 2) ? "force-cache" : "no-cache";
+
         // update if there's no data
         if (roundState.roundData === null || forceUpdate) {
             fetch(`https://api.neofood.club/rounds/${roundState.currentSelectedRound}.json`, {
-                cache: "no-cache"
+                cache: cache
             })
                 .then(response => response.json())
                 .then(roundData => {
