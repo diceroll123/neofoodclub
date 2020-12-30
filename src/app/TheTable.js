@@ -111,8 +111,8 @@ const CopyLinkButtons = () => {
     let betURL = createBetURL(roundState);
     let amountsBetUrl = createBetURL(roundState, false);
 
-    const urlClip = useClipboard(betURL);
-    const urlAmountsClip = useClipboard(amountsBetUrl);
+    const urlClip = useClipboard(window.location.origin + betURL);
+    const urlAmountsClip = useClipboard(window.location.origin + amountsBetUrl);
 
     return (
         <>
