@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react"
 import Moment from "react-moment";
 import {SunIcon, MoonIcon} from "@chakra-ui/icons"
-import React from "react"
+import React, {useState} from "react"
 import RoundInput from "./RoundInput";
 import RoundContext from "./RoundState";
 import moment from "moment";
@@ -132,6 +132,7 @@ function MaxBetInput() {
     const toast = useToast();
 
     let maxBet = getMaxBet(roundState.currentSelectedRound);
+    const [tempMaxBet, setTempMaxBet] = useState(maxBet);
 
     return (
         <>
@@ -139,7 +140,8 @@ function MaxBetInput() {
                 <Skeleton height="24px" width="80px"><Box>&nbsp;</Box></Skeleton>
                 :
                 <BetAmountInput
-                    defaultValue={maxBet}
+                    value={tempMaxBet}
+                    onChange={(value) => setTempMaxBet(value)}
                     onBlur={(e) => {
                         let value = parseInt(e.target.value);
                         if (value === maxBet) {
@@ -150,6 +152,8 @@ function MaxBetInput() {
                         if (isNaN(value) || value === 0) {
                             value = -1000;
                         }
+
+                        setTempMaxBet(value.toString());
 
                         maxBet = value;
 
