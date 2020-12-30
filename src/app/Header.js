@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react"
 import Moment from "react-moment";
 import {SunIcon, MoonIcon} from "@chakra-ui/icons"
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import RoundInput from "./RoundInput";
 import RoundContext from "./RoundState";
 import moment from "moment";
@@ -131,45 +131,45 @@ function MaxBetInput() {
     const cookies = new Cookies();
     const toast = useToast();
 
-    let maxBet = getMaxBet(roundState.currentSelectedRound);
-    const [tempMaxBet, setTempMaxBet] = useState(maxBet);
+    const [tempMaxBet, setTempMaxBet] = useState(getMaxBet(roundState.currentSelectedRound));
+
+    useEffect(() => {
+        setTempMaxBet(getMaxBet(roundState.currentSelectedRound));
+    }, [roundState.currentSelectedRound]);
+
+    if (roundState.roundData === null) {
+        return (<Skeleton h="24px" w="80px"><Box/></Skeleton>);
+    }
 
     return (
-        <>
-            {roundState.roundData === null ?
-                <Skeleton height="24px" width="80px"><Box>&nbsp;</Box></Skeleton>
-                :
-                <BetAmountInput
-                    value={tempMaxBet}
-                    onChange={(value) => setTempMaxBet(value)}
-                    onBlur={(e) => {
-                        let value = parseInt(e.target.value);
-                        if (value === maxBet) {
-                            // don't save over it if it's the same
-                            return;
-                        }
+        <BetAmountInput
+            value={tempMaxBet.toString()}
+            onChange={(value) => setTempMaxBet(value)}
+            onBlur={(e) => {
+                let value = parseInt(e.target.value);
+                if (value === tempMaxBet) {
+                    // don't save over it if it's the same
+                    return;
+                }
 
-                        if (isNaN(value) || value === 0) {
-                            value = -1000;
-                        }
+                if (isNaN(value) || value < 50) {
+                    value = -1000;
+                }
 
-                        setTempMaxBet(value.toString());
+                setTempMaxBet(value);
 
-                        maxBet = value;
+                let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
+                cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
 
-                        let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
-                        cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
-
-                        toast.closeAll();
-                        toast({
-                            title: `Max Bet Saved!`,
-                            status: "success",
-                            duration: 1200,
-                            isClosable: true
-                        });
-                    }}/>
-            }
-        </>
+                toast.closeAll();
+                toast({
+                    title: `Max Bet Saved!`,
+                    status: "success",
+                    duration: 1200,
+                    isClosable: true
+                });
+            }}
+        />
     )
 }
 

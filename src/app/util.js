@@ -140,7 +140,13 @@ export function getMaxBet(currentSelectedRound) {
     if (maxBet === undefined) {
         return -1000;
     }
-    return calculateMaxBet(parseInt(maxBet), currentSelectedRound);
+    let value = calculateMaxBet(parseInt(maxBet), currentSelectedRound);
+
+    if (value < 50) {
+        return -1000;
+    }
+
+    return Math.min(500_000, value);
 }
 
 export function getTableMode() {
