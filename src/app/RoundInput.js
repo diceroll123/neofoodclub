@@ -15,15 +15,19 @@ export default function RoundInput() {
         <NumberInput
             size="sm"
             isDisabled={roundState.currentSelectedRound === null}
-            value={roundState.currentSelectedRound || 1}
+            value={roundState.currentSelectedRound || 0}
             min={1}
             max={roundState.currentRound}
             allowMouseWheel
             width="80px"
-            onChange={(value) => setRoundState({
-                currentSelectedRound: parseInt(value),
-                roundData: null
-            })}>
+            onChange={(value) => {
+                if (value > 0) {
+                    setRoundState({
+                        currentSelectedRound: parseInt(value),
+                        roundData: null
+                    })
+                }
+            }}>
             <NumberInputField/>
             <NumberInputStepper>
                 <NumberIncrementStepper/>
