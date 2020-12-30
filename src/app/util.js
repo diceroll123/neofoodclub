@@ -159,7 +159,9 @@ export function createBetURL(roundState, ignoreBetAmounts) {
     // bet amounts will only be added if ignoreBetAmounts is false AND valid bet amounts are found
 
     // that aside, this only returns the hash, shaped like so:
+    // "/#round=7018"
     // "/#round=7018&b=gmkhmgklhkfmlfmbkkhkgkacm"
+    // "/#round=7018&b=gmkhmgklhkfmlfmbkkhkgkacm&a=CEbCEbCEbCEbCEbCEbCEbCEbCEbCEb"
 
     if (ignoreBetAmounts === undefined) {
         ignoreBetAmounts = true;
