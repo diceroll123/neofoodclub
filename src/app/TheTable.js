@@ -106,44 +106,57 @@ const ClearBetsButton = () => {
 
 const CopyLinkButtons = () => {
     const toast = useToast();
+    const cookies = new Cookies();
     const {roundState} = React.useContext(RoundContext);
+    const [useWebDomain, toggleUseWebDomain] = useState(cookies.get('useWebDomain') === "true");
 
-    let betURL = createBetURL(roundState);
-    let amountsBetUrl = createBetURL(roundState, false);
+    const betURL = createBetURL(roundState);
+    const amountsBetUrl = createBetURL(roundState, false);
+    const origin = useWebDomain ? window.location.origin : "";
 
-    const urlClip = useClipboard(window.location.origin + betURL);
-    const urlAmountsClip = useClipboard(window.location.origin + amountsBetUrl);
+    const urlClip = useClipboard(origin + betURL);
+    const urlAmountsClip = useClipboard(origin + amountsBetUrl);
+
+    function copier(clip, title) {
+        clip.onCopy();
+        toast.closeAll();
+        toast({
+            title: title,
+            status: "success",
+            duration: 1300,
+            isClosable: true
+        });
+    }
+
+    if (betURL.includes("&b=") === false) {
+        return null;
+    }
 
     return (
         <>
-            {betURL.includes("&b=") &&
-            <ButtonGroup size="sm" isAttached variant="outline">
-                <Button mr="-px"
-                        leftIcon={<LinkIcon/>}
-                        onClick={() => {
-                            urlClip.onCopy();
-                            toast.closeAll();
-                            toast({
-                                title: `Bet URL copied!`,
-                                status: "success",
-                                duration: 1300,
-                                isClosable: true
-                            });
-                        }}>Copy URL</Button>
-                {amountsBetUrl.includes("&a=") &&
-                <Button onClick={() => {
-                    urlAmountsClip.onCopy();
-                    toast.closeAll();
-                    toast({
-                        title: `Bet URL + Amounts copied!`,
-                        status: "success",
-                        duration: 1300,
-                        isClosable: true
-                    });
-                }}>+ Amounts</Button>
-                }
-            </ButtonGroup>
-            }
+            <ExtraBox whiteSpace="nowrap">
+                <Stack>
+                    <ButtonGroup size="sm" isAttached variant="outline">
+                        <Button mr="-px"
+                                leftIcon={<LinkIcon/>}
+                                onClick={
+                                    () => copier(urlClip, 'Bet URL copied!')
+                                }>Copy URL</Button>
+                        {amountsBetUrl.includes("&a=") &&
+                        <Button onClick={
+                            () => copier(urlAmountsClip, 'Bet URL + Amounts copied!')
+                        }>+ Amounts</Button>
+                        }
+                    </ButtonGroup>
+                    <Checkbox
+                        isChecked={useWebDomain}
+                        onChange={(e) => {
+                            let checked = e.target.checked;
+                            toggleUseWebDomain(checked);
+                            cookies.set('useWebDomain', checked);
+                        }}>Include website domain</Checkbox>
+                </Stack>
+            </ExtraBox>
         </>
     )
 }
