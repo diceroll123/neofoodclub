@@ -23,8 +23,9 @@ export default function RoundInput() {
         }
     }
 
-    if (roundState.currentSelectedRound !== roundNumber && roundNumber === 0) {
-        setRoundNumber(roundState.currentSelectedRound);
+    const currentSelected = roundState.currentSelectedRound;
+    if (currentSelected !== null && currentSelected !== roundNumber && roundNumber === 0) {
+        setRoundNumber(currentSelected);
     }
 
     return (
