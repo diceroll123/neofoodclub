@@ -46,6 +46,11 @@ export const RoundManager = () => {
             return;
         }
 
+        // do not update this round if it's over
+        if (forceUpdate && roundState.roundData !== null && roundState.roundData.winners[0] > 0) {
+            forceUpdate = false;
+        }
+
         // update if there's no data
         if (roundState.roundData === null || forceUpdate) {
             fetch(`https://api.neofood.club/rounds/${roundState.currentSelectedRound}.json`, {
@@ -70,8 +75,6 @@ export const RoundManager = () => {
                         isClosable: true
                     });
                 });
-        } else {
-
         }
     }
 
@@ -93,15 +96,14 @@ export const RoundManager = () => {
         });
 
         const refreshInterval = setInterval(() => {
-            if (roundState.currentSelectedRound === roundState.currentRound) {
-                getRoundData(true);
-            }
+            getRoundData(true);
         }, 10000);
 
         return () => clearInterval(refreshInterval);
     }, [
         roundState.currentSelectedRound,
         roundState.currentRound,
+        roundState.roundData,
         roundState.bets,
         roundState.betAmounts
     ]);
