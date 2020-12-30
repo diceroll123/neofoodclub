@@ -82,7 +82,6 @@ export const RoundManager = () => {
     }
 
     useEffect(() => {
-        // TODO: Debounce round number input
         new Promise((resolve, reject) => {
             getCurrentRoundNumber(resolve, reject);
         }).then(() => {
