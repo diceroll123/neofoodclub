@@ -26,7 +26,7 @@ const links = [
     {
         icon: GithubIcon,
         label: "GitHub",
-        href: "https://github.com/diceroll123/foodclub",
+        href: "https://github.com/diceroll123/neofoodclub",
     }
 ];
 
