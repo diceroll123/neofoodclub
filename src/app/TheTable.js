@@ -747,7 +747,7 @@ const PlaceThisBetButton = (props) => {
     }
 
     return (
-        <Button size="xs" isDisabled={clicked} onClick={() => {
+        <Button size="xs" onClick={() => {
             generate_bet_link(bet, betNum);
             setClicked(true);
         }}>
