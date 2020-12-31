@@ -3,6 +3,9 @@ import {
     Button,
     ButtonGroup,
     Checkbox,
+    Editable,
+    EditableInput,
+    EditablePreview,
     Flex,
     HStack,
     Icon,
@@ -46,6 +49,7 @@ import BetAmountInput from "./BetAmountInput";
 import Cookies from "universal-cookie/es6";
 
 import moment from "moment";
+
 moment.relativeTimeThreshold('ss', 0);
 
 const redditIcon = (props) => (
@@ -1027,7 +1031,6 @@ const NormalExtras = (props) => {
                         toggleFaDetails(checked);
                         let currentAdvanced = roundState.advanced;
                         setRoundState({advanced: {...currentAdvanced, faDetails: checked}});
-
                     }}
                 >FA Details</Checkbox>
                 <Checkbox isDisabled>Odds Timeline</Checkbox>
@@ -1141,6 +1144,7 @@ const BetsSaver = (props) => {
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const [currentBet, setCurrentBet] = useState("0");
 
+    const [allNames, setAllNames] = useState({"0": "Starting Set"});
     const [allBets, setAllBets] = useState({"0": {...roundState.bets}});
 
     useEffect(() => {
@@ -1163,7 +1167,20 @@ const BetsSaver = (props) => {
                                         onClick={() => {
                                             setCurrentBet(e);
                                             setRoundState({bets: {...allBets[e]}});
-                                        }}>Bet Set {e}</Button>
+                                        }}>
+                                    {e === currentBet ?
+                                        <Editable defaultValue={allNames[e]}
+                                                  onChange={(value) => {
+                                                      let newName = {};
+                                                      newName[currentBet] = value || "Unnamed Set";
+                                                      setAllNames({...allNames, ...newName});
+                                                  }}>
+                                            <EditablePreview/>
+                                            <EditableInput/>
+                                        </Editable>
+                                        : <Text>{allNames[e]}</Text>
+                                    }
+                                </Button>
                             </WrapItem>
                         )
                     })}
@@ -1173,13 +1190,16 @@ const BetsSaver = (props) => {
                             aria-label="Add New Bet Set"
                             onClick={() => {
                                 const newObj = {};
+                                const newName = {};
                                 const bets = {};
                                 let newIndex = (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
                                 for (let index = 1; index <= Object.keys(allBets[currentBet]).length; index++) {
                                     bets[index] = [0, 0, 0, 0, 0];
                                 }
                                 newObj[newIndex] = {...bets};
+                                newName[newIndex] = "New Set";
 
+                                setAllNames({...allNames, ...newName});
                                 setAllBets({...allBets, ...newObj});
                                 setRoundState({bets: {...newObj[newIndex]}});
                                 setCurrentBet(newIndex);
@@ -1188,10 +1208,13 @@ const BetsSaver = (props) => {
                             aria-label="Clone Current Bet Set"
                             onClick={() => {
                                 const newObj = {};
+                                const newName = {};
                                 let newIndex = (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
                                 // forgive me, there is no better way to clone in JS yet
                                 newObj[newIndex] = JSON.parse(JSON.stringify(allBets[currentBet]));
+                                newName[newIndex] = `${allNames[currentBet]} (Clone)`;
 
+                                setAllNames({...allNames, ...newName});
                                 setAllBets({...allBets, ...newObj});
                                 setRoundState({bets: {...newObj[newIndex]}});
                                 setCurrentBet(newIndex);
@@ -1208,8 +1231,11 @@ const BetsSaver = (props) => {
 
                                 const previousElement = Object.keys(allBets)[useIndex];
                                 const allBetsCopy = {...allBets};
+                                const allNamesCopy = {...allNames};
                                 delete allBetsCopy[currentBet];
+                                delete allNamesCopy[currentBet];
                                 setAllBets({...allBetsCopy});
+                                setAllNames({...allNamesCopy});
                                 setRoundState({bets: {...allBetsCopy[previousElement]}});
                                 setCurrentBet(previousElement);
                             }}>Delete</Button>
