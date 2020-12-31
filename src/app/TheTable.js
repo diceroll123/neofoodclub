@@ -7,13 +7,13 @@ import {
     HStack,
     Icon,
     IconButton,
+    Radio,
+    RadioGroup,
     Select,
     Skeleton,
     Spacer,
-    StatArrow,
-    RadioGroup,
     Stack,
-    Radio,
+    StatArrow,
     Table,
     Tbody,
     Td as OriginalTd,
@@ -27,24 +27,18 @@ import {
     useTheme,
     useToast,
 } from "@chakra-ui/react";
-import {ArrowUpIcon, ArrowDownIcon, LinkIcon} from "@chakra-ui/icons";
+import {AddIcon, ArrowDownIcon, ArrowUpIcon, CopyIcon, DeleteIcon, LinkIcon} from "@chakra-ui/icons";
 import React, {useEffect, useState} from "react";
 import RoundContext from "./RoundState";
 import {
     calculateArenaRatios,
     calculatePayoutTables,
-    computePirateFAs,
-    computeProbabilities,
     computePirateBinary,
-    computePiratesBinary
+    computePirateFAs,
+    computePiratesBinary,
+    computeProbabilities
 } from "./maths";
-import {
-    displayAsPercent,
-    numberWithCommas,
-    getMaxBet,
-    getTableMode,
-    createBetURL
-} from "./util";
+import {createBetURL, displayAsPercent, getMaxBet, getTableMode, numberWithCommas} from "./util";
 import {ARENA_NAMES, FOODS, NEGATIVE_FAS, PIRATE_NAMES, POSITIVE_FAS} from "./constants";
 import BetAmountInput from "./BetAmountInput";
 import Cookies from "universal-cookie/es6";
@@ -1141,6 +1135,87 @@ const CopyPayouts = (props) => {
     )
 }
 
+const BetsSaver = (props) => {
+    const {roundState, setRoundState} = React.useContext(RoundContext);
+    const [currentBet, setCurrentBet] = useState("0");
+
+    const [allBets, setAllBets] = useState({"0": {...roundState.bets}});
+
+    useEffect(() => {
+        // TODO: (maybe fix?) when you switch between sets, this has the side effect of updating itself again here one time
+        const newObj = {};
+        newObj[currentBet] = {...roundState.bets};
+        setAllBets({...allBets, ...newObj});
+    }, [roundState.bets]);
+
+    return (
+        <SettingsBox mt={4} {...props}>
+            <Stack>
+                <HorizontalScrollingBox whiteSpace="nowrap" pb={1} pt={4} px={4}>
+                    <HStack>
+                        <ButtonGroup size="sm" isAttached variant="outline">
+                            {
+                                Object.keys(allBets).map((e) => {
+                                    return <Button isActive={e === currentBet} onClick={() => {
+                                        setCurrentBet(e);
+                                        setRoundState({bets: {...allBets[e]}});
+                                    }}>Bet Set {e}</Button>
+                                })
+                            }
+                        </ButtonGroup>
+                    </HStack>
+                </HorizontalScrollingBox>
+                <ButtonGroup pt={1} pb={4} px={4} size="sm" isAttached variant="outline">
+                    <Button leftIcon={<AddIcon/>}
+                            aria-label="Add New Bet Set"
+                            onClick={() => {
+                                const newObj = {};
+                                const bets = {};
+                                let newIndex = (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
+                                for (let index = 1; index <= Object.keys(allBets[currentBet]).length; index++) {
+                                    bets[index] = [0, 0, 0, 0, 0];
+                                }
+                                newObj[newIndex] = {...bets};
+
+                                setAllBets({...allBets, ...newObj});
+                                setRoundState({bets: {...newObj[newIndex]}});
+                                setCurrentBet(newIndex);
+                            }}>New</Button>
+                    <Button leftIcon={<CopyIcon/>}
+                            aria-label="Clone Current Bet Set"
+                            onClick={() => {
+                                const newObj = {};
+                                let newIndex = (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
+                                // forgive me, there is no better way to clone in JS yet
+                                newObj[newIndex] = JSON.parse(JSON.stringify(allBets[currentBet]));
+
+                                setAllBets({...allBets, ...newObj});
+                                setRoundState({bets: {...newObj[newIndex]}});
+                                setCurrentBet(newIndex);
+                            }}>Clone</Button>
+                    <Button leftIcon={<DeleteIcon/>}
+                            aria-label="Delete Current Bet Set"
+                            isDisabled={Object.keys(allBets).length === 1}
+                            onClick={() => {
+                                const currentIndex = Object.keys(allBets).indexOf(currentBet);
+                                let useIndex = currentIndex - 1;
+                                if (useIndex < 0) {
+                                    useIndex = currentIndex + 1;
+                                }
+
+                                const previousElement = Object.keys(allBets)[useIndex];
+                                const allBetsCopy = {...allBets};
+                                delete allBetsCopy[currentBet];
+                                setAllBets({...allBetsCopy});
+                                setRoundState({bets: {...allBetsCopy[previousElement]}});
+                                setCurrentBet(previousElement);
+                            }}>Delete</Button>
+                </ButtonGroup>
+            </Stack>
+        </SettingsBox>
+    );
+}
+
 export default function TheTable(props) {
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
@@ -1215,6 +1290,8 @@ export default function TheTable(props) {
     return (
         <Box {...props}>
             <TableExtras background={grayAccent}/>
+
+            <BetsSaver background={grayAccent}/>
 
             <HorizontalScrollingBox>
                 <PirateTable m={4}
