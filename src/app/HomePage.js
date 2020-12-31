@@ -10,7 +10,7 @@ export default function HomePage() {
 
             <TheTable pt="6.5rem"/>
 
-            <Footer mb="3rem"/>
+            <Footer/>
         </>
     )
 }

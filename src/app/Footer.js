@@ -32,7 +32,7 @@ const links = [
 
 function Footer(props) {
     return (
-        <Box as="footer" mt={12} textAlign="center" {...props}>
+        <Box as="footer" mb="3rem" mt={12} textAlign="center" {...props}>
             <Divider/>
             <Box pt={6}>
                 <Text fontSize="sm">
