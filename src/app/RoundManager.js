@@ -7,6 +7,17 @@ export const RoundManager = () => {
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const toast = useToast();
 
+    function errorToast(title, description) {
+        toast.closeAll();
+        toast({
+            title: title,
+            description: description,
+            status: "error",
+            duration: 3000,
+            isClosable: true
+        })
+    }
+
     function getCurrentRoundNumber(resolve, reject) {
         if (roundState.currentRound === null) {
             // first pass-through sets the round, then bails out
@@ -25,14 +36,10 @@ export const RoundManager = () => {
                     }
                 })
                 .catch(() => {
-                    toast.closeAll();
-                    toast({
-                        title: `Current round data not found.`,
-                        description: "We don't seem to know what round it currently is. 🤔",
-                        status: "error",
-                        duration: 3000,
-                        isClosable: true
-                    })
+                    errorToast(
+                        "Current round data not found.",
+                        "We don't seem to know what round it currently is. 🤔"
+                    )
                 })
                 .then(reject)
         } else {
@@ -69,14 +76,10 @@ export const RoundManager = () => {
                     setRoundState({roundData, currentRound});
                 })
                 .catch(() => {
-                    toast.closeAll();
-                    toast({
-                        title: `Round ${roundState.currentSelectedRound} not found.`,
-                        description: "We don't seem to have data for this round. 🤔",
-                        status: "error",
-                        duration: 3000,
-                        isClosable: true
-                    });
+                    errorToast(
+                        `Round ${roundState.currentSelectedRound} not found.`,
+                        "We don't seem to have data for this round. 🤔"
+                    );
                 });
         }
     }
