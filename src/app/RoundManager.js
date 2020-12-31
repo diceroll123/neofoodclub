@@ -1,7 +1,8 @@
 import React, {useEffect} from "react";
 import RoundContext from "./RoundState";
 import {useToast} from "@chakra-ui/react";
-import {createBetURL} from "./util";
+import {createBetURL, parseBetUrl} from "./util";
+import HashChange from "react-hashchange";
 
 export const RoundManager = () => {
     const {roundState, setRoundState} = React.useContext(RoundContext);
@@ -113,5 +114,15 @@ export const RoundManager = () => {
         roundState.betAmounts
     ]);
 
-    return null;
+    return (
+        <HashChange onChange={() => {
+            const data = parseBetUrl();
+            setRoundState({
+                currentSelectedRound: data.round,
+                bets: data.bets,
+                betAmounts: data.betAmounts,
+                roundData: null
+            });
+        }}/>
+    );
 }

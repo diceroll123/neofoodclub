@@ -1,4 +1,4 @@
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import RoundContext from "./RoundState";
 import {
     NumberDecrementStepper,
@@ -27,6 +27,10 @@ export default function RoundInput() {
     if (currentSelected !== null && currentSelected !== roundNumber && roundNumber === 0) {
         setRoundNumber(currentSelected);
     }
+
+    useEffect(() => {
+        setRoundNumber(roundState.currentSelectedRound);
+    }, [roundState.currentSelectedRound]);
 
     return (
         <NumberInput
