@@ -22,7 +22,7 @@ export default function RoundInput() {
             });
         }
     }
-    
+
     useEffect(() => {
         const currentSelected = roundState.currentSelectedRound;
         if (currentSelected !== null && currentSelected !== roundNumber && roundNumber === 0) {
@@ -39,8 +39,14 @@ export default function RoundInput() {
             max={roundState.currentRound}
             allowMouseWheel
             width="80px"
+            onFocus={(e) => e.target.select()}
             onChange={(value) => {
                 value = parseInt(value);
+                if (isNaN(value)) {
+                    setRoundNumber("");
+                    return;
+                }
+
                 setRoundNumber(value);
 
                 // debounce number input to 300ms
@@ -52,8 +58,14 @@ export default function RoundInput() {
                     setTimeout(() => {
                         setTimeoutId(null);
                         changeCurrentSelectedRound(value);
-                    }, 300)
+                    }, 400)
                 );
+            }}
+            onBlur={(e) => {
+                if (e.target.value === "") {
+                    setRoundNumber(roundState.currentRound);
+                    changeCurrentSelectedRound(roundState.currentRound);
+                }
             }}>
             <NumberInputField/>
             <NumberInputStepper>
