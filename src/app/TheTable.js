@@ -272,10 +272,7 @@ const NormalTable = (props) => {
                     {/*<Th>Custom</Th>*/}
                     {/*<Th>Used</Th>*/}
                     <BigBrainElement as={Th}>Payout</BigBrainElement>
-                    {roundState.roundData && roundState.roundData.foods !== undefined ?
-                        <BigBrainElement as={Th}><TextTooltip text="FA" label="Food Adjustment"/></BigBrainElement>
-                        : null
-                    }
+                    <BigBrainElement as={Th}><TextTooltip text="FA" label="Food Adjustment"/></BigBrainElement>
                     <FaDetailsElement as={Th} colSpan={10}>FA Explanation</FaDetailsElement>
                     <Th><TextTooltip text="Open" label="Opening Odds"/></Th>
                     <Th><TextTooltip text="Curr" label="Current Odds"/></Th>
@@ -410,7 +407,7 @@ const NormalTable = (props) => {
                                                     {roundState.roundData.foods[arenaId].map((foodId) => {
                                                         return calculatePirateFA(pirateId, foodId)
                                                     })}
-                                                </> : null
+                                                </> : <BigBrainElement as={Td} isNumeric>N/A</BigBrainElement>
                                         }
                                         <Td isNumeric>{opening}:1</Td>
                                         <Td isNumeric whiteSpace="nowrap">
