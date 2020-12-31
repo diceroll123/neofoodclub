@@ -22,14 +22,12 @@ export default function RoundInput() {
             });
         }
     }
-
-    const currentSelected = roundState.currentSelectedRound;
-    if (currentSelected !== null && currentSelected !== roundNumber && roundNumber === 0) {
-        setRoundNumber(currentSelected);
-    }
-
+    
     useEffect(() => {
-        setRoundNumber(roundState.currentSelectedRound);
+        const currentSelected = roundState.currentSelectedRound;
+        if (currentSelected !== null && currentSelected !== roundNumber && roundNumber === 0) {
+            setRoundNumber(currentSelected);
+        }
     }, [roundState.currentSelectedRound]);
 
     return (
