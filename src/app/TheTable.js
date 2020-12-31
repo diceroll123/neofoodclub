@@ -22,6 +22,8 @@ import {
     Thead,
     Tooltip,
     Tr,
+    Wrap,
+    WrapItem,
     useClipboard,
     useColorModeValue,
     useTheme,
@@ -1150,22 +1152,23 @@ const BetsSaver = (props) => {
 
     return (
         <SettingsBox mt={4} {...props}>
-            <Stack>
-                <HorizontalScrollingBox whiteSpace="nowrap" pb={1} pt={4} px={4}>
-                    <HStack>
-                        <ButtonGroup size="sm" isAttached variant="outline">
-                            {
-                                Object.keys(allBets).map((e) => {
-                                    return <Button isActive={e === currentBet} onClick={() => {
-                                        setCurrentBet(e);
-                                        setRoundState({bets: {...allBets[e]}});
-                                    }}>Bet Set {e}</Button>
-                                })
-                            }
-                        </ButtonGroup>
-                    </HStack>
-                </HorizontalScrollingBox>
-                <ButtonGroup pt={1} pb={4} px={4} size="sm" isAttached variant="outline">
+            <Stack p={4}>
+                <Wrap>
+                    {Object.keys(allBets).map((e) => {
+                        return (
+                            <WrapItem>
+                                <Button size="sm"
+                                        variant="outline"
+                                        isActive={e === currentBet}
+                                        onClick={() => {
+                                            setCurrentBet(e);
+                                            setRoundState({bets: {...allBets[e]}});
+                                        }}>Bet Set {e}</Button>
+                            </WrapItem>
+                        )
+                    })}
+                </Wrap>
+                <ButtonGroup size="sm" isAttached variant="outline">
                     <Button leftIcon={<AddIcon/>}
                             aria-label="Add New Bet Set"
                             onClick={() => {
