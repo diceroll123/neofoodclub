@@ -1169,12 +1169,13 @@ const BetsSaver = (props) => {
                                             setRoundState({bets: {...allBets[e]}});
                                         }}>
                                     {e === currentBet ?
-                                        <Editable defaultValue={allNames[e]}
-                                                  onChange={(value) => {
-                                                      let newName = {};
-                                                      newName[currentBet] = value || "Unnamed Set";
-                                                      setAllNames({...allNames, ...newName});
-                                                  }}>
+                                        <Editable
+                                            value={allNames[e]}
+                                            onChange={(value) => {
+                                                let newName = {};
+                                                newName[currentBet] = value || "Unnamed Set";
+                                                setAllNames({...allNames, ...newName});
+                                            }}>
                                             <EditablePreview/>
                                             <EditableInput/>
                                         </Editable>
