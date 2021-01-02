@@ -3,9 +3,6 @@ import {
     Button,
     ButtonGroup,
     Checkbox,
-    Editable,
-    EditableInput,
-    EditablePreview,
     Flex,
     HStack,
     Icon,
@@ -25,14 +22,12 @@ import {
     Thead,
     Tooltip,
     Tr,
-    Wrap,
-    WrapItem,
     useClipboard,
     useColorModeValue,
     useTheme,
     useToast,
 } from "@chakra-ui/react";
-import {AddIcon, ArrowDownIcon, ArrowUpIcon, CopyIcon, DeleteIcon, LinkIcon} from "@chakra-ui/icons";
+import {ArrowDownIcon, ArrowUpIcon, LinkIcon} from "@chakra-ui/icons";
 import React, {useEffect, useState} from "react";
 import RoundContext from "./RoundState";
 import {
@@ -51,6 +46,7 @@ import Cookies from "universal-cookie/es6";
 import moment from "moment";
 import CustomOddsInput from "./CustomOddsInput";
 import CustomProbsInput from "./CustomProbsInput";
+import BetsSaver from "./BetFunctions";
 
 moment.relativeTimeThreshold('ss', 0);
 
@@ -511,7 +507,7 @@ const BetExtras = (props) => {
     )
 }
 
-const SettingsBox = (props) => {
+export const SettingsBox = (props) => {
     const {background, children, ...rest} = props;
     return (
         <Flex align="center"
@@ -1189,111 +1185,6 @@ const CopyPayouts = (props) => {
     )
 }
 
-const BetsSaver = (props) => {
-    const {roundState, setRoundState} = React.useContext(RoundContext);
-    const [currentBet, setCurrentBet] = useState("0");
-
-    const [allNames, setAllNames] = useState({"0": "Starting Set"});
-    const [allBets, setAllBets] = useState({"0": {...roundState.bets}});
-
-    useEffect(() => {
-        // TODO: (maybe fix?) when you switch between sets, this has the side effect of updating itself again here one time
-        const newObj = {};
-        newObj[currentBet] = {...roundState.bets};
-        setAllBets({...allBets, ...newObj});
-    }, [roundState.bets]);
-
-    return (
-        <SettingsBox mt={4} {...props}>
-            <Stack p={4}>
-                <Wrap>
-                    {Object.keys(allBets).map((e) => {
-                        return (
-                            <WrapItem>
-                                <Button size="sm"
-                                        variant="outline"
-                                        isActive={e === currentBet}
-                                        onClick={() => {
-                                            setCurrentBet(e);
-                                            setRoundState({bets: {...allBets[e]}});
-                                        }}>
-                                    {e === currentBet ?
-                                        <Editable
-                                            value={allNames[e]}
-                                            onChange={(value) => {
-                                                let newName = {};
-                                                newName[currentBet] = value || "Unnamed Set";
-                                                setAllNames({...allNames, ...newName});
-                                            }}>
-                                            <EditablePreview/>
-                                            <EditableInput/>
-                                        </Editable>
-                                        : <Text>{allNames[e]}</Text>
-                                    }
-                                </Button>
-                            </WrapItem>
-                        )
-                    })}
-                </Wrap>
-                <ButtonGroup size="sm" isAttached variant="outline">
-                    <Button leftIcon={<AddIcon/>}
-                            aria-label="Add New Bet Set"
-                            onClick={() => {
-                                const newObj = {};
-                                const newName = {};
-                                const bets = {};
-                                let newIndex = (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
-                                for (let index = 1; index <= Object.keys(allBets[currentBet]).length; index++) {
-                                    bets[index] = [0, 0, 0, 0, 0];
-                                }
-                                newObj[newIndex] = {...bets};
-                                newName[newIndex] = "New Set";
-
-                                setAllNames({...allNames, ...newName});
-                                setAllBets({...allBets, ...newObj});
-                                setRoundState({bets: {...newObj[newIndex]}});
-                                setCurrentBet(newIndex);
-                            }}>New</Button>
-                    <Button leftIcon={<CopyIcon/>}
-                            aria-label="Clone Current Bet Set"
-                            onClick={() => {
-                                const newObj = {};
-                                const newName = {};
-                                let newIndex = (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
-                                newObj[newIndex] = cloneArray(allBets[currentBet]);
-                                newName[newIndex] = `${allNames[currentBet]} (Clone)`;
-
-                                setAllNames({...allNames, ...newName});
-                                setAllBets({...allBets, ...newObj});
-                                setRoundState({bets: {...newObj[newIndex]}});
-                                setCurrentBet(newIndex);
-                            }}>Clone</Button>
-                    <Button leftIcon={<DeleteIcon/>}
-                            aria-label="Delete Current Bet Set"
-                            isDisabled={Object.keys(allBets).length === 1}
-                            onClick={() => {
-                                const currentIndex = Object.keys(allBets).indexOf(currentBet);
-                                let useIndex = currentIndex - 1;
-                                if (useIndex < 0) {
-                                    useIndex = currentIndex + 1;
-                                }
-
-                                const previousElement = Object.keys(allBets)[useIndex];
-                                const allBetsCopy = {...allBets};
-                                const allNamesCopy = {...allNames};
-                                delete allBetsCopy[currentBet];
-                                delete allNamesCopy[currentBet];
-                                setAllBets({...allBetsCopy});
-                                setAllNames({...allNamesCopy});
-                                setRoundState({bets: {...allBetsCopy[previousElement]}});
-                                setCurrentBet(previousElement);
-                            }}>Delete</Button>
-                </ButtonGroup>
-            </Stack>
-        </SettingsBox>
-    );
-}
-
 export default function TheTable(props) {
     const {roundState} = React.useContext(RoundContext);
 
@@ -1367,7 +1258,8 @@ export default function TheTable(props) {
         <Box {...props}>
             <TableExtras background={grayAccent}/>
 
-            <BetsSaver background={grayAccent}/>
+            <BetsSaver background={grayAccent}
+                       probabilities={probabilities}/>
 
             <HorizontalScrollingBox>
                 <PirateTable m={4}

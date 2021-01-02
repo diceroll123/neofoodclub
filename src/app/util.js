@@ -159,6 +159,16 @@ export function getTableMode() {
     return mode;
 }
 
+export function anyBetsExist(betsObject) {
+    let exists = false;
+    for (const [, value] of Object.entries(betsObject)) {
+        if (exists === false) {
+            exists = value.some(x => x > 0);
+        }
+    }
+    return exists;
+}
+
 export function createBetURL(roundState, ignoreBetAmounts) {
     // for this function:
     // bets will only be added if any bets are valid
@@ -174,12 +184,7 @@ export function createBetURL(roundState, ignoreBetAmounts) {
     }
 
     let betURL = `/#round=${roundState.currentSelectedRound}`;
-    let addBets = false;
-    for (const [, value] of Object.entries(roundState.bets)) {
-        if (addBets === false) {
-            addBets = value.some(x => x > 0);
-        }
-    }
+    let addBets = anyBetsExist(roundState.bets);
 
     if (addBets === false) {
         return betURL;

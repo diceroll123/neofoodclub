@@ -155,7 +155,7 @@ export function calculatePayoutTables(roundState, betOdds, betPayoffs) {
     */
 
     // arIb[i] will accept pirates from arena i and only them. arIb[4] == 1111, arIb[3] == 11110000, etc...
-    let arIb = [15 << 16, 15 << 12, 15 << 8, 15 << 4, 15];
+    let arIb = [983040, 61440, 3840, 240, 15];
     // allIb will accept all pirates. allIb = 11111111111111111111 (should be 20 '1's)
     let allIb = (1 << 20) - 1;
     // pirIb[i] will accept pirates of index i (from 0 to 3) pirIb[0] = 10001000100010001000, pirIb[1] = 01000100010001000100, pirIb[2] = 00100010001000100010, pirIb[3] = 00010001000100010001
@@ -292,4 +292,16 @@ export function computePiratesBinary(piratesArray) {
         }
     }
     return value;
+}
+
+export function computeBinaryToPirates(bin) {
+    let indices = [];
+    [983040, 61440, 3840, 240, 15].forEach((arenaValue) => {
+        let value = arenaValue & bin;
+        if (value > 0) {
+            value = 4 - ((value.toString(2).length - 1) % 4);
+        }
+        indices.push(value)
+    })
+    return indices;
 }
