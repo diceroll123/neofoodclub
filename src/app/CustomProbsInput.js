@@ -22,7 +22,7 @@ export default function CustomProbsInput(props) {
         newData["customProbs"][arenaIndex][pirateIndex] = probValue / 100;
 
         let currentRoundData = roundState.roundData;
-        setRoundState({roundData: {...currentRoundData, ...newData}})
+        setRoundState({roundData: {...currentRoundData, ...newData}});
     }
 
     return (
@@ -32,7 +32,7 @@ export default function CustomProbsInput(props) {
             onChange={(value) => {
                 const cleanValue = parseFloat(value);
 
-                if (isNaN(cleanValue)) {
+                if (isNaN(cleanValue) || value.charAt(value.length - 1) === ".") {
                     setProb(value);
                 } else {
                     changeProbs(cleanValue);
