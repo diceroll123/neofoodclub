@@ -128,11 +128,14 @@ export const RoundManager = () => {
     return (
         <HashChange onChange={() => {
             const data = parseBetUrl();
+            if (isNaN(parseInt(data.round))) {
+                data.round = roundState.currentRound;
+            }
             setRoundState({
                 currentSelectedRound: data.round,
                 bets: data.bets,
                 betAmounts: data.betAmounts,
-                roundData: null
+                roundData: data.round === roundState.currentSelectedRound ? roundState.roundData : null
             });
         }}/>
     );
