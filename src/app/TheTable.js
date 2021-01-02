@@ -247,7 +247,7 @@ const NormalTable = (props) => {
     const StickyTd = (props) => {
         const {children, ...rest} = props;
         return (
-            <Td style={{"position": "sticky", "left": "0"}}
+            <Td style={{"position": "sticky", "left": "0", "z-index": "1"}}
                 {...rest}>{children}</Td>
         )
     }
@@ -1029,7 +1029,7 @@ const NormalExtras = (props) => {
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
     const [bigBrain, setBigBrain] = useState(true);
-    const [faDetails, toggleFaDetails] = useState(false);
+    const [faDetails, setFaDetails] = useState(false);
     const [customOddsMode, setCustomOddsMode] = useState(false);
 
     const faExists = roundState.roundData !== null && roundState.roundData.foods !== undefined;
@@ -1070,9 +1070,8 @@ const NormalExtras = (props) => {
                     isDisabled={!faExists ^ !bigBrain}
                     onChange={(e) => {
                         let checked = e.target.checked;
-                        toggleFaDetails(checked);
-                        let currentAdvanced = roundState.advanced;
-                        setRoundState({advanced: {...currentAdvanced, faDetails: checked}});
+                        setFaDetails(checked);
+                        setRoundState({advanced: {...roundState.advanced, faDetails: checked}});
                     }}
                 >FA Details</Checkbox>
                 <Checkbox isDisabled>Odds Timeline</Checkbox>

@@ -150,7 +150,7 @@ export function getMaxBet(currentSelectedRound) {
 }
 
 export function getTableMode() {
-    const validModes = ["normal", "dropdown"]; // TODO: Add custom mode
+    const validModes = ["normal", "dropdown"];
     const cookies = new Cookies();
     let mode = cookies.get("tableMode");
     if (validModes.includes(mode) === false) {
