@@ -400,7 +400,12 @@ const NormalTable = (props) => {
                                     bgColor = green;
                                 }
 
-                                let payout = custom * roundState.roundData.customProbs[arenaId][pirateIndex + 1] - 1;
+                                let prob = roundState.roundData.customProbs[arenaId][pirateIndex + 1];
+                                if (prob === 0) {
+                                    prob = probabilities.used[arenaId][pirateIndex + 1];
+                                }
+
+                                let payout = custom * prob - 1;
                                 let payoutBackground = "transparent";
                                 if (payout > 0) {
                                     payoutBackground = green;
@@ -425,7 +430,7 @@ const NormalTable = (props) => {
                                                 probabilities={probabilities}/>
                                         </CustomOddsElement>
                                         <CustomOddsElement as={Td}
-                                                           isNumeric>{displayAsPercent(roundState.roundData.customProbs[arenaId][pirateIndex + 1], 1)}</CustomOddsElement>
+                                                           isNumeric>{displayAsPercent(prob, 1)}</CustomOddsElement>
                                         <BigBrainElement as={Td} backgroundColor={payoutBackground}
                                                          isNumeric>{displayAsPercent(payout, 1)}</BigBrainElement>
                                         {
@@ -1207,10 +1212,6 @@ export default function TheTable(props) {
 
     if (roundState.roundData) {
         probabilities = computeProbabilities(roundState.roundData);
-
-        if (roundState.roundData.customProbs === null) {
-            roundState.roundData.customProbs = cloneArray(probabilities.used);
-        }
 
         pirateFAs = computePirateFAs(roundState.roundData);
         arenaRatios = calculateArenaRatios(roundState.roundData);

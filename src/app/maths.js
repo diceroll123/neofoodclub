@@ -98,9 +98,8 @@ export function computeProbabilities(roundData) {
         }
 
         let sum = 0;
-        let probs = roundData.customProbs || returnValue.std;
         for (pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
-            returnValue.used[arenaIndex][pirateIndex] = probs[arenaIndex][pirateIndex];
+            returnValue.used[arenaIndex][pirateIndex] = roundData.customProbs[arenaIndex][pirateIndex] || returnValue.std[arenaIndex][pirateIndex];
             sum += returnValue.used[arenaIndex][pirateIndex];
         }
 

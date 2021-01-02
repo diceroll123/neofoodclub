@@ -11,7 +11,8 @@ import {
 export default function CustomProbsInput(props) {
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const {arenaIndex, pirateIndex, probabilities, ...rest} = props;
-    const [prob, setProb] = useState(roundState.roundData.customProbs[arenaIndex][pirateIndex] * 100);
+    const [prob, setProb] = useState(probabilities.used[arenaIndex][pirateIndex] * 100);
+
     // we multiply by 100 to make it visibly a percentage
 
     function changeProbs(probValue) {

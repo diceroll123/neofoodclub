@@ -79,10 +79,12 @@ export const RoundManager = () => {
                         newRoundData = {...roundState.roundData, ...newRoundData};
                     }
 
-                    if(newRoundData.customOdds === undefined) {
-                        // give it custom odds + probabilities properties to optionally edit later
+                    // give it custom odds + probabilities properties to optionally edit later
+                    if (newRoundData.customOdds === undefined) {
                         newRoundData["customOdds"] = cloneArray(newRoundData.currentOdds);
-                        newRoundData["customProbs"] = null;
+                    }
+                    if (newRoundData.customProbs === undefined) {
+                        newRoundData["customProbs"] = [[1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0]];
                     }
 
                     setRoundState({roundData: newRoundData, currentRound});
