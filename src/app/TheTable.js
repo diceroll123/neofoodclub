@@ -43,7 +43,7 @@ import {
     computePiratesBinary,
     computeProbabilities
 } from "./maths";
-import {createBetURL, displayAsPercent, getMaxBet, getTableMode, numberWithCommas} from "./util";
+import {cloneArray, createBetURL, displayAsPercent, getMaxBet, getTableMode, numberWithCommas} from "./util";
 import {ARENA_NAMES, FOODS, NEGATIVE_FAS, PIRATE_NAMES, POSITIVE_FAS} from "./constants";
 import BetAmountInput from "./BetAmountInput";
 import Cookies from "universal-cookie/es6";
@@ -1211,8 +1211,7 @@ const BetsSaver = (props) => {
                                 const newObj = {};
                                 const newName = {};
                                 let newIndex = (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
-                                // forgive me, there is no better way to clone in JS yet
-                                newObj[newIndex] = JSON.parse(JSON.stringify(allBets[currentBet]));
+                                newObj[newIndex] = cloneArray(allBets[currentBet]);
                                 newName[newIndex] = `${allNames[currentBet]} (Clone)`;
 
                                 setAllNames({...allNames, ...newName});

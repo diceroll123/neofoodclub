@@ -211,3 +211,8 @@ export function calculateRoundOverPercentage(roundState) {
     let elapsedMillis = now.valueOf() - start.valueOf();
     return Math.max(0, Math.min(100, 100 * (elapsedMillis / totalMillisInRange)));
 }
+
+export function cloneArray(arr) {
+    // forgive me, there is no better way to clone in JS yet
+    return JSON.parse(JSON.stringify(arr));
+}
