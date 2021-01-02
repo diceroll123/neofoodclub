@@ -247,7 +247,8 @@ const NormalTable = (props) => {
     const StickyTd = (props) => {
         const {children, ...rest} = props;
         return (
-            <Td style={{"position": "sticky", "left": "0", "z-index": "1"}}
+            <Td style={{"position": "sticky", "left": "0"}}
+                zIndex={1}
                 {...rest}>{children}</Td>
         )
     }
@@ -925,13 +926,20 @@ const DropDownTable = (props) => {
 }
 
 const PirateTable = (props) => {
-    const {roundState} = React.useContext(RoundContext);
+    const {roundState, setRoundState} = React.useContext(RoundContext);
 
-    if (roundState.tableMode === "dropdown") {
-        return <DropDownTable {...props}/>;
+    function changeBet(betIndex, arenaIndex, pirateIndex) {
+        // change a single pirate in a single arena
+        let newBets = roundState.bets;
+        newBets[betIndex][arenaIndex] = pirateIndex;
+        setRoundState({bets: {...newBets}}); // hacky way to force an object to update useEffect
     }
 
-    return <NormalTable {...props}/>
+    if (roundState.tableMode === "dropdown") {
+        return <DropDownTable changeBet={changeBet} {...props}/>;
+    }
+
+    return <NormalTable changeBet={changeBet} {...props}/>
 }
 
 const PayoutExtras = (props) => {
@@ -1287,7 +1295,7 @@ const BetsSaver = (props) => {
 }
 
 export default function TheTable(props) {
-    const {roundState, setRoundState} = React.useContext(RoundContext);
+    const {roundState} = React.useContext(RoundContext);
 
     let probabilities = {};
     let pirateFAs = {};
@@ -1355,13 +1363,6 @@ export default function TheTable(props) {
         return green;
     }
 
-    function changeBet(betIndex, arenaIndex, pirateIndex) {
-        // change a single pirate in a single arena
-        let newBets = roundState.bets;
-        newBets[betIndex][arenaIndex] = pirateIndex;
-        setRoundState({bets: {...newBets}}); // hacky way to force an object to update useEffect
-    }
-
     return (
         <Box {...props}>
             <TableExtras background={grayAccent}/>
@@ -1373,7 +1374,6 @@ export default function TheTable(props) {
                              pirateFAs={pirateFAs}
                              arenaRatios={arenaRatios}
                              probabilities={probabilities}
-                             changeBet={changeBet}
                              getPirateBgColor={getPirateBgColor}
                              winningBetBinary={winningBetBinary}
                              green={green}
@@ -1399,8 +1399,7 @@ export default function TheTable(props) {
                     orange={orange}
                     red={red}
                     yellow={yellow}
-                    green={green}
-                    grayAccent={grayAccent}/>
+                    green={green}/>
             </HorizontalScrollingBox>
 
             <CopyPayouts background={grayAccent}
