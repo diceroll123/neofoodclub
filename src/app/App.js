@@ -18,6 +18,7 @@ function App() {
         advanced: {
             bigBrain: true,
             faDetails: false,
+            customOddsMode: false,
             oddsTimeline: false
         },
     });

@@ -98,8 +98,9 @@ export function computeProbabilities(roundData) {
         }
 
         let sum = 0;
+        let probs = roundData.customProbs || returnValue.std;
         for (pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
-            returnValue.used[arenaIndex][pirateIndex] = returnValue.std[arenaIndex][pirateIndex];
+            returnValue.used[arenaIndex][pirateIndex] = probs[arenaIndex][pirateIndex];
             sum += returnValue.used[arenaIndex][pirateIndex];
         }
 
@@ -115,7 +116,7 @@ export function calculateArenaRatios(roundData) {
     for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
         let ratio = 0;
         for (let pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
-            ratio += 1 / roundData.currentOdds[arenaIndex][pirateIndex];
+            ratio += 1 / roundData.customOdds[arenaIndex][pirateIndex];
         }
         ratio = 1 / ratio - 1;
         arenas[arenaIndex] = ratio;
@@ -140,8 +141,8 @@ function tableToList(oddsTable) {
     return oddsList;
 }
 
-export function calculatePayoutTables(roundState, probabilities, betOdds, betPayoffs) {
-    let prob = probabilities.used;
+export function calculatePayoutTables(roundState, betOdds, betPayoffs) {
+    let prob = roundState.roundData.customProbs;
 
     /*
     ib is a binary format to represent bets.

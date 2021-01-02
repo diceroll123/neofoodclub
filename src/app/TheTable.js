@@ -49,6 +49,8 @@ import BetAmountInput from "./BetAmountInput";
 import Cookies from "universal-cookie/es6";
 
 import moment from "moment";
+import CustomOddsInput from "./CustomOddsInput";
+import CustomProbsInput from "./CustomProbsInput";
 
 moment.relativeTimeThreshold('ss', 0);
 
@@ -195,6 +197,27 @@ const FaDetailsElement = (props) => {
     )
 }
 
+const CustomOddsElement = (props) => {
+    const {roundState} = React.useContext(RoundContext);
+    const {children, ...rest} = props;
+
+    if (roundState.advanced.bigBrain === false) {
+        return null;
+    }
+
+    if (roundState.advanced.customOddsMode === false) {
+        return null;
+    }
+
+    if (roundState.roundData === null) {
+        return null;
+    }
+
+    return (
+        <Box {...rest}>{children}</Box>
+    )
+}
+
 const NormalTable = (props) => {
     let {
         pirateFAs,
@@ -269,14 +292,16 @@ const NormalTable = (props) => {
                     <BigBrainElement as={Th}>Min Prob</BigBrainElement>
                     <BigBrainElement as={Th}>Max Prob</BigBrainElement>
                     <BigBrainElement as={Th}>Std Prob</BigBrainElement>
-                    {/*<Th>Custom</Th>*/}
-                    {/*<Th>Used</Th>*/}
+                    <CustomOddsElement as={Th}><TextTooltip text="Custom Prob"
+                                                            label="Custom Std. Probability"/></CustomOddsElement>
+                    <CustomOddsElement as={Th}><TextTooltip text="Used"
+                                                            label="Used Std. Probability"/></CustomOddsElement>
                     <BigBrainElement as={Th}>Payout</BigBrainElement>
                     <BigBrainElement as={Th}><TextTooltip text="FA" label="Food Adjustment"/></BigBrainElement>
                     <FaDetailsElement as={Th} colSpan={10}>FA Explanation</FaDetailsElement>
                     <Th><TextTooltip text="Open" label="Opening Odds"/></Th>
                     <Th><TextTooltip text="Curr" label="Current Odds"/></Th>
-                    {/*<Th>Custom</Th>*/}
+                    <CustomOddsElement as={Th}><TextTooltip text="Custom"/></CustomOddsElement>
                     {/*<Th>Timeline</Th>*/}
                     {
                         [...Array(amountOfBets)].map((e, i) => {
@@ -306,7 +331,7 @@ const NormalTable = (props) => {
                                     }
                                 </BigBrainElement>
                                 <Td backgroundColor={grayAccent} colSpan={roundState.advanced.bigBrain ? 6 : 1}/>
-                                {/*<Td colSpan={2}></Td>*/}
+                                <CustomOddsElement as={Td} backgroundColor={grayAccent} colSpan={2}/>
 
                                 {roundState.roundData !== null && roundState.roundData.foods !== undefined ? <>
 
@@ -326,7 +351,7 @@ const NormalTable = (props) => {
                                 </> : null}
 
                                 <Td backgroundColor={grayAccent} colSpan={2}/>
-                                {/*<Td colSpan={1}></Td>*/}
+                                <CustomOddsElement as={Td} backgroundColor={grayAccent}/>
                                 {/*<Td>showOddsTimeline</Td>*/}
                                 {roundState.roundData !== null ? <>
                                     {[...Array(amountOfBets)].map((bet, betNum) => {
@@ -370,6 +395,7 @@ const NormalTable = (props) => {
 
                                 let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
                                 let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
+                                let custom = roundState.roundData.customOdds[arenaId][pirateIndex + 1];
 
                                 let bgColor = "transparent";
                                 let pirateBin = computePirateBinary(arenaId, pirateIndex + 1);
@@ -377,7 +403,7 @@ const NormalTable = (props) => {
                                     bgColor = green;
                                 }
 
-                                let payout = current * probabilities.used[arenaId][pirateIndex + 1] - 1;
+                                let payout = custom * roundState.roundData.customProbs[arenaId][pirateIndex + 1] - 1;
                                 let payoutBackground = "transparent";
                                 if (payout > 0) {
                                     payoutBackground = green;
@@ -395,8 +421,14 @@ const NormalTable = (props) => {
                                                          isNumeric>{displayAsPercent(probabilities.max[arenaId][pirateIndex + 1], 1)}</BigBrainElement>
                                         <BigBrainElement as={Td}
                                                          isNumeric>{displayAsPercent(probabilities.std[arenaId][pirateIndex + 1], 1)}</BigBrainElement>
-                                        {/*<Td>Custom</Td>*/}
-                                        {/*<Td>Used</Td>*/}
+                                        <CustomOddsElement as={Td} isNumeric>
+                                            <CustomProbsInput
+                                                arenaIndex={arenaId}
+                                                pirateIndex={pirateIndex + 1}
+                                                probabilities={probabilities}/>
+                                        </CustomOddsElement>
+                                        <CustomOddsElement as={Td}
+                                                           isNumeric>{displayAsPercent(roundState.roundData.customProbs[arenaId][pirateIndex + 1], 1)}</CustomOddsElement>
                                         <BigBrainElement as={Td} backgroundColor={payoutBackground}
                                                          isNumeric>{displayAsPercent(payout, 1)}</BigBrainElement>
                                         {
@@ -417,7 +449,9 @@ const NormalTable = (props) => {
                                             <StatArrow mr={1} type="decrease" style={{"stroke": "#000000"}}/>}
                                             <Text as={current === opening ? "" : "b"}>{current}:1</Text>
                                         </Td>
-                                        {/*<Td>Custom Odds</Td>*/}
+                                        <CustomOddsElement as={Td}>
+                                            <CustomOddsInput arenaIndex={arenaId} pirateIndex={pirateIndex + 1}/>
+                                        </CustomOddsElement>
                                         {/* Odds Timeline */}
                                         {[...Array(amountOfBets)].map((bet, betNum) => {
                                             return (
@@ -964,7 +998,6 @@ const TableModes = () => {
             }} value={value}>
                 <Stack>
                     <Radio value="normal">Normal Mode</Radio>
-                    <Radio isDisabled>Custom mode</Radio>
                     <Radio value="dropdown">Dropdown Mode</Radio>
                 </Stack>
             </RadioGroup>
@@ -997,6 +1030,7 @@ const NormalExtras = (props) => {
 
     const [bigBrain, setBigBrain] = useState(true);
     const [faDetails, toggleFaDetails] = useState(false);
+    const [customOddsMode, setCustomOddsMode] = useState(false);
 
     const faExists = roundState.roundData !== null && roundState.roundData.foods !== undefined;
 
@@ -1023,6 +1057,14 @@ const NormalExtras = (props) => {
                         w="190px">
                     Big Brain Mode is {bigBrain === true ? "ON" : "OFF"}
                 </Button>
+                <Checkbox
+                    isChecked={customOddsMode}
+                    isDisabled={!bigBrain}
+                    onChange={(e) => {
+                        let checked = e.target.checked;
+                        setCustomOddsMode(checked);
+                        setRoundState({advanced: {...roundState.advanced, customOddsMode: checked}});
+                    }}>Custom probs/odds</Checkbox>
                 <Checkbox
                     isChecked={faDetails}
                     isDisabled={!faExists ^ !bigBrain}
@@ -1263,6 +1305,11 @@ export default function TheTable(props) {
 
     if (roundState.roundData) {
         probabilities = computeProbabilities(roundState.roundData);
+
+        if (roundState.roundData.customProbs === null) {
+            roundState.roundData.customProbs = cloneArray(probabilities.used);
+        }
+
         pirateFAs = computePirateFAs(roundState.roundData);
         arenaRatios = calculateArenaRatios(roundState.roundData);
         winningBetBinary = computePiratesBinary(roundState.roundData.winners);
@@ -1276,8 +1323,8 @@ export default function TheTable(props) {
             for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
                 let pirateIndex = roundState.bets[betIndex][arenaIndex];
                 if (pirateIndex > 0) {
-                    betOdds[betIndex] = (betOdds[betIndex] || 1) * roundState.roundData.currentOdds[arenaIndex][pirateIndex];
-                    betProbabilities[betIndex] = (betProbabilities[betIndex] || 1) * probabilities.used[arenaIndex][pirateIndex];
+                    betOdds[betIndex] = (betOdds[betIndex] || 1) * roundState.roundData.customOdds[arenaIndex][pirateIndex];
+                    betProbabilities[betIndex] = (betProbabilities[betIndex] || 1) * roundState.roundData.customProbs[arenaIndex][pirateIndex];
                 }
             }
             // yes, the for-loop above had to be separate.
@@ -1289,7 +1336,7 @@ export default function TheTable(props) {
             }
         }
 
-        payoutTables = calculatePayoutTables(roundState, probabilities, betOdds, betPayoffs);
+        payoutTables = calculatePayoutTables(roundState, betOdds, betPayoffs);
     }
 
     const theme = useTheme();

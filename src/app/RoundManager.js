@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import RoundContext from "./RoundState";
 import {useToast} from "@chakra-ui/react";
-import {createBetURL, parseBetUrl} from "./util";
+import {cloneArray, createBetURL, parseBetUrl} from "./util";
 import HashChange from "react-hashchange";
 
 export const RoundManager = () => {
@@ -74,7 +74,18 @@ export const RoundManager = () => {
                     if (currentRound === roundState.currentSelectedRound && roundData.winners[0] > 0) {
                         currentRound += 1;
                     }
-                    setRoundState({roundData, currentRound});
+                    let newRoundData = roundData;
+                    if (roundState.roundData) {
+                        newRoundData = {...roundState.roundData, ...newRoundData};
+                    }
+
+                    if(newRoundData.customOdds === undefined) {
+                        // give it custom odds + probabilities properties to optionally edit later
+                        newRoundData["customOdds"] = cloneArray(newRoundData.currentOdds);
+                        newRoundData["customProbs"] = null;
+                    }
+
+                    setRoundState({roundData: newRoundData, currentRound});
                 })
                 .catch(() => {
                     errorToast(
