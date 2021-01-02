@@ -626,7 +626,11 @@ const PayoutTable = (props) => {
                             let baBg = (betAmount < 50) ? red : getMaxBetColor(betIndex + 1);
                             let mbBg = getMaxBetColor(betIndex + 1);
 
-                            let betNumBgColor = betsWon[betIndex + 1] ? green : "transparent";
+                            let betNumBgColor = "transparent";
+
+                            if (winningBetBinary) {
+                                betNumBgColor = betsWon[betIndex + 1] ? green : red;
+                            }
 
                             return (
                                 <Tr>
