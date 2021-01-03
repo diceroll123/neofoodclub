@@ -557,7 +557,6 @@ const PayoutTable = (props) => {
     let totalWinningPayoff = 0;
     let totalWinningOdds = 0;
     let totalEnabledBets = 0;
-    let betsWon = {};
 
     for (let betIndex in roundState.bets) {
         let betBinary = betBinaries[betIndex];
@@ -567,7 +566,6 @@ const PayoutTable = (props) => {
             totalBetExpectedRatios += betExpectedRatios[betIndex];
             totalBetNetExpected += betNetExpected[betIndex];
             if ((winningBetBinary & betBinary) === betBinary) { // bet won
-                betsWon[betIndex] = true;
                 totalWinningOdds += betOdds[betIndex];
                 totalWinningPayoff += betOdds[betIndex] * roundState.betAmounts[betIndex];
             }
@@ -621,7 +619,9 @@ const PayoutTable = (props) => {
                     {
                         [...Array(amountOfBets)].map((e, betIndex) => {
 
-                            if (betBinaries[betIndex + 1] === 0) {
+                            const betBinary = betBinaries[betIndex+1];
+
+                            if (betBinary === 0) {
                                 return null;
                             }
 
@@ -638,7 +638,7 @@ const PayoutTable = (props) => {
                             let betNumBgColor = "transparent";
 
                             if (winningBetBinary) {
-                                betNumBgColor = betsWon[betIndex + 1] ? green : red;
+                                betNumBgColor = (winningBetBinary & betBinary) === betBinary ? green : red;
                             }
 
                             return (
@@ -688,8 +688,13 @@ const PayoutTable = (props) => {
                                             let pirateIndex = roundState.bets[betIndex + 1][arenaIndex];
                                             let bgColor = "transparent";
                                             if (pirateIndex) {
-                                                if (betsWon[betIndex + 1]) {
-                                                    bgColor = green;
+                                                if (winningBetBinary) {
+                                                    const pirateBin = computePirateBinary(arenaIndex, pirateIndex);
+                                                    if ((winningBetBinary & pirateBin) === pirateBin) {
+                                                        bgColor = green;
+                                                    } else {
+                                                        bgColor = red;
+                                                    }
                                                 } else {
                                                     bgColor = getPirateBgColor(roundState.roundData.openingOdds[arenaIndex][pirateIndex]);
                                                 }
