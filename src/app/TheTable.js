@@ -1230,8 +1230,10 @@ export default function TheTable(props) {
             for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
                 let pirateIndex = roundState.bets[betIndex][arenaIndex];
                 if (pirateIndex > 0) {
-                    betOdds[betIndex] = (betOdds[betIndex] || 1) * roundState.roundData.customOdds[arenaIndex][pirateIndex];
-                    betProbabilities[betIndex] = (betProbabilities[betIndex] || 1) * roundState.roundData.customProbs[arenaIndex][pirateIndex];
+                    let odd = roundState.roundData.customOdds[arenaIndex][pirateIndex] || roundState.roundData.currentOdds[arenaIndex][pirateIndex];
+                    let prob = roundState.roundData.customProbs[arenaIndex][pirateIndex] || probabilities.used[arenaIndex][pirateIndex];
+                    betOdds[betIndex] = (betOdds[betIndex] || 1) * odd;
+                    betProbabilities[betIndex] = (betProbabilities[betIndex] || 1) * prob;
                 }
             }
             // yes, the for-loop above had to be separate.
@@ -1243,7 +1245,7 @@ export default function TheTable(props) {
             }
         }
 
-        payoutTables = calculatePayoutTables(roundState, betOdds, betPayoffs);
+        payoutTables = calculatePayoutTables(roundState, probabilities.used, betOdds, betPayoffs);
     }
 
     const theme = useTheme();

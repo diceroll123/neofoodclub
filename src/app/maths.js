@@ -140,9 +140,7 @@ function tableToList(oddsTable) {
     return oddsList;
 }
 
-export function calculatePayoutTables(roundState, betOdds, betPayoffs) {
-    let prob = roundState.roundData.customProbs;
-
+export function calculatePayoutTables(roundState, probabilities, betOdds, betPayoffs) {
     /*
     ib is a binary format to represent bets.
     It works on 20 bits (because there are 20 pirates).
@@ -230,7 +228,7 @@ export function calculatePayoutTables(roundState, betOdds, betPayoffs) {
             let arProb = 0;
             for (let j = 0; j < 4; j++) {
                 if (ib & arIb[i] & pirIb[j]) {
-                    arProb += prob[i][j + 1];
+                    arProb += roundState.roundData.customProbs[i][j+1] || probabilities[i][j+1];
                 }
             }
             totProb *= arProb;
