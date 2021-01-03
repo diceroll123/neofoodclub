@@ -492,7 +492,7 @@ const BetExtras = (props) => {
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
     function setAllBets(value) {
-        let betAmounts = roundState.betAmounts;
+        let betAmounts = {...roundState.betAmounts};
         for (let index in roundState.betAmounts) {
             betAmounts[index] = Math.min(value, Math.max(Math.floor(1_000_000 / betOdds[index]) + 1, 50));
         }
@@ -665,7 +665,7 @@ const PayoutTable = (props) => {
                                         <BetAmountInput
                                             value={roundState.betAmounts[betIndex + 1]}
                                             onChange={(str, value) => {
-                                                let betAmounts = roundState.betAmounts;
+                                                let betAmounts = {...roundState.betAmounts};
                                                 if (isNaN(value) || value === 0) {
                                                     value = -1000;
                                                 }
