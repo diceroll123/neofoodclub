@@ -111,7 +111,7 @@ export const RoundManager = () => {
 
         const refreshInterval = setInterval(() => {
             getRoundData(true);
-        }, 10000);
+        }, 15000);
 
         return () => clearInterval(refreshInterval);
     }, [
