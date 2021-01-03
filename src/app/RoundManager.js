@@ -23,7 +23,7 @@ export const RoundManager = () => {
         if (roundState.currentRound === null) {
             // first pass-through sets the round, then bails out
             // which starts useEffect again a second time, with a round number
-            fetch('https://api.neofood.club/next_round.txt', {cache: "no-cache"})
+            fetch('https://api.neofood.club/next_round.txt')
                 .then(response => response.text())
                 .then(data => {
                     let currentRound = parseInt(data);
@@ -59,14 +59,9 @@ export const RoundManager = () => {
             forceUpdate = false;
         }
 
-        // if the current selected round is a round older than 2 days ago, force cache
-        let cache = roundState.currentSelectedRound < (roundState.currentRound - 2) ? "force-cache" : "no-cache";
-
         // update if there's no data
         if (roundState.roundData === null || forceUpdate) {
-            fetch(`https://api.neofood.club/rounds/${roundState.currentSelectedRound}.json`, {
-                cache: cache
-            })
+            fetch(`https://api.neofood.club/rounds/${roundState.currentSelectedRound}.json`)
                 .then(response => response.json())
                 .then(roundData => {
                     let currentRound = roundState.currentRound;
