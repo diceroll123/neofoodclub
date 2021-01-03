@@ -221,3 +221,19 @@ export function cloneArray(arr) {
     // forgive me, there is no better way to clone in JS yet
     return JSON.parse(JSON.stringify(arr));
 }
+
+export function makeEmptyBets(length) {
+    const bets = {};
+    for (let index = 1; index <= length; index++) {
+        bets[index] = [0, 0, 0, 0, 0];
+    }
+    return bets;
+}
+
+export function makeEmptyBetAmounts(length) {
+    const betAmounts = {};
+    for (let index = 1; index <= length; index++) {
+        betAmounts[index] = -1000;
+    }
+    return betAmounts;
+}

@@ -38,7 +38,15 @@ import {
     computePiratesBinary,
     computeProbabilities
 } from "./maths";
-import {cloneArray, createBetURL, displayAsPercent, getMaxBet, getTableMode, numberWithCommas} from "./util";
+import {
+    cloneArray,
+    createBetURL,
+    displayAsPercent,
+    getMaxBet,
+    getTableMode,
+    makeEmptyBets,
+    numberWithCommas
+} from "./util";
 import {ARENA_NAMES, FOODS, NEGATIVE_FAS, PIRATE_NAMES, POSITIVE_FAS} from "./constants";
 import BetAmountInput from "./BetAmountInput";
 import Cookies from "universal-cookie/es6";
@@ -90,11 +98,7 @@ const ClearBetsButton = () => {
     const amountOfBets = Object.keys(roundState.bets).length;
 
     function clearBets() {
-        let newBets = roundState.bets;
-        for (let x = 1; x <= amountOfBets; x++) {
-            newBets[x] = [0, 0, 0, 0, 0];
-        }
-        setRoundState({bets: {...newBets}});
+        setRoundState({bets: {...makeEmptyBets(amountOfBets)}});
     }
 
     return (

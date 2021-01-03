@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import React, {useEffect, useState} from "react";
 import RoundContext from "./RoundState";
-import {anyBetsExist, cloneArray, getMaxBet} from "./util";
+import {anyBetsExist, cloneArray, getMaxBet, makeEmptyBetAmounts, makeEmptyBets} from "./util";
 import {computeBinaryToPirates, computePiratesBinary} from "./maths";
 import {AddIcon, CopyIcon, DeleteIcon, ChevronDownIcon} from "@chakra-ui/icons";
 import {SettingsBox} from "./TheTable";
@@ -32,43 +32,57 @@ const BetsSaver = (props) => {
 
     const [allNames, setAllNames] = useState({"0": "Starting Set"});
     const [allBets, setAllBets] = useState({"0": {...roundState.bets}});
+    const [allBetAmounts, setAllBetAmounts] = useState({"0": {...roundState.betAmounts}});
 
     const getNewIndex = () => (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
 
     useEffect(() => {
         // TODO: (maybe fix?) when you switch between sets, this has the side effect of updating itself again here one time
-        const newObj = {};
-        newObj[currentBet] = {...roundState.bets};
-        setAllBets({...allBets, ...newObj});
-    }, [roundState.bets]);
+        const newBetObj = {};
+        newBetObj[currentBet] = {...roundState.bets};
+
+        const newAmountObj = {};
+        newAmountObj[currentBet] = {...roundState.betAmounts};
+
+        setAllBets({...allBets, ...newBetObj});
+        setAllBetAmounts({...allBetAmounts, ...newAmountObj});
+    }, [roundState.bets, roundState.betAmounts]);
 
     function newEmptySet() {
         const newObj = {};
         const newName = {};
-        const bets = {};
         const newIndex = getNewIndex();
-        for (let index = 1; index <= Object.keys(allBets[currentBet]).length; index++) {
-            bets[index] = [0, 0, 0, 0, 0];
-        }
-        newObj[newIndex] = {...bets};
+        const amountOfBets = Object.keys(allBets[currentBet]).length;
+        const emptyBetAmounts = makeEmptyBetAmounts(amountOfBets);
+        newObj[newIndex] = {...makeEmptyBets(amountOfBets)};
         newName[newIndex] = "New Set";
 
         setAllNames({...allNames, ...newName});
         setAllBets({...allBets, ...newObj});
-        setRoundState({bets: {...newObj[newIndex]}});
+        setAllBetAmounts({...allBetAmounts, ...emptyBetAmounts});
+        setRoundState({
+            bets: {...newObj[newIndex]},
+            betAmounts: emptyBetAmounts
+        });
         setCurrentBet(newIndex);
     }
 
     function cloneSet() {
         const newObj = {};
         const newName = {};
+        const newAmount = {};
         const newIndex = getNewIndex();
         newObj[newIndex] = cloneArray(allBets[currentBet]);
         newName[newIndex] = `${allNames[currentBet]} (Clone)`;
+        newAmount[newIndex] = cloneArray(allBetAmounts[currentBet]);
 
         setAllNames({...allNames, ...newName});
         setAllBets({...allBets, ...newObj});
-        setRoundState({bets: {...newObj[newIndex]}});
+        setAllBetAmounts({...allBetAmounts, ...newAmount});
+        setRoundState({
+            bets: {...newObj[newIndex]},
+            betAmounts: {...newAmount[newIndex]}
+        });
         setCurrentBet(newIndex);
     }
 
@@ -78,15 +92,23 @@ const BetsSaver = (props) => {
         if (useIndex < 0) {
             useIndex = currentIndex + 1;
         }
-
         const previousElement = Object.keys(allBets)[useIndex];
+
         const allBetsCopy = {...allBets};
+        const allBetAmountsCopy = {...allBetAmounts};
         const allNamesCopy = {...allNames};
+
         delete allBetsCopy[currentBet];
+        delete allBetAmountsCopy[currentBet];
         delete allNamesCopy[currentBet];
+
         setAllBets({...allBetsCopy});
+        setAllBetAmounts({...allBetAmountsCopy});
         setAllNames({...allNamesCopy});
-        setRoundState({bets: {...allBetsCopy[previousElement]}});
+        setRoundState({
+            bets: {...allBetsCopy[previousElement]},
+            betAmounts: {...allBetAmountsCopy[previousElement]}
+        });
         setCurrentBet(previousElement);
     }
 
@@ -143,11 +165,14 @@ const BetsSaver = (props) => {
         const newIndex = anyBetsExist(roundState.bets) ? getNewIndex() : currentBet;
         const newObj = {};
         const newName = {};
+        const newBetAmount = {};
         newObj[newIndex] = {...newBets};
         newName[newIndex] = `Max TER Set (${maxBet} NP)`;
+        newBetAmount[newIndex] = {...newBetAmounts};
 
         setAllNames({...allNames, ...newName});
         setAllBets({...allBets, ...newObj});
+        setAllBetAmounts({...allBetAmounts, ...newBetAmount});
         setRoundState({bets: {...newBets}, betAmounts: {...newBetAmounts}});
         setCurrentBet(newIndex);
     }
@@ -164,7 +189,10 @@ const BetsSaver = (props) => {
                                         isActive={e === currentBet}
                                         onClick={() => {
                                             setCurrentBet(e);
-                                            setRoundState({bets: {...allBets[e]}});
+                                            setRoundState({
+                                                bets: {...allBets[e]},
+                                                betAmounts: {...allBetAmounts[e]}
+                                            });
                                         }}>
                                     {e === currentBet ?
                                         <Editable
