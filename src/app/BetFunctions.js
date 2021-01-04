@@ -48,33 +48,14 @@ const BetsSaver = (props) => {
         setAllBetAmounts({...allBetAmounts, ...newAmountObj});
     }, [roundState.bets, roundState.betAmounts]);
 
-    function newEmptySet() {
-        const newObj = {};
-        const newName = {};
+    function addNewSet(name, bets, betAmounts) {
         const newIndex = getNewIndex();
-        const amountOfBets = Object.keys(allBets[currentBet]).length;
-        const emptyBetAmounts = makeEmptyBetAmounts(amountOfBets);
-        newObj[newIndex] = {...makeEmptyBets(amountOfBets)};
-        newName[newIndex] = "New Set";
-
-        setAllNames({...allNames, ...newName});
-        setAllBets({...allBets, ...newObj});
-        setAllBetAmounts({...allBetAmounts, ...emptyBetAmounts});
-        setRoundState({
-            bets: {...newObj[newIndex]},
-            betAmounts: emptyBetAmounts
-        });
-        setCurrentBet(newIndex);
-    }
-
-    function cloneSet() {
-        const newObj = {};
         const newName = {};
+        const newObj = {};
         const newAmount = {};
-        const newIndex = getNewIndex();
-        newObj[newIndex] = cloneArray(allBets[currentBet]);
-        newName[newIndex] = `${allNames[currentBet]} (Clone)`;
-        newAmount[newIndex] = cloneArray(allBetAmounts[currentBet]);
+        newName[newIndex] = name;
+        newObj[newIndex] = cloneArray(bets);
+        newAmount[newIndex] = cloneArray(betAmounts);
 
         setAllNames({...allNames, ...newName});
         setAllBets({...allBets, ...newObj});
@@ -84,6 +65,15 @@ const BetsSaver = (props) => {
             betAmounts: {...newAmount[newIndex]}
         });
         setCurrentBet(newIndex);
+    }
+
+    function newEmptySet() {
+        const amountOfBets = Object.keys(allBets[currentBet]).length;
+        addNewSet("New Set", makeEmptyBets(amountOfBets), makeEmptyBetAmounts(amountOfBets));
+    }
+
+    function cloneSet() {
+        addNewSet(`${allNames[currentBet]} (Clone)`, allBets[currentBet], allBetAmounts[currentBet]);
     }
 
     function deleteSet() {
