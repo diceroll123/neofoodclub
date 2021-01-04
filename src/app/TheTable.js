@@ -43,6 +43,7 @@ import {
     displayAsPercent,
     getMaxBet,
     getTableMode,
+    makeEmptyBetAmounts,
     makeEmptyBets,
     numberWithCommas
 } from "./util";
@@ -97,7 +98,10 @@ const ClearBetsButton = () => {
     const amountOfBets = Object.keys(roundState.bets).length;
 
     function clearBets() {
-        setRoundState({bets: {...makeEmptyBets(amountOfBets)}});
+        setRoundState({
+            bets: {...makeEmptyBets(amountOfBets)},
+            betAmounts: {...makeEmptyBetAmounts(amountOfBets)}
+        });
     }
 
     return (
