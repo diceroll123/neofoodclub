@@ -487,13 +487,17 @@ const NormalTable = (props) => {
 }
 
 const BetExtras = (props) => {
-    const {betOdds, ...rest} = props;
+    const {betOdds, betBinaries, ...rest} = props;
     const {roundState, setRoundState} = React.useContext(RoundContext);
 
     function setAllBets(value) {
         let betAmounts = {...roundState.betAmounts};
         for (let index in roundState.betAmounts) {
-            betAmounts[index] = Math.min(value, Math.max(Math.floor(1_000_000 / betOdds[index]) + 1, 50));
+            if (betBinaries[index] > 0) {
+                betAmounts[index] = Math.min(value, Math.max(Math.floor(1_000_000 / betOdds[index]) + 1, 50));
+            } else {
+                betAmounts[index] = -1000;
+            }
         }
         setRoundState({betAmounts});
     }
@@ -1290,6 +1294,7 @@ export default function TheTable(props) {
             </HorizontalScrollingBox>
 
             <BetExtras background={grayAccent}
+                       betBinaries={betBinaries}
                        betOdds={betOdds}/>
 
             <HorizontalScrollingBox>
