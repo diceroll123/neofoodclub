@@ -48,8 +48,9 @@ const BetsSaver = (props) => {
         setAllBetAmounts({...allBetAmounts, ...newAmountObj});
     }, [roundState.bets, roundState.betAmounts]);
 
-    function addNewSet(name, bets, betAmounts) {
-        const newIndex = getNewIndex();
+    function addNewSet(name, bets, betAmounts, maybe_replace = false) {
+        // will modify the current set if the current set is empty and maybe_replace is explicitly set to true
+        const newIndex = maybe_replace && !anyBetsExist(roundState.bets) ? currentBet : getNewIndex();
         const newName = {};
         const newObj = {};
         const newAmount = {};
@@ -151,20 +152,7 @@ const BetsSaver = (props) => {
             newBetAmounts[bet + 1] = betCaps[pirateBinary];
         }
 
-        // add new bet tab... if current tab isn't empty
-        const newIndex = anyBetsExist(roundState.bets) ? getNewIndex() : currentBet;
-        const newObj = {};
-        const newName = {};
-        const newBetAmount = {};
-        newObj[newIndex] = {...newBets};
-        newName[newIndex] = `Max TER Set (${maxBet} NP)`;
-        newBetAmount[newIndex] = {...newBetAmounts};
-
-        setAllNames({...allNames, ...newName});
-        setAllBets({...allBets, ...newObj});
-        setAllBetAmounts({...allBetAmounts, ...newBetAmount});
-        setRoundState({bets: {...newBets}, betAmounts: {...newBetAmounts}});
-        setCurrentBet(newIndex);
+        addNewSet(`Max TER Set (${maxBet} NP)`, newBets, newBetAmounts, true);
     }
 
     return (
