@@ -17,7 +17,9 @@ const config = {
     measurementId: "G-TPEBSBBBTR"
 };
 
-firebase.initializeApp(config);
+if (!firebase.apps.length) {
+    firebase.initializeApp(config);
+}
 
 function App() {
     const initialState = parseBetUrl();
