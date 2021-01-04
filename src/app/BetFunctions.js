@@ -112,7 +112,6 @@ const BetsSaver = (props) => {
 
         let betCaps = {};
         let pirateCombos = {};
-        let topRatios = [];
 
         function calculateCombination(pirates) {
             const [a, b, c, d, e] = pirates;
@@ -139,9 +138,7 @@ const BetsSaver = (props) => {
             calculateCombination(p);
         }
 
-        for (let key in pirateCombos) {
-            topRatios.push([key, pirateCombos[key]]);
-        }
+        let topRatios = Object.entries(pirateCombos).map(([k, v]) => [k, v]);
         topRatios.sort((a, b) => b[1] - a[1]);
 
         let newBets = {};
