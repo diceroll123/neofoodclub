@@ -109,7 +109,11 @@ function CurrentRoundInfo() {
 function RoundInfo() {
     const {roundState} = React.useContext(RoundContext);
 
-    let element = <SkeletonText noOfLines={3} minWidth="190px"/>;
+    const oldRound = parseInt(roundState.currentSelectedRound) !== roundState.currentRound;
+
+    const skeletonWidth = oldRound ? "129px" : "190px";
+
+    let element = <SkeletonText noOfLines={3} minWidth={skeletonWidth}/>;
 
     if (roundState.roundData !== null) {
         if (roundState.roundData.winners[0] > 0) {
@@ -137,39 +141,37 @@ function MaxBetInput() {
         setTempMaxBet(getMaxBet(roundState.currentSelectedRound));
     }, [roundState.currentSelectedRound]);
 
-    if (roundState.roundData === null) {
-        return (<Skeleton h="24px" w="80px"><Box/></Skeleton>);
-    }
-
     return (
-        <BetAmountInput
-            value={tempMaxBet.toString()}
-            onChange={(value) => setTempMaxBet(value)}
-            onBlur={(e) => {
-                let value = parseInt(e.target.value);
-                if (value === tempMaxBet) {
-                    // don't save over it if it's the same
-                    return;
-                }
+        <Skeleton isLoaded={roundState.roundData !== null}>
+            <BetAmountInput
+                value={tempMaxBet.toString()}
+                onChange={(value) => setTempMaxBet(value)}
+                onBlur={(e) => {
+                    let value = parseInt(e.target.value);
+                    if (value === tempMaxBet) {
+                        // don't save over it if it's the same
+                        return;
+                    }
 
-                if (isNaN(value) || value < 50) {
-                    value = -1000;
-                }
+                    if (isNaN(value) || value < 50) {
+                        value = -1000;
+                    }
 
-                setTempMaxBet(value);
+                    setTempMaxBet(value);
 
-                let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
-                cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
+                    let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
+                    cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
 
-                toast.closeAll();
-                toast({
-                    title: `Max Bet Saved!`,
-                    status: "success",
-                    duration: 1200,
-                    isClosable: true
-                });
-            }}
-        />
+                    toast.closeAll();
+                    toast({
+                        title: `Max Bet Saved!`,
+                        status: "success",
+                        duration: 1200,
+                        isClosable: true
+                    });
+                }}
+            />
+        </Skeleton>
     )
 }
 

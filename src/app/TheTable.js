@@ -39,7 +39,6 @@ import {
     computeProbabilities
 } from "./maths";
 import {
-    cloneArray,
     createBetURL,
     displayAsPercent,
     getMaxBet,
@@ -619,7 +618,7 @@ const PayoutTable = (props) => {
                     {
                         [...Array(amountOfBets)].map((e, betIndex) => {
 
-                            const betBinary = betBinaries[betIndex+1];
+                            const betBinary = betBinaries[betIndex + 1];
 
                             if (betBinary === 0) {
                                 return null;
@@ -1054,7 +1053,7 @@ const NormalExtras = (props) => {
     const [faDetails, setFaDetails] = useState(false);
     const [customOddsMode, setCustomOddsMode] = useState(false);
 
-    const faExists = roundState.roundData !== null && roundState.roundData.foods !== undefined;
+    const faExists = (roundState.roundData || {}).foods !== undefined;
 
     if (getTableMode() !== "normal") {
         return null;
@@ -1081,7 +1080,7 @@ const NormalExtras = (props) => {
                 </Button>
                 <Checkbox
                     isChecked={customOddsMode}
-                    isDisabled={!bigBrain}
+                    isDisabled={!(bigBrain && roundState.roundData)}
                     onChange={(e) => {
                         let checked = e.target.checked;
                         setCustomOddsMode(checked);
@@ -1089,7 +1088,7 @@ const NormalExtras = (props) => {
                     }}>Custom probs/odds</Checkbox>
                 <Checkbox
                     isChecked={faDetails}
-                    isDisabled={!faExists ^ !bigBrain}
+                    isDisabled={!(faExists && bigBrain)}
                     onChange={(e) => {
                         let checked = e.target.checked;
                         setFaDetails(checked);
