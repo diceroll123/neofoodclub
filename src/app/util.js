@@ -160,13 +160,7 @@ export function getTableMode() {
 }
 
 export function anyBetsExist(betsObject) {
-    let exists = false;
-    for (const [, value] of Object.entries(betsObject)) {
-        if (exists === false) {
-            exists = value.some(x => x > 0);
-        }
-    }
-    return exists;
+    return Object.values(betsObject).some(pirates => pirates.some(index => index > 0));
 }
 
 export function createBetURL(roundState, ignoreBetAmounts) {
@@ -196,12 +190,7 @@ export function createBetURL(roundState, ignoreBetAmounts) {
         return betURL;
     }
 
-    let addBetAmounts = false;
-    for (const [, value] of Object.entries(roundState.betAmounts)) {
-        if (addBetAmounts === false) {
-            addBetAmounts = value >= 50;
-        }
-    }
+    let addBetAmounts =  Object.values(roundState.betAmounts).some(value => value >= 50);
     if (addBetAmounts) {
         return betURL + '&a=' + makeBetAmountsUrl(roundState.betAmounts);
     }

@@ -52,17 +52,17 @@ const BetsSaver = (props) => {
         // will modify the current set if the current set is empty and maybe_replace is explicitly set to true
         const newIndex = maybe_replace && !anyBetsExist(roundState.bets) ? currentBet : getNewIndex();
         const newName = {};
-        const newObj = {};
+        const newBet = {};
         const newAmount = {};
         newName[newIndex] = name;
-        newObj[newIndex] = cloneArray(bets);
+        newBet[newIndex] = cloneArray(bets);
         newAmount[newIndex] = cloneArray(betAmounts);
 
         setAllNames({...allNames, ...newName});
-        setAllBets({...allBets, ...newObj});
+        setAllBets({...allBets, ...newBet});
         setAllBetAmounts({...allBetAmounts, ...newAmount});
         setRoundState({
-            bets: {...newObj[newIndex]},
+            bets: {...newBet[newIndex]},
             betAmounts: {...newAmount[newIndex]}
         });
         setCurrentBet(newIndex);
