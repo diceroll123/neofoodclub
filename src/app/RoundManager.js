@@ -4,7 +4,8 @@ import {useToast} from "@chakra-ui/react";
 import {cloneArray, createBetURL, parseBetUrl} from "./util";
 import HashChange from "react-hashchange";
 
-export const RoundManager = () => {
+export const RoundManager = (props) => {
+    const {firebase} = props;
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const toast = useToast();
 
@@ -19,105 +20,56 @@ export const RoundManager = () => {
         })
     }
 
-    function getCurrentRoundNumber(resolve, reject) {
+    useEffect(() => {
         if (roundState.currentRound === null) {
-            // first pass-through sets the round, then bails out
-            // which starts useEffect again a second time, with a round number
-            fetch('https://api.neofood.club/next_round.txt')
-                .then(response => response.text())
-                .then(data => {
-                    let currentRound = parseInt(data);
-                    if (isNaN(currentRound) === false) {
-                        setRoundState({
-                            currentRound: currentRound,
-                            currentSelectedRound: roundState.currentSelectedRound || currentRound
-                        })
-                    } else {
-                        throw Error('Cannot grab current round data');
-                    }
-                })
-                .catch(() => {
-                    errorToast(
-                        "Current round data not found.",
-                        "We don't seem to know what round it currently is. 🤔"
-                    )
-                })
-                .then(reject)
-        } else {
-            resolve();
-        }
-    }
-
-    function getRoundData(forceUpdate) {
-        if (roundState.currentSelectedRound === null) {
-            // this should never happen
+            firebase.database().ref().child("current_round").once('value', (snapshot) => {
+                const currentRound = snapshot.val();
+                const currentSelectedRound = roundState.currentSelectedRound || currentRound;
+                setRoundState({currentRound, currentSelectedRound});
+            });
             return;
         }
 
-        // do not update this round if it's over
-        if (forceUpdate && roundState.roundData !== null && roundState.roundData.winners[0] > 0) {
-            forceUpdate = false;
-        }
+        const ref = firebase.database().ref().child(`rounds/${roundState.currentSelectedRound}`);
 
-        // update if there's no data
-        if (roundState.roundData === null || forceUpdate) {
-            fetch(`https://api.neofood.club/rounds/${roundState.currentSelectedRound}.json`)
-                .then(response => response.json())
-                .then(roundData => {
-                    let currentRound = roundState.currentRound;
-                    // if winning pirates were just added, increase the in-memory current round
-                    if (currentRound === roundState.currentSelectedRound && roundData.winners[0] > 0) {
-                        currentRound += 1;
-                    }
-                    let newRoundData = roundData;
-                    if (roundState.roundData) {
-                        newRoundData = {...roundState.roundData, ...newRoundData};
-                    }
+        const onValueChange = (snapshot) => {
+            let newRoundData = snapshot.val();
+            if (newRoundData) {
+                let currentRound = roundState.currentRound;
+                // if winning pirates were just added, increase the in-memory current round
+                if (currentRound === roundState.currentSelectedRound && newRoundData.winners[0] > 0) {
+                    currentRound += 1;
+                }
 
-                    // give it custom odds + probabilities properties to optionally edit later
-                    if (newRoundData.customOdds === undefined) {
-                        newRoundData["customOdds"] = cloneArray(newRoundData.currentOdds);
-                    }
-                    if (newRoundData.customProbs === undefined) {
-                        newRoundData["customProbs"] = [[1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0]];
-                    }
+                if (roundState.roundData) {
+                    newRoundData = {...roundState.roundData, ...newRoundData};
+                }
 
-                    setRoundState({roundData: newRoundData, currentRound});
-                })
-                .catch(() => {
-                    errorToast(
-                        `Round ${roundState.currentSelectedRound} not found.`,
-                        "We don't seem to have data for this round. 🤔"
-                    );
-                });
-        }
-    }
+                // give it custom odds + probabilities properties to optionally edit later
+                if (newRoundData.customOdds === undefined) {
+                    newRoundData["customOdds"] = cloneArray(newRoundData.currentOdds);
+                }
+                if (newRoundData.customProbs === undefined) {
+                    newRoundData["customProbs"] = [[1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0]];
+                }
 
-    useEffect(() => {
-        new Promise((resolve, reject) => {
-            getCurrentRoundNumber(resolve, reject);
-        }).then(() => {
-            getRoundData(false);
-        }).catch(() => {
-            // blah
-        }).then(() => {
-            // changing round/bets will keep the url updated
-            if (roundState.currentSelectedRound === null) {
-                return;
+                setRoundState({roundData: newRoundData, currentRound});
+            } else {
+                errorToast(
+                    `Round ${roundState.currentSelectedRound} not found.`,
+                    "We don't seem to have data for this round. 🤔"
+                );
             }
+        };
 
-            window.history.replaceState(null, "", createBetURL(roundState));
-        });
+        ref.on('value', onValueChange);
 
-        const refreshInterval = setInterval(() => {
-            getRoundData(true);
-        }, 15000);
+        window.history.replaceState(null, "", createBetURL(roundState));
 
-        return () => clearInterval(refreshInterval);
+        return () => ref.off("value", onValueChange);
     }, [
         roundState.currentSelectedRound,
         roundState.currentRound,
-        roundState.roundData,
         roundState.bets,
         roundState.betAmounts
     ]);
