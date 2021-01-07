@@ -115,6 +115,12 @@ const BetsSaver = (props) => {
 
         function calculateCombination(pirates) {
             const [a, b, c, d, e] = pirates;
+            const betBinary = computePiratesBinary(pirates);
+
+            if (betBinary === 0) {
+                // empty bet, SKIP!
+                return;
+            }
 
             let odds = roundState.roundData.currentOdds;
             let probs = probabilities.std;
@@ -128,7 +134,6 @@ const BetsSaver = (props) => {
             const winChance = probs[0][a] * probs[1][b] * probs[2][c] * probs[3][d] * probs[4][e];
             const betCap = Math.min(Math.floor(1_000_000 / totalOdds) + 1, maxBet);
             const winnings = Math.min(maxBet * totalOdds, 1_000_000);
-            const betBinary = computePiratesBinary(pirates);
 
             betCaps[betBinary] = betCap;
             pirateCombos[betBinary] = ((winChance * winnings / betCap) - 1) * betCap;
