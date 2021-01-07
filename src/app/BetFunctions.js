@@ -157,6 +157,69 @@ const BetsSaver = (props) => {
         addNewSet(`Max TER Set (${maxBet} NP)`, newBets, newBetAmounts, true);
     }
 
+    function gambitSet() {
+        const maxBet = getMaxBet(roundState.currentSelectedRound);
+
+        let betCaps = {};
+        let pirateCombos = {};
+        let betOdds = {};
+
+        function calculateCombination(pirates) {
+            const [a, b, c, d, e] = pirates;
+            const betBinary = computePiratesBinary(pirates);
+
+            let odds = roundState.roundData.currentOdds;
+            let probs = probabilities.std;
+
+            if (roundState.tableMode === "normal" && roundState.advanced.bigBrain && roundState.advanced.customOddsMode) {
+                odds = roundState.customOdds;
+                probs = roundState.customProbs;
+            }
+
+            const totalOdds = odds[0][a] * odds[1][b] * odds[2][c] * odds[3][d] * odds[4][e];
+            const winChance = probs[0][a] * probs[1][b] * probs[2][c] * probs[3][d] * probs[4][e];
+            betCaps[betBinary] = Math.min(Math.floor(1_000_000 / totalOdds) + 1, maxBet);
+            pirateCombos[betBinary] = totalOdds * winChance;
+            betOdds[betBinary] = totalOdds;
+        }
+
+        for (let p of cartesian([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4])) {
+            calculateCombination(p);
+        }
+
+        let topRatios = Object.entries(pirateCombos).map(([k, v]) => [k, v]);
+        topRatios.sort((a, b) => b[1] - a[1]);
+
+        // get best full bet
+        const best = computeBinaryToPirates(topRatios[0][0]);
+
+        betCaps = {};
+        pirateCombos = {};
+        betOdds = {};
+
+        // generate a set based on those 5 pirates
+        for (let p of cartesian([0, best[0]], [0, best[1]], [0, best[2]], [0, best[3]], [0, best[4]],)) {
+            calculateCombination(p);
+        }
+
+        topRatios = Object.entries(betOdds).map(([k, v]) => [k, v]);
+        topRatios.sort((a, b) => b[1] - a[1]);
+
+        let newBets = {};
+        let newBetAmounts = {};
+        for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
+            const pirateBinary = topRatios[bet][0];
+            newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
+            let amount = Math.min(betCaps[pirateBinary], 500_000);
+            if (amount < 50) {
+                amount = -1000;
+            }
+            newBetAmounts[bet + 1] = amount;
+        }
+
+        addNewSet(`Gambit Set (${maxBet} NP)`, newBets, newBetAmounts, true);
+    }
+
     return (
         <SettingsBox mt={4} {...rest}>
             <Stack p={4}>
@@ -208,7 +271,7 @@ const BetsSaver = (props) => {
                                 <MenuDivider/>
                                 <MenuGroup title="Generate a set">
                                     <MenuItem onClick={merSet}>Max TER set</MenuItem>
-                                    <MenuItem isDisabled>Gambit set (Coming Soon)</MenuItem>
+                                    <MenuItem onClick={gambitSet}>Gambit set</MenuItem>
                                     <MenuItem isDisabled>Bustproof set (Coming Soon)</MenuItem>
                                     <MenuItem isDisabled>Random Crazy set (Coming Soon)</MenuItem>
                                 </MenuGroup>
