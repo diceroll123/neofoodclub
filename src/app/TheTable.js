@@ -28,7 +28,7 @@ import {
 } from "@chakra-ui/react";
 import {ArrowDownIcon, ArrowUpIcon, LinkIcon} from "@chakra-ui/icons";
 import React, {useEffect, useState} from "react";
-import {css} from "@emotion/css";
+import {css, cx} from "@emotion/css";
 import RoundContext from "./RoundState";
 import {
     calculateArenaRatios,
@@ -89,13 +89,13 @@ const BrainIcon = (props) => (
 // NOTE(matchu): To build this, I manually inspected <Td />'s behavior on the page, and
 //               copied the relevant HTML and styles here by hand!
 const Td = (props) => {
-    const {backgroundColor, colSpan, isNumeric, rowSpan, px, style, whiteSpace, zIndex} = props;
+    const {backgroundColor, className, colSpan, isNumeric, rowSpan, px, style, whiteSpace, zIndex} = props;
 
     return (
         <td
             colSpan={colSpan}
             rowSpan={rowSpan}
-            className={css(
+            className={cx(className, css(
                 css`
                     text-align: left;
                     padding: 0.25rem 1rem;
@@ -109,7 +109,7 @@ const Td = (props) => {
                 isNumeric && css`
                     text-align: right;
                 `
-            )}
+            ))}
             style={{
                 ...style,
                 backgroundColor,
