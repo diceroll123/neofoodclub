@@ -158,7 +158,7 @@ const BetsSaver = (props) => {
                 <Wrap>
                     {Object.keys(allBets).map((e) => {
                         return (
-                            <WrapItem>
+                            <WrapItem key={e}>
                                 <Button size="sm"
                                         variant="outline"
                                         isActive={e === currentBet}

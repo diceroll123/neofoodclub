@@ -277,7 +277,8 @@ const NormalTable = (props) => {
         }
 
         return (
-            <FaDetailsElement as={Pd}
+            <FaDetailsElement key={foodId}
+                              as={Pd}
                               isNumeric
                               backgroundColor={color}
                               whiteSpace="nowrap">
@@ -309,7 +310,7 @@ const NormalTable = (props) => {
                     {/*<Th>Timeline</Th>*/}
                     {
                         [...Array(amountOfBets)].map((e, i) => {
-                            return <Th>Bet {i + 1}</Th>
+                            return <Th key={i}>Bet {i + 1}</Th>
                         })
                     }
                     <Th><ClearBetsButton/></Th>
@@ -325,7 +326,7 @@ const NormalTable = (props) => {
                     }
 
                     return (
-                        <Tbody>
+                        <Tbody key={arenaId}>
                             <Tr>
                                 <Td rowSpan={5}>{arenaName}</Td>
                                 <BigBrainElement as={Td} rowSpan={5} isNumeric>
@@ -342,7 +343,8 @@ const NormalTable = (props) => {
                                     {roundState.roundData.foods[arenaId].map((foodId) => {
                                         const food = FOODS[foodId];
                                         return (
-                                            <FaDetailsElement as={Pd}
+                                            <FaDetailsElement key={foodId}
+                                                              as={Pd}
                                                               whiteSpace="nowrap"
                                                               overflow="hidden"
                                                               textOverflow="ellipsis"
@@ -360,7 +362,7 @@ const NormalTable = (props) => {
                                 {roundState.roundData !== null ? <>
                                     {[...Array(amountOfBets)].map((bet, betNum) => {
                                         return (
-                                            <Td backgroundColor={grayAccent}>
+                                            <Td key={betNum} backgroundColor={grayAccent}>
                                                 <Radio
                                                     name={"bet" + (betNum + 1) + arenaId}
                                                     value={0}
@@ -389,7 +391,7 @@ const NormalTable = (props) => {
                                 if (roundState.roundData === null) {
                                     // big ol skeleton
                                     return (
-                                        <Tr>
+                                        <Tr key={pirateIndex}>
                                             <Td colSpan={100}>
                                                 <Skeleton height="24px">&nbsp;</Skeleton>
                                             </Td>
@@ -421,7 +423,7 @@ const NormalTable = (props) => {
                                 }
 
                                 return (
-                                    <Tr backgroundColor={bgColor}>
+                                    <Tr key={pirateId} backgroundColor={bgColor}>
                                         <StickyTd
                                             backgroundColor={getPirateBgColor(opening)}>{PIRATE_NAMES[pirateId]}</StickyTd>
                                         <BigBrainElement as={Td}
@@ -464,7 +466,7 @@ const NormalTable = (props) => {
                                         {/* Odds Timeline */}
                                         {[...Array(amountOfBets)].map((bet, betNum) => {
                                             return (
-                                                <Td>
+                                                <Td key={betNum}>
                                                     <Radio name={"bet" + (betNum + 1) + arenaId}
                                                            value={pirateIndex + 1}
                                                            onChange={() => changeBet(betNum + 1, arenaId, pirateIndex + 1)}
@@ -649,7 +651,7 @@ const PayoutTable = (props) => {
                             }
 
                             return (
-                                <Tr>
+                                <Tr key={betIndex}>
                                     <Pd backgroundColor={betNumBgColor}>
                                         <HStack>
                                             <Spacer/>
@@ -707,7 +709,7 @@ const PayoutTable = (props) => {
                                                 }
                                             }
                                             return (
-                                                <Td backgroundColor={bgColor}>
+                                                <Td key={arenaIndex} backgroundColor={bgColor}>
                                                     {PIRATE_NAMES[roundState.roundData.pirates[arenaIndex][pirateIndex - 1]]}
                                                 </Td>
                                             )
@@ -841,7 +843,7 @@ const DropDownTable = (props) => {
                             }
 
                             return (
-                                <Pd>
+                                <Pd key={arenaId}>
                                     <Table size="sm" maxW="150px">
                                         <Tbody>
                                             {
@@ -850,7 +852,7 @@ const DropDownTable = (props) => {
                                                     if (roundState.roundData === null) {
                                                         // big ol skeleton
                                                         return (
-                                                            <Tr>
+                                                            <Tr key={pirateIndex}>
                                                                 <Pd>
                                                                     <Skeleton width="150px"
                                                                               height="24px">&nbsp;</Skeleton>
@@ -871,7 +873,7 @@ const DropDownTable = (props) => {
                                                     }
 
                                                     return (
-                                                        <Tr backgroundColor={trBg}>
+                                                        <Tr key={pirateId} backgroundColor={trBg}>
                                                             <Pd whiteSpace="nowrap"
                                                                 backgroundColor={pirateBg}>{PIRATE_NAMES[pirateId]}</Pd>
                                                             <Pd isNumeric>{opening}:1</Pd>
@@ -895,12 +897,12 @@ const DropDownTable = (props) => {
                 {
                     [...Array(amountOfBets)].map((bet, betNum) => {
                         return (
-                            <Tr>
+                            <Tr key={betNum}>
                                 {
                                     [...Array(5)].map((_, arenaId) => {
                                         if (roundState.roundData === null) {
                                             return (
-                                                <Pd>
+                                                <Pd key={arenaId}>
                                                     <Skeleton height="24px"><Box>&nbsp;</Box></Skeleton>
                                                 </Pd>
                                             )
@@ -916,7 +918,7 @@ const DropDownTable = (props) => {
                                         }
 
                                         return (
-                                            <Pd>
+                                            <Pd key={arenaId}>
                                                 <Select size="sm"
                                                         height="1.5rem"
                                                         backgroundColor={pirateBg}
@@ -926,7 +928,7 @@ const DropDownTable = (props) => {
                                                     {
                                                         pirates.map((pirateId, pirateIndex) => {
                                                             return (
-                                                                <option
+                                                                <option key={pirateId}
                                                                     style={{"background": getPirateBgColor(roundState.roundData.openingOdds[arenaId][pirateIndex + 1])}}
                                                                     value={pirateIndex + 1}>{PIRATE_NAMES[pirateId]}</option>
                                                             )
@@ -975,7 +977,7 @@ const PayoutExtras = (props) => {
             const dataObj = data[key];
 
             return (
-                <Tr>
+                <Tr key={key}>
                     <Td isNumeric>{numberWithCommas(dataObj.value)}</Td>
                     <Td isNumeric>{displayAsPercent(dataObj.probability, 3)}</Td>
                     <Td isNumeric>{displayAsPercent(dataObj.cumulative, 3)}</Td>
