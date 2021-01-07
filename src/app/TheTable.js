@@ -16,7 +16,6 @@ import {
     StatArrow,
     Table,
     Tbody,
-    Td as OriginalTd,
     Text,
     Th,
     Thead,
@@ -29,6 +28,7 @@ import {
 } from "@chakra-ui/react";
 import {ArrowDownIcon, ArrowUpIcon, LinkIcon} from "@chakra-ui/icons";
 import React, {useEffect, useState} from "react";
+import {css} from "@emotion/css";
 import RoundContext from "./RoundState";
 import {
     calculateArenaRatios,
@@ -83,7 +83,39 @@ const BrainIcon = (props) => (
     </svg>
 )
 
-const Td = (props) => (<OriginalTd py={1} {...props}>{props.children}</OriginalTd>);
+const Td = (props) => {
+    const {backgroundColor, colSpan, isNumeric, rowSpan, px, style, whiteSpace, zIndex} = props;
+
+    return (
+        <td
+            colSpan={colSpan}
+            rowSpan={rowSpan}
+            className={css(
+                css`
+                    text-align: left;
+                    padding: 0.25rem 1rem;
+                    font-size: 0.875rem;
+                    line-height: 1rem;
+                    border-bottom: 1px solid #EDF2F7;
+                `,
+                px == 1 && css`
+                    padding: 0.25rem;
+                `,
+                isNumeric && css`
+                    text-align: right;
+                `
+            )}
+            style={{
+                ...style,
+                backgroundColor,
+                whiteSpace,
+                zIndex,
+            }}
+        >
+            {props.children}
+        </td>
+    );
+};
 
 // A special Td with minimal x-axis padding to cut down on giant tables
 const Pd = (props) => (<Td px={1} {...props}>{props.children}</Td>);
