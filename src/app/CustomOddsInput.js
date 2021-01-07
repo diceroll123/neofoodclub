@@ -6,21 +6,21 @@ import {
     NumberInputStepper
 } from "@chakra-ui/react";
 import React, {useState} from "react";
+import produce from "immer";
 import RoundContext from "./RoundState";
 
 export default function CustomOddsInput(props) {
     const {roundState, setRoundState} = React.useContext(RoundContext);
     const {arenaIndex, pirateIndex, ...rest} = props;
-    const [odds, setOdds] = useState(roundState.roundData.customOdds[arenaIndex][pirateIndex]);
+    const [odds, setOdds] = useState(roundState.customOdds[arenaIndex][pirateIndex]);
 
     function changeOdds(oddsValue) {
         setOdds(oddsValue);
 
-        let newData = {}
-        newData["customOdds"] = roundState.roundData.customOdds;
-        newData["customOdds"][arenaIndex][pirateIndex] = oddsValue;
-
-        setRoundState({roundData: {...roundState.roundData, ...newData}})
+        const customOdds = produce(roundState.customOdds, draftCustomOdds => {
+            draftCustomOdds[arenaIndex][pirateIndex] = oddsValue;
+        });
+        setRoundState({customOdds});
     }
 
     return (

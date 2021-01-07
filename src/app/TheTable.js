@@ -401,7 +401,7 @@ const NormalTable = (props) => {
 
                                 let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
                                 let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
-                                let custom = roundState.roundData.customOdds[arenaId][pirateIndex + 1];
+                                let custom = roundState.customOdds[arenaId][pirateIndex + 1];
 
                                 let bgColor = "transparent";
                                 let pirateBin = computePirateBinary(arenaId, pirateIndex + 1);
@@ -409,7 +409,7 @@ const NormalTable = (props) => {
                                     bgColor = green;
                                 }
 
-                                let prob = roundState.roundData.customProbs[arenaId][pirateIndex + 1];
+                                let prob = roundState.customProbs[arenaId][pirateIndex + 1];
                                 if (prob === 0) {
                                     prob = probabilities.used[arenaId][pirateIndex + 1];
                                 }
@@ -1229,10 +1229,10 @@ export default function TheTable(props) {
     let winningBetBinary = 0;
 
     if (roundState.roundData) {
-        probabilities = computeProbabilities(roundState.roundData);
+        probabilities = computeProbabilities(roundState.roundData, roundState.customProbs);
 
         pirateFAs = computePirateFAs(roundState.roundData);
-        arenaRatios = calculateArenaRatios(roundState.roundData);
+        arenaRatios = calculateArenaRatios(roundState.customOdds);
         winningBetBinary = computePiratesBinary(roundState.roundData.winners);
 
         // keep the "cache" of bet data up to date
@@ -1244,8 +1244,8 @@ export default function TheTable(props) {
             for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
                 let pirateIndex = roundState.bets[betIndex][arenaIndex];
                 if (pirateIndex > 0) {
-                    let odd = roundState.roundData.customOdds[arenaIndex][pirateIndex] || roundState.roundData.currentOdds[arenaIndex][pirateIndex];
-                    let prob = roundState.roundData.customProbs[arenaIndex][pirateIndex] || probabilities.used[arenaIndex][pirateIndex];
+                    let odd = roundState.customOdds[arenaIndex][pirateIndex] || roundState.roundData.currentOdds[arenaIndex][pirateIndex];
+                    let prob = roundState.customProbs[arenaIndex][pirateIndex] || probabilities.used[arenaIndex][pirateIndex];
                     betOdds[betIndex] = (betOdds[betIndex] || 1) * odd;
                     betProbabilities[betIndex] = (betProbabilities[betIndex] || 1) * prob;
                 }
