@@ -8,8 +8,7 @@ export default function useRoundData(firebase, currentSelectedRound) {
     const [roundData, setRoundData] = useState(null);
 
     // When the page first loads, if there's no round selected yet, get the current round number
-    // from Firebase. Set it as the currentRound, and as our currentlySelectedRound ID in the UI,
-    // if there isn't one already.
+    // from Firebase.
     useEffect(() => {
         firebase.database().ref().child("current_round").once('value', (snapshot) => {
             const newCurrentRound = snapshot.val();
