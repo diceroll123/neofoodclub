@@ -190,7 +190,7 @@ export function createBetURL(roundState, ignoreBetAmounts) {
         return betURL;
     }
 
-    let addBetAmounts =  Object.values(roundState.betAmounts).some(value => value >= 50);
+    let addBetAmounts = Object.values(roundState.betAmounts).some(value => value >= 50);
     if (addBetAmounts) {
         return betURL + '&a=' + makeBetAmountsUrl(roundState.betAmounts);
     }
@@ -225,4 +225,12 @@ export function makeEmptyBetAmounts(length) {
         betAmounts[index] = -1000;
     }
     return betAmounts;
+}
+
+export function shuffleArray(array) {
+    // from https://stackoverflow.com/a/12646864
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
 }

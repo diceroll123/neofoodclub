@@ -5,11 +5,11 @@ import {
     EditableInput,
     EditablePreview,
     Menu,
+    MenuButton,
     MenuDivider,
     MenuGroup,
-    MenuButton,
-    MenuList,
     MenuItem,
+    MenuList,
     Portal,
     Stack,
     Text,
@@ -18,9 +18,9 @@ import {
 } from "@chakra-ui/react";
 import React, {useEffect, useState} from "react";
 import RoundContext from "./RoundState";
-import {anyBetsExist, cloneArray, getMaxBet, makeEmptyBetAmounts, makeEmptyBets} from "./util";
+import {anyBetsExist, cloneArray, getMaxBet, makeEmptyBetAmounts, makeEmptyBets, shuffleArray} from "./util";
 import {computeBinaryToPirates, computePiratesBinary} from "./maths";
-import {AddIcon, CopyIcon, DeleteIcon, ChevronDownIcon} from "@chakra-ui/icons";
+import {AddIcon, ChevronDownIcon, CopyIcon, DeleteIcon} from "@chakra-ui/icons";
 import {SettingsBox} from "./TheTable";
 
 const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
@@ -35,6 +35,55 @@ const BetsSaver = (props) => {
     const [allBetAmounts, setAllBetAmounts] = useState({"0": {...roundState.betAmounts}});
 
     const getNewIndex = () => (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
+
+    class BetsMaker {
+        #odds;
+        #probs;
+
+        constructor() {
+            this.#odds = roundState.roundData.currentOdds;
+            this.#probs = probabilities.std;
+
+            if (roundState.tableMode === "normal" && roundState.advanced.bigBrain && roundState.advanced.customOddsMode) {
+                this.#odds = roundState.customOdds;
+                this.#probs = roundState.customProbs;
+            }
+        }
+
+        calculate(...pirates) {
+            const maxBet = getMaxBet(roundState.currentSelectedRound);
+            let betCaps = {};
+            let betOdds = {};
+            let pirateCombos = {};
+
+            for (let p of cartesian(...pirates)) {
+                const [a, b, c, d, e] = p;
+                const betBinary = computePiratesBinary(p);
+
+                if (betBinary === 0) {
+                    // empty bet, SKIP!
+                    continue;
+                }
+
+                const totalOdds = this.#odds[0][a] * this.#odds[1][b] * this.#odds[2][c] * this.#odds[3][d] * this.#odds[4][e];
+                const winChance = this.#probs[0][a] * this.#probs[1][b] * this.#probs[2][c] * this.#probs[3][d] * this.#probs[4][e];
+                const betCap = Math.min(Math.floor(1_000_000 / totalOdds) + 1, maxBet);
+                const winnings = Math.min(maxBet * totalOdds, 1_000_000);
+
+                betCaps[betBinary] = betCap;
+                betOdds[betBinary] = totalOdds;
+                if (maxBet >= 50) {
+                    // Net expected
+                    pirateCombos[betBinary] = ((winChance * winnings / betCap) - 1) * betCap;
+                } else {
+                    // Expected return
+                    pirateCombos[betBinary] = totalOdds * winChance;
+                }
+            }
+
+            return {betCaps, betOdds, pirateCombos};
+        }
+    }
 
     useEffect(() => {
         // TODO: (maybe fix?) when you switch between sets, this has the side effect of updating itself again here one time
@@ -110,38 +159,11 @@ const BetsSaver = (props) => {
             return;
         }
 
-        let betCaps = {};
-        let pirateCombos = {};
-
-        function calculateCombination(pirates) {
-            const [a, b, c, d, e] = pirates;
-            const betBinary = computePiratesBinary(pirates);
-
-            if (betBinary === 0) {
-                // empty bet, SKIP!
-                return;
-            }
-
-            let odds = roundState.roundData.currentOdds;
-            let probs = probabilities.std;
-
-            if (roundState.tableMode === "normal" && roundState.advanced.bigBrain && roundState.advanced.customOddsMode) {
-                odds = roundState.customOdds;
-                probs = roundState.customProbs;
-            }
-
-            const totalOdds = odds[0][a] * odds[1][b] * odds[2][c] * odds[3][d] * odds[4][e];
-            const winChance = probs[0][a] * probs[1][b] * probs[2][c] * probs[3][d] * probs[4][e];
-            const betCap = Math.min(Math.floor(1_000_000 / totalOdds) + 1, maxBet);
-            const winnings = Math.min(maxBet * totalOdds, 1_000_000);
-
-            betCaps[betBinary] = betCap;
-            pirateCombos[betBinary] = ((winChance * winnings / betCap) - 1) * betCap;
-        }
-
-        for (let p of cartesian([0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4])) {
-            calculateCombination(p);
-        }
+        const maker = new BetsMaker();
+        const {
+            betCaps,
+            pirateCombos
+        } = maker.calculate([0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]);
 
         let topRatios = Object.entries(pirateCombos).map(([k, v]) => [k, v]);
         topRatios.sort((a, b) => b[1] - a[1]);
@@ -151,7 +173,7 @@ const BetsSaver = (props) => {
         for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
             const pirateBinary = topRatios[bet][0];
             newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
-            newBetAmounts[bet + 1] = Math.min(Math.max(betCaps[pirateBinary], 50), 500_000);
+            newBetAmounts[bet + 1] = Math.max(Math.min(betCaps[pirateBinary], 500_000), 50);
         }
 
         addNewSet(`Max TER Set (${maxBet} NP)`, newBets, newBetAmounts, true);
@@ -160,32 +182,8 @@ const BetsSaver = (props) => {
     function gambitSet() {
         const maxBet = getMaxBet(roundState.currentSelectedRound);
 
-        let betCaps = {};
-        let pirateCombos = {};
-        let betOdds = {};
-
-        function calculateCombination(pirates) {
-            const [a, b, c, d, e] = pirates;
-            const betBinary = computePiratesBinary(pirates);
-
-            let odds = roundState.roundData.currentOdds;
-            let probs = probabilities.std;
-
-            if (roundState.tableMode === "normal" && roundState.advanced.bigBrain && roundState.advanced.customOddsMode) {
-                odds = roundState.customOdds;
-                probs = roundState.customProbs;
-            }
-
-            const totalOdds = odds[0][a] * odds[1][b] * odds[2][c] * odds[3][d] * odds[4][e];
-            const winChance = probs[0][a] * probs[1][b] * probs[2][c] * probs[3][d] * probs[4][e];
-            betCaps[betBinary] = Math.min(Math.floor(1_000_000 / totalOdds) + 1, maxBet);
-            pirateCombos[betBinary] = totalOdds * winChance;
-            betOdds[betBinary] = totalOdds;
-        }
-
-        for (let p of cartesian([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4])) {
-            calculateCombination(p);
-        }
+        const maker = new BetsMaker();
+        const {pirateCombos} = maker.calculate([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]);
 
         let topRatios = Object.entries(pirateCombos).map(([k, v]) => [k, v]);
         topRatios.sort((a, b) => b[1] - a[1]);
@@ -193,14 +191,11 @@ const BetsSaver = (props) => {
         // get best full bet
         const best = computeBinaryToPirates(topRatios[0][0]);
 
-        betCaps = {};
-        pirateCombos = {};
-        betOdds = {};
-
         // generate a set based on those 5 pirates
-        for (let p of cartesian([0, best[0]], [0, best[1]], [0, best[2]], [0, best[3]], [0, best[4]],)) {
-            calculateCombination(p);
-        }
+        const {
+            betCaps,
+            betOdds
+        } = maker.calculate([0, best[0]], [0, best[1]], [0, best[2]], [0, best[3]], [0, best[4]]);
 
         topRatios = Object.entries(betOdds).map(([k, v]) => [k, v]);
         topRatios.sort((a, b) => b[1] - a[1]);
@@ -210,14 +205,34 @@ const BetsSaver = (props) => {
         for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
             const pirateBinary = topRatios[bet][0];
             newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
-            let amount = Math.min(betCaps[pirateBinary], 500_000);
-            if (amount < 50) {
-                amount = -1000;
-            }
-            newBetAmounts[bet + 1] = amount;
+            newBetAmounts[bet + 1] = Math.max(Math.min(betCaps[pirateBinary], 500_000), 50);
         }
 
         addNewSet(`Gambit Set (${maxBet} NP)`, newBets, newBetAmounts, true);
+    }
+
+    function randomCrazySet() {
+        const maxBet = getMaxBet(roundState.currentSelectedRound);
+
+        const maker = new BetsMaker();
+        const {
+            betCaps,
+            betOdds
+        } = maker.calculate([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]);
+
+        let allFullBets = Object.keys(betOdds);
+        shuffleArray(allFullBets);
+
+        let newBets = {};
+        let newBetAmounts = {};
+        for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
+            const pirateBinary = allFullBets[bet];
+            newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
+            newBetAmounts[bet + 1] = Math.max(Math.min(betCaps[pirateBinary], 500_000), 50);
+        }
+
+        addNewSet(`Crazy Set (${maxBet} NP)`, newBets, newBetAmounts, true);
+
     }
 
     return (
@@ -272,8 +287,11 @@ const BetsSaver = (props) => {
                                 <MenuGroup title="Generate a set">
                                     <MenuItem onClick={merSet}>Max TER set</MenuItem>
                                     <MenuItem onClick={gambitSet}>Gambit set</MenuItem>
-                                    <MenuItem isDisabled>Bustproof set (Coming Soon)</MenuItem>
-                                    <MenuItem isDisabled>Random Crazy set (Coming Soon)</MenuItem>
+                                    <MenuItem onClick={randomCrazySet}>Random Crazy set</MenuItem>
+                                </MenuGroup>
+                                <MenuDivider/>
+                                <MenuGroup title="Coming Soon">
+                                    <MenuItem isDisabled>Bustproof set</MenuItem>
                                 </MenuGroup>
                             </MenuList>
                         </Portal>
