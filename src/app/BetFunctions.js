@@ -151,7 +151,7 @@ const BetsSaver = (props) => {
         for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
             const pirateBinary = topRatios[bet][0];
             newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
-            newBetAmounts[bet + 1] = betCaps[pirateBinary];
+            newBetAmounts[bet + 1] = Math.min(Math.max(betCaps[pirateBinary], 50), 500_000);
         }
 
         addNewSet(`Max TER Set (${maxBet} NP)`, newBets, newBetAmounts, true);
