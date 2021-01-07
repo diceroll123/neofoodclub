@@ -402,6 +402,8 @@ const NormalTable = (props) => {
                                 let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
                                 let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
                                 let custom = roundState.customOdds[arenaId][pirateIndex + 1];
+                                const useCustom = roundState.advanced.bigBrain && roundState.advanced.customOddsMode;
+                                const useOdds = useCustom ? custom : current;
 
                                 let bgColor = "transparent";
                                 let pirateBin = computePirateBinary(arenaId, pirateIndex + 1);
@@ -409,12 +411,15 @@ const NormalTable = (props) => {
                                     bgColor = green;
                                 }
 
-                                let prob = roundState.customProbs[arenaId][pirateIndex + 1];
-                                if (prob === 0) {
-                                    prob = probabilities.used[arenaId][pirateIndex + 1];
+                               let prob = probabilities.used[arenaId][pirateIndex + 1];
+                                if (useCustom) {
+                                    let tempProb = roundState.customProbs[arenaId][pirateIndex + 1];
+                                    if (tempProb !== 0) {
+                                        prob = tempProb;
+                                    }
                                 }
 
-                                let payout = custom * prob - 1;
+                                const payout = useOdds * prob - 1;
                                 let payoutBackground = "transparent";
                                 if (payout > 0) {
                                     payoutBackground = green;
