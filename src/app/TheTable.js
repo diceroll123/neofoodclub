@@ -411,7 +411,7 @@ const NormalTable = (props) => {
                                     bgColor = green;
                                 }
 
-                               let prob = probabilities.used[arenaId][pirateIndex + 1];
+                                let prob = probabilities.used[arenaId][pirateIndex + 1];
                                 if (useCustom) {
                                     let tempProb = roundState.customProbs[arenaId][pirateIndex + 1];
                                     if (tempProb !== 0) {
@@ -692,7 +692,11 @@ const PayoutTable = (props) => {
                                     </Pd>
                                     <Td isNumeric>{numberWithCommas(betOdds[betIndex + 1])}:1</Td>
                                     <Td isNumeric>{numberWithCommas(betPayoffs[betIndex + 1])}</Td>
-                                    <Td isNumeric>{displayAsPercent(betProbabilities[betIndex + 1], 3)}</Td>
+                                    <Td isNumeric>
+                                        <TextTooltip
+                                            text={displayAsPercent(betProbabilities[betIndex + 1], 3)}
+                                            label={displayAsPercent(betProbabilities[betIndex + 1])}/>
+                                    </Td>
                                     <Td isNumeric backgroundColor={erBg}>{er.toFixed(3)}:1</Td>
                                     <Td isNumeric backgroundColor={neBg}>{ne.toFixed(2)}</Td>
                                     <Td isNumeric
@@ -984,9 +988,21 @@ const PayoutExtras = (props) => {
             return (
                 <Tr key={key}>
                     <Td isNumeric>{numberWithCommas(dataObj.value)}</Td>
-                    <Td isNumeric>{displayAsPercent(dataObj.probability, 3)}</Td>
-                    <Td isNumeric>{displayAsPercent(dataObj.cumulative, 3)}</Td>
-                    <Td isNumeric>{displayAsPercent(dataObj.tail, 3)}</Td>
+                    <Td isNumeric>
+                        <TextTooltip
+                            text={displayAsPercent(dataObj.probability, 3)}
+                            label={displayAsPercent(dataObj.probability)}/>
+                    </Td>
+                    <Td isNumeric>
+                        <TextTooltip
+                            text={displayAsPercent(dataObj.cumulative, 3)}
+                            label={displayAsPercent(dataObj.cumulative)}/>
+                    </Td>
+                    <Td isNumeric>
+                        <TextTooltip
+                            text={displayAsPercent(dataObj.tail, 3)}
+                            label={displayAsPercent(dataObj.tail)}/>
+                    </Td>
                 </Tr>
             )
         });
