@@ -83,6 +83,11 @@ const BrainIcon = (props) => (
     </svg>
 )
 
+// A low-feature, high-performance copy of <Td /> from @chakra-ui/react.
+// We render a few hundred cells in the table, so it's important that they render very fast!
+//
+// NOTE(matchu): To build this, I manually inspected <Td />'s behavior on the page, and
+//               copied the relevant HTML and styles here by hand!
 const Td = (props) => {
     const {backgroundColor, colSpan, isNumeric, rowSpan, px, style, whiteSpace, zIndex} = props;
 
@@ -119,6 +124,80 @@ const Td = (props) => {
 
 // A special Td with minimal x-axis padding to cut down on giant tables
 const Pd = (props) => (<Td px={1} {...props}>{props.children}</Td>);
+
+// A low-feature, high-performance copy of <Radio /> from @chakra-ui/react.
+// We render a few hundred radios in the table, so it's important that they render very fast!
+//
+// NOTE(matchu): To build this, I manually inspected <Radio />'s behavior on the page, and
+//               copied the relevant HTML and styles here by hand!
+const TableRadio = (props) => {
+    const {name, value, isChecked, onChange} = props;
+
+    return (
+        <label
+            className={css`
+                display: inline-flex;
+                align-items: center;
+                vertical-align: top;
+            `}
+        >
+            <input
+                type="radio"
+                name={name}
+                value={value}
+                checked={isChecked}
+                onChange={onChange}
+                className={css`
+                    border: 0px none;
+                    clip: rect(0px, 0px, 0px, 0px);
+                    height: 1px;
+                    width: 1px;
+                    margin: -1px;
+                    padding: 0px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    position: absolute;
+                `}
+            />
+            <div
+                aria-hidden="true"
+                className={css`
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                    width: 1rem;
+                    transition: box-shadow 250ms;
+                    border: 2px solid;
+                    border-color: inherit;
+                    border-radius: 9999px;
+                    color: white;
+                    height: 1rem;
+
+                    input[type=radio]:focus + & {
+                        box-shadow: rgba(66, 153, 225, 0.6) 0px 0px 0px 3px;
+                    }
+
+                    input[type=radio]:checked + & {
+                        background: #3182CE; /* blue.500 */
+                        border-color: #3182CE; /* blue.500 */
+                        color: white;
+
+                        &::before {
+                            content: "";
+                            display: inline-block;
+                            position: relative;
+                            width: 50%;
+                            height: 50%;
+                            border-radius: 50%;
+                            background: currentcolor;
+                        }
+                    }
+                `}
+            />
+        </label>
+    );
+};
 
 const TextTooltip = (props) => {
     const {text, label, ...rest} = props;
@@ -395,7 +474,7 @@ const NormalTable = (props) => {
                                     {[...Array(amountOfBets)].map((bet, betNum) => {
                                         return (
                                             <Td key={betNum} backgroundColor={grayAccent}>
-                                                <Radio
+                                                <TableRadio
                                                     name={"bet" + (betNum + 1) + arenaId}
                                                     value={0}
                                                     onChange={() => changeBet(betNum + 1, arenaId, 0)}
@@ -499,7 +578,7 @@ const NormalTable = (props) => {
                                         {[...Array(amountOfBets)].map((bet, betNum) => {
                                             return (
                                                 <Td key={betNum}>
-                                                    <Radio name={"bet" + (betNum + 1) + arenaId}
+                                                    <TableRadio name={"bet" + (betNum + 1) + arenaId}
                                                            value={pirateIndex + 1}
                                                            onChange={() => changeBet(betNum + 1, arenaId, pirateIndex + 1)}
                                                            isChecked={roundState.bets[betNum + 1][arenaId] === pirateIndex + 1}/>
