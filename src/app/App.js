@@ -52,18 +52,6 @@ function App() {
         }
     }, [roundState.currentSelectedRound, currentRound]);
 
-    console.log(roundState);
-
-    // When new round data comes in, reset the round-specific state.
-    useEffect(() => {
-        setRoundState({
-            // TODO(matchu): We should probably also reset bets and betAmounts here,
-            //               but I don't know the default values!
-            customOdds: null,
-            customProbs: null,
-        });
-    }, [roundData?.round]);
-
     const mergedRoundState = {
         ...roundState,
         currentRound,
@@ -93,13 +81,13 @@ function useRoundStateURLs(roundState, setRoundState) {
     const onHashChange = useCallback(() => {
         const data = parseBetUrl();
         if (isNaN(parseInt(data.round))) {
-            data.round = roundState.currentRound;
+            data.round = roundState.currentRound.toString();
         }
         setRoundState({
             currentSelectedRound: data.round,
             bets: data.bets,
             betAmounts: data.betAmounts,
-            roundData: data.round === roundState.currentSelectedRound ? roundState.roundData : null
+            roundData: parseInt(data.round) === parseInt(roundState.currentSelectedRound) ? roundState.roundData : null
         });
     }, [roundState.currentRound, roundState.currentSelectedRound, roundState.roundData, setRoundState]);
 

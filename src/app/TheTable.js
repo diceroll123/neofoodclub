@@ -338,7 +338,7 @@ const NormalTable = (props) => {
                                 <Td backgroundColor={grayAccent} colSpan={roundState.advanced.bigBrain ? 6 : 1}/>
                                 <CustomOddsElement as={Td} backgroundColor={grayAccent} colSpan={2}/>
 
-                                {roundState.roundData !== null && roundState.roundData.foods !== undefined ? <>
+                                {roundState.roundData?.foods ? <>
 
                                     {roundState.roundData.foods[arenaId].map((foodId) => {
                                         const food = FOODS[foodId];
@@ -443,7 +443,7 @@ const NormalTable = (props) => {
                                         <BigBrainElement as={Td} backgroundColor={payoutBackground}
                                                          isNumeric>{displayAsPercent(payout, 1)}</BigBrainElement>
                                         {
-                                            roundState.roundData && roundState.roundData.foods !== undefined ?
+                                            roundState.roundData?.foods ?
                                                 <>
                                                     <BigBrainElement as={Td}
                                                                      isNumeric>{pirateFAs[arenaId][pirateIndex]}</BigBrainElement>
@@ -929,8 +929,8 @@ const DropDownTable = (props) => {
                                                         pirates.map((pirateId, pirateIndex) => {
                                                             return (
                                                                 <option key={pirateId}
-                                                                    style={{"background": getPirateBgColor(roundState.roundData.openingOdds[arenaId][pirateIndex + 1])}}
-                                                                    value={pirateIndex + 1}>{PIRATE_NAMES[pirateId]}</option>
+                                                                        style={{"background": getPirateBgColor(roundState.roundData.openingOdds[arenaId][pirateIndex + 1])}}
+                                                                        value={pirateIndex + 1}>{PIRATE_NAMES[pirateId]}</option>
                                                             )
                                                         })
                                                     }
@@ -969,7 +969,7 @@ const PayoutExtras = (props) => {
     const {payoutTables, grayAccent} = props;
 
     if (payoutTables.odds === undefined) {
-        return (<></>)
+        return null;
     }
 
     function makeTable(title, data) {
@@ -1063,8 +1063,6 @@ const NormalExtras = (props) => {
     const [faDetails, setFaDetails] = useState(false);
     const [customOddsMode, setCustomOddsMode] = useState(false);
 
-    const faExists = (roundState.roundData || {}).foods !== undefined;
-
     if (getTableMode() !== "normal") {
         return null;
     }
@@ -1098,7 +1096,7 @@ const NormalExtras = (props) => {
                     }}>Custom probs/odds</Checkbox>
                 <Checkbox
                     isChecked={faDetails}
-                    isDisabled={!(faExists && bigBrain)}
+                    isDisabled={!(roundState.roundData?.foods && bigBrain)}
                     onChange={(e) => {
                         let checked = e.target.checked;
                         setFaDetails(checked);

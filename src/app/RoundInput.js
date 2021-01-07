@@ -7,6 +7,7 @@ import {
     NumberInputField,
     NumberInputStepper
 } from "@chakra-ui/react";
+import {makeEmptyBetAmounts, makeEmptyBets} from "./util";
 
 export default function RoundInput() {
     const {roundState, setRoundState} = useContext(RoundContext);
@@ -16,16 +17,21 @@ export default function RoundInput() {
 
     function changeCurrentSelectedRound(value) {
         if (value > 0) {
+            const amountOfBets = Object.keys(roundState.bets).length;
             setRoundState({
                 currentSelectedRound: value,
-                roundData: null
+                roundData: null,
+                bets: makeEmptyBets(amountOfBets),
+                betAmounts: makeEmptyBetAmounts(amountOfBets),
+                customOdds: null,
+                customProbs: null,
             });
         }
     }
 
     useEffect(() => {
         const currentSelected = roundState.currentSelectedRound;
-        if (currentSelected !== null && currentSelected !== roundNumber && roundNumber === 0) {
+        if (currentSelected !== null && currentSelected !== roundNumber) {
             setRoundNumber(currentSelected);
         }
     }, [roundState.currentSelectedRound]);
