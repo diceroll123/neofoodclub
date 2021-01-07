@@ -120,8 +120,8 @@ const BetsSaver = (props) => {
             let probs = probabilities.std;
 
             if (roundState.tableMode === "normal" && roundState.advanced.bigBrain && roundState.advanced.customOddsMode) {
-                odds = roundState.roundData.customOdds;
-                probs = roundState.roundData.customProbs;
+                odds = roundState.customOdds;
+                probs = roundState.customProbs;
             }
 
             const totalOdds = odds[0][a] * odds[1][b] * odds[2][c] * odds[3][d] * odds[4][e];

@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import RoundContext from "./RoundState";
 import {
     NumberDecrementStepper,
     NumberIncrementStepper,
@@ -7,6 +6,8 @@ import {
     NumberInputField,
     NumberInputStepper
 } from "@chakra-ui/react";
+import produce from "immer";
+import RoundContext from "./RoundState";
 
 export default function CustomProbsInput(props) {
     const {roundState, setRoundState} = React.useContext(RoundContext);
@@ -18,12 +19,10 @@ export default function CustomProbsInput(props) {
     function changeProbs(probValue) {
         setProb(probValue);
 
-        let newData = {}
-        newData["customProbs"] = roundState.roundData.customProbs;
-        newData["customProbs"][arenaIndex][pirateIndex] = probValue / 100;
-
-        let currentRoundData = roundState.roundData;
-        setRoundState({roundData: {...currentRoundData, ...newData}});
+        const customProbs = produce(roundState.customProbs, draftCustomProbs => {
+            draftCustomProbs[arenaIndex][pirateIndex] = probValue / 100;
+        });
+        setRoundState({customProbs});
     }
 
     return (

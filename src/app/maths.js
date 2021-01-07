@@ -22,7 +22,7 @@ export function computePirateFAs(roundData) {
     return fas;
 }
 
-export function computeProbabilities(roundData) {
+export function computeProbabilities(roundData, customProbs) {
     let returnValue = {
         min: [],
         std: [],
@@ -99,7 +99,7 @@ export function computeProbabilities(roundData) {
 
         let sum = 0;
         for (pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
-            returnValue.used[arenaIndex][pirateIndex] = roundData.customProbs[arenaIndex][pirateIndex] || returnValue.std[arenaIndex][pirateIndex];
+            returnValue.used[arenaIndex][pirateIndex] = customProbs[arenaIndex][pirateIndex] || returnValue.std[arenaIndex][pirateIndex];
             sum += returnValue.used[arenaIndex][pirateIndex];
         }
 
@@ -110,12 +110,12 @@ export function computeProbabilities(roundData) {
     return returnValue;
 }
 
-export function calculateArenaRatios(roundData) {
+export function calculateArenaRatios(customOdds) {
     let arenas = [];
     for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
         let ratio = 0;
         for (let pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
-            ratio += 1 / roundData.customOdds[arenaIndex][pirateIndex];
+            ratio += 1 / customOdds[arenaIndex][pirateIndex];
         }
         ratio = 1 / ratio - 1;
         arenas[arenaIndex] = ratio;
@@ -228,7 +228,7 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
             let arProb = 0;
             for (let j = 0; j < 4; j++) {
                 if (ib & arIb[i] & pirIb[j]) {
-                    arProb += roundState.roundData.customProbs[i][j+1] || probabilities[i][j+1];
+                    arProb += roundState.customProbs[i][j+1] || probabilities[i][j+1];
                 }
             }
             totProb *= arProb;
