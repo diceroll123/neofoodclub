@@ -132,6 +132,10 @@ const BetsSaver = (props) => {
         if (useIndex < 0) {
             useIndex = currentIndex + 1;
         }
+
+        if (Object.keys(allBets).length === 1) {
+            useIndex = 0;
+        }
         const previousElement = Object.keys(allBets)[useIndex];
 
         const allBetsCopy = {...allBets};
@@ -141,6 +145,13 @@ const BetsSaver = (props) => {
         delete allBetsCopy[currentBet];
         delete allBetAmountsCopy[currentBet];
         delete allNamesCopy[currentBet];
+
+        if (Object.keys(allBetsCopy).length === 0) {
+            //
+            allBetsCopy[currentBet] = makeEmptyBets(10);
+            allBetAmountsCopy[currentBet] = makeEmptyBetAmounts(10);
+            allNamesCopy[currentBet] = "Starting Set";
+        }
 
         setAllBets({...allBetsCopy});
         setAllBetAmounts({...allBetAmountsCopy});
@@ -302,8 +313,7 @@ const BetsSaver = (props) => {
                             onClick={cloneSet}>Clone</Button>
                     <Button leftIcon={<DeleteIcon/>}
                             aria-label="Delete Current Bet Set"
-                            isDisabled={Object.keys(allBets).length === 1}
-                            onClick={deleteSet}>Delete</Button>
+                            onClick={deleteSet}>{Object.keys(allBets).length === 1 ? "Clear" : "Delete"}</Button>
                 </ButtonGroup>
             </Stack>
         </SettingsBox>
