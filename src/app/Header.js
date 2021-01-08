@@ -226,7 +226,7 @@ function HeaderContent() {
 }
 
 function Header(props) {
-    const bg = useColorModeValue("white", "gray.800");
+    const bg = useColorModeValue("rgba(255, 255, 255, 0.7)", "rgba(26, 32, 44, 0.7)");
     const [y, setY] = React.useState(0);
 
     const {scrollY} = useViewportScroll();
@@ -242,6 +242,7 @@ function Header(props) {
             top="0"
             zIndex="2"
             bg={bg}
+            style={{"backdrop-filter": "blur(16px)"}}
             left="0"
             right="0"
             width="full"
