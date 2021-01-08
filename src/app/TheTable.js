@@ -1302,9 +1302,6 @@ export default function TheTable(props) {
         <Box {...props}>
             <TableExtras background={grayAccent}/>
 
-            <BetsSaver background={grayAccent}
-                       probabilities={probabilities}/>
-
             <HorizontalScrollingBox>
                 <PirateTable m={4}
                              pirateFAs={pirateFAs}
@@ -1317,6 +1314,9 @@ export default function TheTable(props) {
                              yellow={yellow}
                              grayAccent={grayAccent}/>
             </HorizontalScrollingBox>
+            
+            <BetsSaver background={grayAccent}
+                       probabilities={probabilities}/>
 
             <BetExtras background={grayAccent}
                        betBinaries={betBinaries}
