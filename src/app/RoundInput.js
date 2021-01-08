@@ -17,12 +17,9 @@ export default function RoundInput() {
 
     function changeCurrentSelectedRound(value) {
         if (value > 0) {
-            const amountOfBets = Object.keys(roundState.bets).length;
             setRoundState({
                 currentSelectedRound: value,
                 roundData: null,
-                bets: makeEmptyBets(amountOfBets),
-                betAmounts: makeEmptyBetAmounts(amountOfBets),
                 customOdds: null,
                 customProbs: null,
             });
