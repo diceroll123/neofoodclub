@@ -147,7 +147,6 @@ const BetsSaver = (props) => {
         delete allNamesCopy[currentBet];
 
         if (Object.keys(allBetsCopy).length === 0) {
-            //
             allBetsCopy[currentBet] = makeEmptyBets(10);
             allBetAmountsCopy[currentBet] = makeEmptyBetAmounts(10);
             allNamesCopy[currentBet] = "Starting Set";
@@ -165,10 +164,6 @@ const BetsSaver = (props) => {
 
     function merSet() {
         const maxBet = getMaxBet(roundState.currentSelectedRound);
-        if (maxBet < 50) {
-            alert("Add a max bet of 50+NP at the top of the page first!");
-            return;
-        }
 
         const maker = new BetsMaker();
         const {
@@ -243,7 +238,6 @@ const BetsSaver = (props) => {
         }
 
         addNewSet(`Crazy Set (${maxBet} NP)`, newBets, newBetAmounts, true);
-
     }
 
     return (
