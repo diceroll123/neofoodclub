@@ -40,6 +40,7 @@ import {
 } from "./maths";
 import {
     createBetURL,
+    determineBetAmount,
     displayAsPercent,
     getMaxBet,
     getTableMode,
@@ -505,7 +506,7 @@ const BetExtras = (props) => {
         let betAmounts = {...roundState.betAmounts};
         for (let index in roundState.betAmounts) {
             if (betBinaries[index] > 0) {
-                betAmounts[index] = Math.min(value, Math.max(Math.floor(1_000_000 / betOdds[index]) + 1, 50));
+                betAmounts[index] = determineBetAmount(value, Math.ceil(1_000_000 / betOdds[index]));
             } else {
                 betAmounts[index] = -1000;
             }
@@ -1326,7 +1327,7 @@ export default function TheTable(props) {
                              yellow={yellow}
                              grayAccent={grayAccent}/>
             </HorizontalScrollingBox>
-            
+
             <BetsSaver background={grayAccent}
                        probabilities={probabilities}/>
 

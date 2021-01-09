@@ -237,3 +237,25 @@ export function shuffleArray(array) {
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
+
+export function determineBetAmount(maxBet, betCap) {
+    // here we will determine a foolproof way to consistently give a bet amount to bets when generated
+
+    // maxBet is the user-set max bet amount for a round.
+    // betCap is the highest bet amount for a bet (1,000,000 / odds + 1) // (the +1 is so we cross the 1M line)
+
+    // first, determine if there IS a max bet set. If not, just return -1000.
+    if (maxBet < 50) {
+        return -1000;
+    }
+
+    if (betCap < 50) {
+        // if the highest bet amount to hit 1M on this bet is under 50, return 50, the minimum bet amount.
+        return 50;
+    }
+
+    // if we've made it this far,
+    // we must go with the smallest of maxBet, betCap, or 500K
+    return Math.min(maxBet, betCap, 500_000)
+
+}

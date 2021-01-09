@@ -18,7 +18,15 @@ import {
 } from "@chakra-ui/react";
 import React, {useEffect, useState} from "react";
 import RoundContext from "./RoundState";
-import {anyBetsExist, cloneArray, getMaxBet, makeEmptyBetAmounts, makeEmptyBets, shuffleArray} from "./util";
+import {
+    anyBetsExist,
+    cloneArray,
+    determineBetAmount,
+    getMaxBet,
+    makeEmptyBetAmounts,
+    makeEmptyBets,
+    shuffleArray
+} from "./util";
 import {computeBinaryToPirates, computePiratesBinary} from "./maths";
 import {AddIcon, ChevronDownIcon, CopyIcon, DeleteIcon} from "@chakra-ui/icons";
 import {SettingsBox} from "./TheTable";
@@ -67,14 +75,15 @@ const BetsSaver = (props) => {
 
                 const totalOdds = this.#odds[0][a] * this.#odds[1][b] * this.#odds[2][c] * this.#odds[3][d] * this.#odds[4][e];
                 const winChance = this.#probs[0][a] * this.#probs[1][b] * this.#probs[2][c] * this.#probs[3][d] * this.#probs[4][e];
-                const betCap = Math.min(Math.floor(1_000_000 / totalOdds) + 1, maxBet);
+                const betCap = Math.ceil(1_000_000 / totalOdds);
                 const winnings = Math.min(maxBet * totalOdds, 1_000_000);
 
                 betCaps[betBinary] = betCap;
                 betOdds[betBinary] = totalOdds;
                 if (maxBet >= 50) {
                     // Net expected
-                    pirateCombos[betBinary] = ((winChance * winnings / betCap) - 1) * betCap;
+                    const maxCap = Math.min(betCap, maxBet);
+                    pirateCombos[betBinary] = ((winChance * winnings / maxCap) - 1) * maxCap;
                 } else {
                     // Expected return
                     pirateCombos[betBinary] = totalOdds * winChance;
@@ -179,7 +188,7 @@ const BetsSaver = (props) => {
         for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
             const pirateBinary = topRatios[bet][0];
             newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
-            newBetAmounts[bet + 1] = Math.max(Math.min(betCaps[pirateBinary], 500_000), 50);
+            newBetAmounts[bet + 1] = determineBetAmount(maxBet, betCaps[pirateBinary]);
         }
 
         addNewSet(`Max TER Set (${maxBet} NP)`, newBets, newBetAmounts, true);
@@ -211,7 +220,7 @@ const BetsSaver = (props) => {
         for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
             const pirateBinary = topRatios[bet][0];
             newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
-            newBetAmounts[bet + 1] = Math.max(Math.min(betCaps[pirateBinary], 500_000), 50);
+            newBetAmounts[bet + 1] = determineBetAmount(maxBet, betCaps[pirateBinary]);
         }
 
         addNewSet(`Gambit Set (${maxBet} NP)`, newBets, newBetAmounts, true);
@@ -234,7 +243,7 @@ const BetsSaver = (props) => {
         for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
             const pirateBinary = allFullBets[bet];
             newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
-            newBetAmounts[bet + 1] = Math.max(Math.min(betCaps[pirateBinary], 500_000), 50);
+            newBetAmounts[bet + 1] = determineBetAmount(maxBet, betCaps[pirateBinary]);
         }
 
         addNewSet(`Crazy Set (${maxBet} NP)`, newBets, newBetAmounts, true);
