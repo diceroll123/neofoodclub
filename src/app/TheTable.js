@@ -770,7 +770,19 @@ const PayoutTable = (props) => {
 
 const HorizontalScrollingBox = (props) => {
     const {children, ...rest} = props;
-    return (<Box overflowX="auto" {...rest}>{children}</Box>);
+    return (
+        <Box
+            overflowX="auto"
+            // Prevent position:absolute elements from escaping. Without this, elements
+            // scrolled out of view will become absolutely-positioned relative to the
+            // *page*, and extend the entire page's scroll area to fit them. This includes
+            // normal hidden elements, like in Chakra's <Radio />!
+            position="relative"
+            {...rest}
+        >
+            {children}
+        </Box>
+    );
 }
 
 const PlaceThisBetButton = (props) => {
