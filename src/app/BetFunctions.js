@@ -44,6 +44,8 @@ const BetsSaver = (props) => {
 
     const getNewIndex = () => (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
 
+    const winningPiratesBinary = computePiratesBinary(roundState.roundData.winners);
+
     class BetsMaker {
         #odds;
         #probs;
@@ -207,23 +209,44 @@ const BetsSaver = (props) => {
         const best = computeBinaryToPirates(topRatios[0][0]);
 
         // generate a set based on those 5 pirates
+        const {bets, betAmounts} = gambitWithPirates(best);
+
+        addNewSet(`Gambit Set (${maxBet} NP)`, bets, betAmounts, true);
+    }
+
+    function winningGambitSet() {
+        if (winningPiratesBinary === 0) {
+            return;
+        }
+
+        const maxBet = getMaxBet(roundState.currentSelectedRound);
+
+        // generate a set based on winning pirates
+        const {bets, betAmounts} = gambitWithPirates(roundState.roundData.winners);
+
+        addNewSet(`Winning Gambit Set (${maxBet} NP)`, bets, betAmounts, true);
+    }
+
+    function gambitWithPirates(pirates) {
+        const maxBet = getMaxBet(roundState.currentSelectedRound);
+        const maker = new BetsMaker();
         const {
             betCaps,
             betOdds
-        } = maker.calculate([0, best[0]], [0, best[1]], [0, best[2]], [0, best[3]], [0, best[4]]);
+        } = maker.calculate([0, pirates[0]], [0, pirates[1]], [0, pirates[2]], [0, pirates[3]], [0, pirates[4]]);
 
-        topRatios = Object.entries(betOdds).map(([k, v]) => [k, v]);
+        let topRatios = Object.entries(betOdds).map(([k, v]) => [k, v]);
         topRatios.sort((a, b) => b[1] - a[1]);
 
-        let newBets = {};
-        let newBetAmounts = {};
+        let bets = {};
+        let betAmounts = {};
         for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
             const pirateBinary = topRatios[bet][0];
-            newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
-            newBetAmounts[bet + 1] = determineBetAmount(maxBet, betCaps[pirateBinary]);
+            bets[bet + 1] = computeBinaryToPirates(pirateBinary);
+            betAmounts[bet + 1] = determineBetAmount(maxBet, betCaps[pirateBinary]);
         }
 
-        addNewSet(`Gambit Set (${maxBet} NP)`, newBets, newBetAmounts, true);
+        return {bets, betAmounts};
     }
 
     function randomCrazySet() {
@@ -301,6 +324,8 @@ const BetsSaver = (props) => {
                                 <MenuGroup title="Generate a set">
                                     <MenuItem onClick={merSet}>Max TER set</MenuItem>
                                     <MenuItem onClick={gambitSet}>Gambit set</MenuItem>
+                                    <MenuItem hidden={winningPiratesBinary === 0}
+                                              onClick={winningGambitSet}>Winning Gambit set</MenuItem>
                                     <MenuItem onClick={randomCrazySet}>Random Crazy set</MenuItem>
                                 </MenuGroup>
                                 <MenuDivider/>
