@@ -7,7 +7,6 @@ import {
     NumberInputField,
     NumberInputStepper
 } from "@chakra-ui/react";
-import {makeEmptyBetAmounts, makeEmptyBets} from "./util";
 
 export default function RoundInput() {
     const {roundState, setRoundState} = useContext(RoundContext);

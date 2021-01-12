@@ -176,9 +176,7 @@ export function createBetURL(roundState, ignoreBetAmounts) {
     // "/#round=7018&b=gmkhmgklhkfmlfmbkkhkgkacm"
     // "/#round=7018&b=gmkhmgklhkfmlfmbkkhkgkacm&a=CEbCEbCEbCEbCEbCEbCEbCEbCEbCEb"
 
-    if (ignoreBetAmounts === undefined) {
-        ignoreBetAmounts = true;
-    }
+    ignoreBetAmounts = ignoreBetAmounts ?? true;
 
     let betURL = `/#round=${roundState.currentSelectedRound}`;
     let addBets = anyBetsExist(roundState.bets);
