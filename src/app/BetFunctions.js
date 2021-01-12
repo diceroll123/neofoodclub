@@ -44,7 +44,7 @@ const BetsSaver = (props) => {
 
     const getNewIndex = () => (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
 
-    const winningPiratesBinary = computePiratesBinary(roundState.roundData.winners);
+    const winningPiratesBinary = computePiratesBinary(roundState.roundData?.winners || [0, 0, 0, 0, 0]);
 
     class BetsMaker {
         #odds;
