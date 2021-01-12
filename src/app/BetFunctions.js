@@ -224,7 +224,7 @@ const BetsSaver = (props) => {
         // generate a set based on winning pirates
         const {bets, betAmounts} = gambitWithPirates(roundState.roundData.winners);
 
-        addNewSet(`Winning Gambit Set (${maxBet} NP)`, bets, betAmounts, true);
+        addNewSet(`Winning Gambit Set (${maxBet} NP, round ${roundState.currentSelectedRound})`, bets, betAmounts, true);
     }
 
     function gambitWithPirates(pirates) {
