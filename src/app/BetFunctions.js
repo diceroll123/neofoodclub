@@ -219,12 +219,13 @@ const BetsSaver = (props) => {
             return;
         }
 
-        const maxBet = getMaxBet(roundState.currentSelectedRound);
-
         // generate a set based on winning pirates
-        const {bets, betAmounts} = gambitWithPirates(roundState.roundData.winners);
+        const {bets} = gambitWithPirates(roundState.roundData.winners);
 
-        addNewSet(`Winning Gambit Set (${maxBet} NP, round ${roundState.currentSelectedRound})`, bets, betAmounts, true);
+        // don't use bet amounts here since this round is definitely over, so this set is just for show really
+        const betAmounts = makeEmptyBetAmounts(Object.keys(bets).length);
+
+        addNewSet(`Winning Gambit Set (round ${roundState.currentSelectedRound})`, bets, betAmounts, true);
     }
 
     function gambitWithPirates(pirates) {
