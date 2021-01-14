@@ -276,38 +276,6 @@ const BetsSaver = (props) => {
     return (
         <SettingsBox mt={4} {...rest}>
             <Stack p={4}>
-                <Wrap>
-                    {Object.keys(allBets).map((e) => {
-                        return (
-                            <WrapItem key={e}>
-                                <Button size="sm"
-                                        variant="outline"
-                                        isActive={e === currentBet}
-                                        onClick={() => {
-                                            setCurrentBet(e);
-                                            setRoundState({
-                                                bets: {...allBets[e]},
-                                                betAmounts: {...allBetAmounts[e]}
-                                            });
-                                        }}>
-                                    {e === currentBet ?
-                                        <Editable
-                                            value={allNames[e]}
-                                            onChange={(value) => {
-                                                let newName = {};
-                                                newName[currentBet] = value || "Unnamed Set";
-                                                setAllNames({...allNames, ...newName});
-                                            }}>
-                                            <EditablePreview/>
-                                            <EditableInput/>
-                                        </Editable>
-                                        : <Text>{allNames[e]}</Text>
-                                    }
-                                </Button>
-                            </WrapItem>
-                        )
-                    })}
-                </Wrap>
                 <ButtonGroup size="sm" isAttached variant="outline">
                     <Menu>
                         <MenuButton as={Button}
@@ -344,6 +312,38 @@ const BetsSaver = (props) => {
                             aria-label="Delete Current Bet Set"
                             onClick={deleteSet}>{Object.keys(allBets).length === 1 ? "Clear" : "Delete"}</Button>
                 </ButtonGroup>
+                <Wrap>
+                    {Object.keys(allBets).map((e) => {
+                        return (
+                            <WrapItem key={e}>
+                                <Button size="sm"
+                                        variant="outline"
+                                        isActive={e === currentBet}
+                                        onClick={() => {
+                                            setCurrentBet(e);
+                                            setRoundState({
+                                                bets: {...allBets[e]},
+                                                betAmounts: {...allBetAmounts[e]}
+                                            });
+                                        }}>
+                                    {e === currentBet ?
+                                        <Editable
+                                            value={allNames[e]}
+                                            onChange={(value) => {
+                                                let newName = {};
+                                                newName[currentBet] = value || "Unnamed Set";
+                                                setAllNames({...allNames, ...newName});
+                                            }}>
+                                            <EditablePreview/>
+                                            <EditableInput/>
+                                        </Editable>
+                                        : <Text>{allNames[e]}</Text>
+                                    }
+                                </Button>
+                            </WrapItem>
+                        )
+                    })}
+                </Wrap>
             </Stack>
         </SettingsBox>
     );

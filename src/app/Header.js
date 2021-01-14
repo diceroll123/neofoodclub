@@ -242,7 +242,7 @@ function Header(props) {
             top="0"
             zIndex="2"
             bg={bg}
-            style={{"backdrop-filter": "blur(16px)"}}
+            style={{backdropFilter: "blur(16px)"}}
             left="0"
             right="0"
             width="full"
