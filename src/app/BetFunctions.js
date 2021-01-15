@@ -331,7 +331,16 @@ const BetsSaver = (props) => {
                                             value={allNames[e]}
                                             onChange={(value) => {
                                                 let newName = {};
-                                                newName[currentBet] = value || "Unnamed Set";
+                                                newName[currentBet] = value;
+                                                setAllNames({...allNames, ...newName});
+                                            }}
+                                            onBlur={(e) => {
+                                                let newName = {};
+                                                let name = e.target.value;
+                                                if (name === "") {
+                                                    name = "Unnamed Set";
+                                                }
+                                                newName[currentBet] = name;
                                                 setAllNames({...allNames, ...newName});
                                             }}>
                                             <EditablePreview/>
