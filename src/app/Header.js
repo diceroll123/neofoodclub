@@ -50,7 +50,7 @@ function PreviousRoundInfo() {
             <VStack>
                 <>Round ended</>
                 <Moment format="YYYY-MM-DD hh:mm:ss A"
-                        date={roundState.roundData.lastUpdate || roundState.roundData.timestamp}/>
+                        date={roundState.roundData.timestamp}/>
             </VStack>
         </Text>
     )
@@ -82,7 +82,7 @@ function CurrentRoundInfo() {
             }
             <Box textAlign="left">
                 <Text fontSize="xs" as={element}>
-                    Last Update: <Moment date={roundState.roundData.lastUpdate}
+                    Last Update: <Moment date={roundState.roundData.timestamp}
                                          fromNow
                                          withTitle
                                          titleFormat="LLL"
