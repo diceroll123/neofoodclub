@@ -18,7 +18,7 @@ export default function useRoundData(firebase, currentSelectedRound) {
 
     // Once a round is selected, we should subscribe to its data!
     useEffect(() => {
-        if (!currentSelectedRound) {
+        if (!currentSelectedRound || !currentRound) {
             return;
         }
 
@@ -101,6 +101,7 @@ export default function useRoundData(firebase, currentSelectedRound) {
         toast,
         firebase,
         currentSelectedRound,
+        currentRound
     ]);
 
     return [currentRound, roundData];
