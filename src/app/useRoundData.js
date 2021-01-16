@@ -31,10 +31,9 @@ export default function useRoundData(firebase, currentSelectedRound) {
                 return;
             }
             setRoundData(roundData => {
-                const newObj = {};
-                newObj[name] = snapshot.val();
                 return {
-                    ...roundData, ...newObj
+                    ...roundData,
+                    [name]: snapshot.val()
                 }
             })
         }
