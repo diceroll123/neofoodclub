@@ -77,7 +77,7 @@ export default function useRoundData(firebase, currentSelectedRound) {
         }).then(() => {
             // after getting round state...
 
-            if ([currentRound, currentRound - 1].includes(currentSelectedRound) === false) {
+            if ([currentRound, currentRound - 1].includes(parseInt(currentSelectedRound)) === false) {
                 // we don't need live data for old rounds
                 // but allow live update on the previous round just in case!
                 return;
