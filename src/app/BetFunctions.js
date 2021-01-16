@@ -98,32 +98,23 @@ const BetsSaver = (props) => {
 
     useEffect(() => {
         // TODO: (maybe fix?) when you switch between sets, this has the side effect of updating itself again here one time
-        const newBetObj = {};
-        newBetObj[currentBet] = {...roundState.bets};
-
-        const newAmountObj = {};
-        newAmountObj[currentBet] = {...roundState.betAmounts};
-
-        setAllBets({...allBets, ...newBetObj});
-        setAllBetAmounts({...allBetAmounts, ...newAmountObj});
+        setAllBets({...allBets, [currentBet]: {...roundState.bets}});
+        setAllBetAmounts({...allBetAmounts, [currentBet]: {...roundState.betAmounts}});
     }, [roundState.bets, roundState.betAmounts]);
 
     function addNewSet(name, bets, betAmounts, maybe_replace = false) {
         // will modify the current set if the current set is empty and maybe_replace is explicitly set to true
         const newIndex = maybe_replace && !anyBetsExist(roundState.bets) ? currentBet : getNewIndex();
-        const newName = {};
-        const newBet = {};
-        const newAmount = {};
-        newName[newIndex] = name;
-        newBet[newIndex] = cloneArray(bets);
-        newAmount[newIndex] = cloneArray(betAmounts);
 
-        setAllNames({...allNames, ...newName});
-        setAllBets({...allBets, ...newBet});
-        setAllBetAmounts({...allBetAmounts, ...newAmount});
+        const clonedBets = cloneArray(bets);
+        const clonedBetAmounts = cloneArray(betAmounts);
+
+        setAllNames({...allNames, [newIndex]: name});
+        setAllBets({...allBets, [newIndex]: clonedBets});
+        setAllBetAmounts({...allBetAmounts, [newIndex]: clonedBetAmounts});
         setRoundState({
-            bets: {...newBet[newIndex]},
-            betAmounts: {...newAmount[newIndex]}
+            bets: {...clonedBets},
+            betAmounts: {...clonedBetAmounts}
         });
         setCurrentBet(newIndex);
     }
@@ -329,19 +320,13 @@ const BetsSaver = (props) => {
                                     {e === currentBet ?
                                         <Editable
                                             value={allNames[e]}
-                                            onChange={(value) => {
-                                                let newName = {};
-                                                newName[currentBet] = value;
-                                                setAllNames({...allNames, ...newName});
-                                            }}
+                                            onChange={(value) => setAllNames({...allNames, [currentBet]: value})}
                                             onBlur={(e) => {
-                                                let newName = {};
                                                 let name = e.target.value;
                                                 if (name === "") {
                                                     name = "Unnamed Set";
                                                 }
-                                                newName[currentBet] = name;
-                                                setAllNames({...allNames, ...newName});
+                                                setAllNames({...allNames, [currentBet]: name});
                                             }}>
                                             <EditablePreview/>
                                             <EditableInput/>
