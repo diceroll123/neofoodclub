@@ -76,6 +76,14 @@ export default function useRoundData(firebase, currentSelectedRound) {
                 });
             }
         }).then(() => {
+            // after getting round state...
+
+            if ([currentRound, currentRound - 1].includes(currentSelectedRound) === false) {
+                // we don't need live data for old rounds
+                // but allow live update on the previous round just in case!
+                return;
+            }
+
             // and now we grab the changeable data points rather than the entire state every time
             winnersRef.on('value', onWinnersChange);
             currentOddsRef.on('value', onCurrentOddsChange);
