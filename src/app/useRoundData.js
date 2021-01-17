@@ -59,6 +59,31 @@ export default function useRoundData(firebase, currentSelectedRound) {
         const onLastChangeChange = (snapshot) => update(snapshot, "lastChange");
         const lastChangeRef = ref.child("lastChange");
 
+        const addFirebaseHandlers = () => {
+            if (currentRound === null) {
+                return;
+            }
+
+            if ([currentRound, currentRound - 1].includes(parseInt(currentSelectedRound)) === false) {
+                // we don't need live data for old rounds
+                // but allow live update on the previous round just in case!
+                return;
+            }
+
+            // and now we grab the changeable data points rather than the entire state every time
+            winnersRef.on('value', onWinnersChange);
+            currentOddsRef.on('value', onCurrentOddsChange);
+            timestampRef.on('value', onTimestampChange);
+            lastChangeRef.on('value', onLastChangeChange);
+        }
+
+        const removeFirebaseHandlers = () => {
+            winnersRef.off('value', onWinnersChange);
+            currentOddsRef.off('value', onCurrentOddsChange);
+            timestampRef.off('value', onTimestampChange);
+            lastChangeRef.off('value', onLastChangeChange);
+        }
+
         // get the entire round state once
         ref.once('value').then((snapshot) => {
             let newRoundData = snapshot.val();
@@ -76,27 +101,17 @@ export default function useRoundData(firebase, currentSelectedRound) {
             }
         }).then(() => {
             // after getting round state...
-
-            if ([currentRound, currentRound - 1].includes(parseInt(currentSelectedRound)) === false) {
-                // we don't need live data for old rounds
-                // but allow live update on the previous round just in case!
-                return;
-            }
-
-            // and now we grab the changeable data points rather than the entire state every time
-            winnersRef.on('value', onWinnersChange);
-            currentOddsRef.on('value', onCurrentOddsChange);
-            timestampRef.on('value', onTimestampChange);
-            lastChangeRef.on('value', onLastChangeChange);
+            addFirebaseHandlers();
         });
 
-        return () => {
-            winnersRef.off('value', onWinnersChange);
-            currentOddsRef.off('value', onCurrentOddsChange);
-            timestampRef.off('value', onTimestampChange);
-            lastChangeRef.off('value', onLastChangeChange);
-        };
+        window.addEventListener("blur", removeFirebaseHandlers);
+        window.addEventListener("focus", addFirebaseHandlers);
 
+        return () => {
+            window.removeEventListener("blur", removeFirebaseHandlers);
+            window.removeEventListener("focus", addFirebaseHandlers);
+            removeFirebaseHandlers();
+        }
     }, [
         toast,
         firebase,
