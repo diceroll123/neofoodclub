@@ -1,6 +1,8 @@
 import {useContext, useEffect, useState} from "react";
 import RoundContext from "./RoundState";
 import {
+    InputGroup,
+    InputLeftAddon,
     NumberDecrementStepper,
     NumberIncrementStepper,
     NumberInput,
@@ -13,6 +15,7 @@ export default function RoundInput() {
 
     const [timeoutId, setTimeoutId] = useState(null);
     const [roundNumber, setRoundNumber] = useState(roundState.currentSelectedRound || 0);
+    const [hasFocus, setHasFocus] = useState(false);
 
     function changeCurrentSelectedRound(value) {
         if (value > 0) {
@@ -33,47 +36,55 @@ export default function RoundInput() {
     }, [roundState.currentSelectedRound]);
 
     return (
-        <NumberInput
-            size="sm"
-            isDisabled={roundNumber === 0}
-            value={roundNumber}
-            min={1}
-            max={roundState.currentRound}
-            allowMouseWheel
-            width="80px"
-            onFocus={(e) => e.target.select()}
-            onChange={(value) => {
-                value = parseInt(value);
-                if (isNaN(value)) {
-                    setRoundNumber("");
-                    return;
-                }
+        <InputGroup
+            size="xs">
+            <InputLeftAddon children="Round"/>
+            <NumberInput
+                isDisabled={roundNumber === 0}
+                value={roundNumber}
+                min={1}
+                max={roundState.currentRound}
+                allowMouseWheel
+                onFocus={(e) => {
+                    setHasFocus(true);
+                    e.target.select();
+                }}
+                onChange={(value) => {
+                    value = parseInt(value);
+                    if (isNaN(value)) {
+                        setRoundNumber("");
+                        return;
+                    }
 
-                setRoundNumber(value);
+                    setRoundNumber(value);
 
-                // debounce number input to 300ms
-                if (timeoutId && typeof timeoutId === "number") {
-                    clearTimeout(timeoutId);
-                }
+                    // debounce number input to 300ms
+                    if (timeoutId && typeof timeoutId === "number") {
+                        clearTimeout(timeoutId);
+                    }
 
-                setTimeoutId(
-                    setTimeout(() => {
-                        setTimeoutId(null);
-                        changeCurrentSelectedRound(value);
-                    }, 400)
-                );
-            }}
-            onBlur={(e) => {
-                if (e.target.value === "") {
-                    setRoundNumber(roundState.currentRound);
-                    changeCurrentSelectedRound(roundState.currentRound);
+                    setTimeoutId(
+                        setTimeout(() => {
+                            setTimeoutId(null);
+                            changeCurrentSelectedRound(value);
+                        }, 400)
+                    );
+                }}
+                onBlur={(e) => {
+                    setHasFocus(false);
+                    if (e.target.value === "") {
+                        setRoundNumber(roundState.currentRound);
+                        changeCurrentSelectedRound(roundState.currentRound);
+                    }
+                }}>
+                <NumberInputField/>
+                {hasFocus &&
+                <NumberInputStepper>
+                    <NumberIncrementStepper/>
+                    <NumberDecrementStepper/>
+                </NumberInputStepper>
                 }
-            }}>
-            <NumberInputField/>
-            <NumberInputStepper>
-                <NumberIncrementStepper/>
-                <NumberDecrementStepper/>
-            </NumberInputStepper>
-        </NumberInput>
+            </NumberInput>
+        </InputGroup>
     )
 }

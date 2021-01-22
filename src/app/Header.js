@@ -1,20 +1,28 @@
 import {
     Box,
-    Stack,
     CircularProgress,
     CircularProgressLabel,
+    Container,
     Divider,
     Heading,
-    Tooltip,
     HStack,
     IconButton,
+    InputGroup,
+    InputLeftAddon,
+    NumberDecrementStepper,
+    NumberIncrementStepper,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper,
     Skeleton,
     SkeletonText,
+    Stack,
     Text,
+    Tooltip,
     useColorMode,
     useColorModeValue,
+    useToast,
     VStack,
-    useToast, Container,
 } from "@chakra-ui/react"
 import Moment from "react-moment";
 import {SunIcon, MoonIcon} from "@chakra-ui/icons"
@@ -24,7 +32,6 @@ import RoundContext from "./RoundState";
 import moment from "moment";
 import {useViewportScroll} from "framer-motion";
 import {calculateBaseMaxBet, calculateRoundOverPercentage, getMaxBet} from "./util";
-import BetAmountInput from "./BetAmountInput";
 import Cookies from "universal-cookie/es6";
 
 function ColorModeButton() {
@@ -46,7 +53,7 @@ function PreviousRoundInfo() {
     return (
         <Text as={Box} fontSize="xs" display={{sm: "none", md: "block"}}>
             <VStack>
-                <>Round ended</>
+                <>Round {roundState.currentSelectedRound} ended</>
                 <Moment format="YYYY-MM-DD hh:mm:ss A"
                         date={roundState.roundData.timestamp}/>
             </VStack>
@@ -132,6 +139,7 @@ function MaxBetInput() {
     const {roundState} = React.useContext(RoundContext);
     const cookies = new Cookies();
     const toast = useToast();
+    const [hasFocus, setHasFocus] = useState(false);
 
     const [tempMaxBet, setTempMaxBet] = useState(getMaxBet(roundState.currentSelectedRound));
 
@@ -141,34 +149,53 @@ function MaxBetInput() {
 
     return (
         <Skeleton isLoaded={roundState.roundData !== null}>
-            <BetAmountInput
-                value={tempMaxBet.toString()}
-                onChange={(value) => setTempMaxBet(value)}
-                onBlur={(e) => {
-                    let value = parseInt(e.target.value);
-                    if (value === tempMaxBet) {
-                        // don't save over it if it's the same
-                        return;
+            <InputGroup
+                size="xs">
+                <InputLeftAddon children="Max Bet"/>
+                <NumberInput
+                    value={tempMaxBet.toString()}
+                    onChange={(value) => setTempMaxBet(value)}
+                    onFocus={(e) => {
+                        setHasFocus(true);
+                        e.target.select();
+                    }}
+                    onBlur={(e) => {
+                        setHasFocus(false);
+                        let value = parseInt(e.target.value);
+                        if (value === tempMaxBet) {
+                            // don't save over it if it's the same
+                            return;
+                        }
+
+                        if (isNaN(value) || value < 50) {
+                            value = -1000;
+                        }
+
+                        setTempMaxBet(value);
+
+                        let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
+                        cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
+
+                        toast.closeAll();
+                        toast({
+                            title: `Max Bet Saved!`,
+                            status: "success",
+                            duration: 1200,
+                            isClosable: true
+                        });
+                    }}
+                    min={-1000}
+                    max={500000}
+                    allowMouseWheel>
+                    <NumberInputField/>
+                    {hasFocus &&
+                    <NumberInputStepper>
+                        <NumberIncrementStepper/>
+                        <NumberDecrementStepper/>
+                    </NumberInputStepper>
                     }
-
-                    if (isNaN(value) || value < 50) {
-                        value = -1000;
-                    }
-
-                    setTempMaxBet(value);
-
-                    let baseMaxBet = calculateBaseMaxBet(value, roundState.currentSelectedRound);
-                    cookies.set('baseMaxBet', baseMaxBet, {expires: moment().add(28, 'days').toDate()});
-
-                    toast.closeAll();
-                    toast({
-                        title: `Max Bet Saved!`,
-                        status: "success",
-                        duration: 1200,
-                        isClosable: true
-                    });
-                }}
-            />
+                </NumberInput>
+            </InputGroup>
         </Skeleton>
     )
 }
@@ -211,23 +238,12 @@ function HeaderContent() {
 
                 <Box p={2} h="4.5rem" maxW="lg" borderWidth="1px" borderRadius="md">
                     <HStack spacing={3} h="100%">
-                        <VStack spacing={0}>
-                            <Text fontSize="sm" as="i">
-                                Round:
-                            </Text>
+                        <VStack spacing={1} maxW={"140px"}>
                             <RoundInput/>
+                            <MaxBetInput/>
                         </VStack>
 
                         <RoundInfo/>
-
-                        <Divider orientation="vertical"/>
-
-                        <VStack spacing={0}>
-                            <Text fontSize="sm" as="i">
-                                Max Bet:
-                            </Text>
-                            <MaxBetInput/>
-                        </VStack>
                     </HStack>
                 </Box>
                 <ColorModeButton/>
