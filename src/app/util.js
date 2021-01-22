@@ -9,8 +9,7 @@ function parseBets(betString) {
     return betString.split("").map((char) => {
         return "abcdefghijklmnopqrstuvwxy".indexOf(char);
     }).reduce((prev, next) => {
-        prev.push(Math.floor(next / 5));
-        prev.push(next % 5);
+        prev.push(Math.floor(next / 5), next % 5);
         return prev;
     }, []).reduce((t, e, r) => {
         let div = r % 5;
@@ -81,9 +80,7 @@ function makeBetUrl(bets) {
     }).map((t) => {
         return bets[t];
     }).reduce((t, e) => {
-        for (let r = 0; r < 5; r++) {
-            t.push(e[r]);
-        }
+        t.push(...e);
         return t;
     }, []).reduce((t, e, r) => {
         if (r % 2 === 0) {
