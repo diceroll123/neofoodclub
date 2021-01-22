@@ -1,7 +1,6 @@
 import {
     Box,
-    Flex,
-    chakra,
+    Stack,
     CircularProgress,
     CircularProgressLabel,
     Divider,
@@ -11,12 +10,11 @@ import {
     IconButton,
     Skeleton,
     SkeletonText,
-    Spacer,
     Text,
     useColorMode,
     useColorModeValue,
     VStack,
-    useToast,
+    useToast, Container,
 } from "@chakra-ui/react"
 import Moment from "react-moment";
 import {SunIcon, MoonIcon} from "@chakra-ui/icons"
@@ -175,14 +173,20 @@ function MaxBetInput() {
     )
 }
 
-function TitleHeading() {
+function TitleHeading(props) {
     return (
         <>
-            <Heading as="h1" fontSize="lg" display={{base: "none", lg: "block"}}>
+            <Heading
+                fontSize="xl"
+                display={{base: "none", lg: "block"}}
+                {...props}>
                 NeoFoodClub
             </Heading>
 
-            <Heading as="h1" fontSize="sm" display={{base: "block", lg: "none"}}>
+            <Heading
+                fontSize="sm"
+                display={{base: "block", lg: "none"}}
+                {...props}>
                 NFC
             </Heading>
         </>
@@ -192,10 +196,19 @@ function TitleHeading() {
 function HeaderContent() {
     return (
         <>
-            <Flex w="100%" h="100%" p={4} align="center">
-                <TitleHeading/>
+            <Stack as={Container}
+                   maxW={'7xl'}
+                   py={4}
+                   direction={'row'}
+                   spacing={4}
+                   justify={'space-between'}
+                   align={'center'}>
 
-                <Spacer/>
+                <TitleHeading
+                    as="h1"
+                    fontFamily="heading"
+                    fontWeight="bold"/>
+
                 <Box p={2} h="4.5rem" maxW="lg" borderWidth="1px" borderRadius="md">
                     <HStack spacing={3} h="100%">
                         <VStack spacing={0}>
@@ -217,10 +230,8 @@ function HeaderContent() {
                         </VStack>
                     </HStack>
                 </Box>
-
-                <Spacer/>
                 <ColorModeButton/>
-            </Flex>
+            </Stack>
         </>
     )
 }
@@ -235,8 +246,9 @@ function Header(props) {
     }, [scrollY]);
 
     return (
-        <chakra.header
-            shadow={y > 0 ? "md" : undefined}
+        <Box
+            as={"header"}
+            shadow={y > 0 ? "lg" : undefined}
             transition="box-shadow 0.2s"
             pos="fixed"
             top="0"
@@ -249,7 +261,7 @@ function Header(props) {
             {...props}
         >
             <HeaderContent/>
-        </chakra.header>
+        </Box>
     )
 }
 
