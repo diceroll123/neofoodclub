@@ -270,7 +270,7 @@ function Header(props) {
             top="0"
             zIndex="2"
             bg={bg}
-            style={{backdropFilter: "blur(16px)"}}
+            style={{backdropFilter: "saturate(180%) blur(16px)"}}
             left="0"
             right="0"
             width="full"
