@@ -11,7 +11,7 @@
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.7.0",
-    "firebase": "^8.2.7",
+    "firebase": "^8.2.9",
     "framer-motion": "^3.3.0",
     "immer": "^8.0.1",
     "moment": "^2.29.1",
