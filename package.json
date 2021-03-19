@@ -13,7 +13,7 @@
     "@testing-library/user-event": "^12.7.0",
     "firebase": "^8.2.7",
     "framer-motion": "^3.3.0",
-    "immer": "^8.0.1",
+    "immer": "^8.0.3",
     "moment": "^2.29.1",
     "moment-duration-format": "^2.3.2",
     "moment-timezone": "^0.5.33",
