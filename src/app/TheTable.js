@@ -827,7 +827,7 @@ const PlaceThisBetButton = (props) => {
     }
 
     return (
-        <Button size="xs" onClick={() => {
+        <Button size="sm" onClick={() => {
             generate_bet_link(bet, betNum);
             setClicked(true);
         }}>
