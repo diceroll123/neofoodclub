@@ -17,7 +17,7 @@ export default function BetAmountInput(props) {
             min={-1000}
             max={500000}
             allowMouseWheel
-            width="80px">
+            width="90px">
             <NumberInputField/>
             <NumberInputStepper width="16px">
                 <NumberIncrementStepper/>
