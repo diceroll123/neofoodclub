@@ -276,6 +276,9 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
 }
 
 export function computePirateBinary(arenaIndex, pirateIndex) {
+    if (pirateIndex === 0) {
+        return 0;
+    }
     return 1 << (19 - (pirateIndex - 1 + arenaIndex * 4));
 }
 
