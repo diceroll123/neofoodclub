@@ -22,7 +22,7 @@
     "react-moment": "^1.1.1",
     "react-scripts": "4.0.3",
     "universal-cookie": "^4.0.4",
-    "web-vitals": "^1.1.1"
+    "web-vitals": "^1.1.2"
   },
   "scripts": {
     "start": "react-scripts start",
