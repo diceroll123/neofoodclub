@@ -5,13 +5,41 @@ import {
     NumberInputField,
     NumberInputStepper
 } from "@chakra-ui/react";
-import React from "react";
+import React, {useEffect, useState} from "react";
+import RoundContext from "./RoundState";
 
 export default function BetAmountInput(props) {
-    const {...rest} = props;
+    const {roundState, setRoundState} = React.useContext(RoundContext);
+    const {betIndex, ...rest} = props;
+
+    const [tempMaxBet, setTempMaxBet] = useState(roundState.betAmounts[betIndex + 1]);
+
+    useEffect(() => {
+        setTempMaxBet(roundState.betAmounts[betIndex + 1]);
+    }, [roundState.betAmounts]);
+
     return (
         <NumberInput
             {...rest}
+            value={tempMaxBet.toString()}
+            onChange={(value) => setTempMaxBet(value)}
+            onBlur={(e) => {
+                let value = parseInt(e.target.value);
+                if (value === tempMaxBet) {
+                    // don't save over it if it's the same
+                    return;
+                }
+
+                if (isNaN(value) || value < 50) {
+                    value = -1000;
+                }
+
+                setTempMaxBet(value);
+
+                let betAmounts = {...roundState.betAmounts};
+                betAmounts[betIndex + 1] = value;
+                setRoundState({betAmounts});
+            }}
             onFocus={(e) => e.target.select()}
             size="sm"
             min={-1000}

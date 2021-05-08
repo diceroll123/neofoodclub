@@ -678,15 +678,7 @@ const PayoutTable = (props) => {
                                     </Pd>
                                     <Pd>
                                         <BetAmountInput
-                                            value={roundState.betAmounts[betIndex + 1]}
-                                            onChange={(str, value) => {
-                                                let betAmounts = {...roundState.betAmounts};
-                                                if (isNaN(value) || value === 0) {
-                                                    value = -1000;
-                                                }
-                                                betAmounts[betIndex + 1] = value;
-                                                setRoundState({betAmounts});
-                                            }}
+                                            betIndex={betIndex}
                                             isInvalid={baBg !== "transparent"}
                                             errorBorderColor={baBg}
                                         />
