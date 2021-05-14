@@ -50,7 +50,7 @@ export default function CustomOddsInput(props) {
             min={2}
             max={13}
             allowMouseWheel
-            width="60px">
+            width="80px">
             <NumberInputField/>
             <NumberInputStepper width="16px">
                 <NumberIncrementStepper/>
