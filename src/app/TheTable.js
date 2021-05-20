@@ -30,6 +30,7 @@ import {
 import {ArrowDownIcon, ArrowUpIcon, LinkIcon} from "@chakra-ui/icons";
 import React, {useEffect, useState} from "react";
 import RoundContext from "./RoundState";
+import { Scatter } from 'react-chartjs-2';
 import {
     calculateArenaRatios,
     calculatePayoutTables,
@@ -986,6 +987,73 @@ const PayoutExtras = (props) => {
         return null;
     }
 
+    function makeChart(data) {
+        let points = [];
+
+        for (const dataObj in data) {
+            let obj = data[dataObj];
+            points.push({
+                x: parseInt(obj.value),
+                y: obj.cumulative
+            });
+        }
+
+        // Chart.js seems to cut off the highest? or last? element in the scatter plot data so we'll fix that
+        const maxValueOfX = Math.max(...points.map(o => o.x), 0);
+
+        const chartData = {
+            datasets: [
+                {
+                    data: points,
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgba(255, 99, 132, 0.8)',
+                    tension: 0,
+                    showLine: true,
+                    stepped: true
+                },
+            ],
+        };
+
+        const options = {
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            elements: {
+                point:{
+                    radius: 0
+                }
+            },
+            scales: {
+                x: {
+                    min: Math.min(0, maxValueOfX),
+                    max: Math.max(0, maxValueOfX),
+                    ticks: {
+                        callback: function (value, index, array) {
+                            if (value >= 1000000) {
+                                return `${value / 1000000}M`;
+                            }
+                            if (value >= 1000) {
+                                return `${value / 1000}K`;
+                            }
+                            return value;
+                        }
+                    }
+                },
+                y: {min: 0.0, max: 1.0}
+            }
+        };
+
+        return (
+            <Tr>
+                <Td colSpan={4}>
+                    <Scatter data={chartData} options={options} />
+                </Td>
+            </Tr>
+        )
+    }
+
     function makeTable(title, data) {
         let tableRows = Object.keys(data).map(key => {
             const dataObj = data[key];
@@ -1028,6 +1096,7 @@ const PayoutExtras = (props) => {
                 </Thead>
                 <Tbody>
                     {tableRows}
+                    {makeChart(data)}
                 </Tbody>
             </Table>
         )
