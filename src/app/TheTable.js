@@ -998,9 +998,6 @@ const PayoutExtras = (props) => {
             });
         }
 
-        // Chart.js seems to cut off the highest? or last? element in the scatter plot data so we'll fix that
-        const maxValueOfX = Math.max(...points.map(o => o.x), 0);
-
         const chartData = {
             datasets: [
                 {
@@ -1030,8 +1027,6 @@ const PayoutExtras = (props) => {
             },
             scales: {
                 x: {
-                    min: Math.min(0, maxValueOfX),
-                    max: Math.max(0, maxValueOfX),
                     ticks: {
                         callback: function (value, index, array) {
                             if (value >= 1000000) {
@@ -1044,7 +1039,10 @@ const PayoutExtras = (props) => {
                         }
                     }
                 },
-                y: {min: 0.0, max: 1.0}
+                y: {
+                    min: 0.0,
+                    max: 1.0 + Number.EPSILON // epsilon because without it, anything with a value of 1.0 is cut off
+                }
             }
         };
 
