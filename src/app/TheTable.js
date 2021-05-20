@@ -1025,6 +1025,9 @@ const PayoutExtras = (props) => {
                     radius: 0
                 }
             },
+            animation: {
+                duration: 0
+            },
             scales: {
                 x: {
                     min: Math.min(0, maxValueOfX),
