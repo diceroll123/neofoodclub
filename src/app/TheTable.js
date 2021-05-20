@@ -994,7 +994,7 @@ const PayoutExtras = (props) => {
             let obj = data[dataObj];
             points.push({
                 x: parseInt(obj.value),
-                y: points.length > 0 ? obj.cumulative : 0
+                y: obj.cumulative
             });
         }
 
