@@ -1033,7 +1033,7 @@ const PayoutExtras = (props) => {
                                 return `${value / 1000000}M`;
                             }
                             if (Math.abs(value) >= 1000) {
-                                return `${value / 1000}K`;
+                                return `${value / 1000}k`;
                             }
                             return value;
                         }
