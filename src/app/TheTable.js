@@ -30,7 +30,7 @@ import {
 import {ArrowDownIcon, ArrowUpIcon, LinkIcon} from "@chakra-ui/icons";
 import React, {useEffect, useState} from "react";
 import RoundContext from "./RoundState";
-import { Scatter } from 'react-chartjs-2';
+import { Chart, Scatter } from 'react-chartjs-2';
 import {
     calculateArenaRatios,
     calculatePayoutTables,
@@ -57,6 +57,9 @@ import moment from "moment";
 import CustomOddsInput from "./CustomOddsInput";
 import CustomProbsInput from "./CustomProbsInput";
 import BetsSaver from "./BetFunctions";
+
+import annotationPlugin from 'chartjs-plugin-annotation';
+Chart.register(annotationPlugin);
 
 moment.relativeTimeThreshold('ss', 0);
 
@@ -981,13 +984,14 @@ const PirateTable = (props) => {
 }
 
 const PayoutExtras = (props) => {
-    const {payoutTables, grayAccent} = props;
+    const {payoutTables, betBinaries, grayAccent} = props;
+    const {roundState} = React.useContext(RoundContext);
 
     if (payoutTables.odds === undefined) {
         return null;
     }
 
-    function makeChart(data) {
+    function makeChart(title, data) {
         let points = [];
 
         for (const dataObj in data) {
@@ -1002,7 +1006,6 @@ const PayoutExtras = (props) => {
             datasets: [
                 {
                     data: points,
-                    backgroundColor: 'rgb(255, 99, 132)',
                     borderColor: 'rgba(255, 99, 132, 0.8)',
                     tension: 0,
                     showLine: true,
@@ -1011,11 +1014,43 @@ const PayoutExtras = (props) => {
             ],
         };
 
+        // this will be our "double units/profit" line
+        let breakEven = 0;
+        let doubleProfit = 0;
+
+        if (title === "Odds") {
+            let validBets = Object.values(betBinaries).filter(x => x > 0);
+            breakEven = validBets.length;
+            doubleProfit = 2 * (breakEven);
+        } else if (title === "Winnings") {
+            let totalBetAmount = Object.values(roundState.betAmounts).reduce((a, b) => a + b);
+            breakEven = totalBetAmount;
+            doubleProfit = totalBetAmount * 2;
+        }
+
         const options = {
             plugins: {
                 legend: {
                     display: false
-                }
+                },
+                annotation: {
+                    annotations: {
+                        doubleProfit: {
+                            type: 'line',
+                            xMin: doubleProfit,
+                            xMax: doubleProfit,
+                            borderColor: 'rgb(46, 204, 113)',
+                            borderWidth: 1,
+                        },
+                        breakEven: {
+                            type: 'line',
+                            xMin: breakEven,
+                            xMax: breakEven,
+                            borderColor: 'rgb(0, 0, 0)',
+                            borderWidth: 1,
+                        }
+                    }
+                },
             },
             elements: {
                 point:{
@@ -1047,9 +1082,9 @@ const PayoutExtras = (props) => {
         };
 
         return (
-            <Tr>
-                <Td colSpan={4}>
-                    <Scatter data={chartData} options={options} />
+            <Tr backgroundColor={"rgba(255, 255, 255, 0.6)"}>
+                <Td colSpan={4} pt={2}>
+                    <Scatter data={chartData} options={options}/>
                 </Td>
             </Tr>
         )
@@ -1097,7 +1132,7 @@ const PayoutExtras = (props) => {
                 </Thead>
                 <Tbody>
                     {tableRows}
-                    {makeChart(data)}
+                    {makeChart(title, data)}
                 </Tbody>
             </Table>
         )
@@ -1422,6 +1457,7 @@ export default function TheTable(props) {
 
             <HorizontalScrollingBox>
                 <PayoutExtras payoutTables={payoutTables}
+                              betBinaries={betBinaries}
                               grayAccent={grayAccent}/>
             </HorizontalScrollingBox>
         </Box>
