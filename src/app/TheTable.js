@@ -1029,10 +1029,10 @@ const PayoutExtras = (props) => {
                 x: {
                     ticks: {
                         callback: function (value, index, array) {
-                            if (value >= 1000000) {
+                            if (Math.abs(value) >= 1000000) {
                                 return `${value / 1000000}M`;
                             }
-                            if (value >= 1000) {
+                            if (Math.abs(value) >= 1000) {
                                 return `${value / 1000}K`;
                             }
                             return value;
