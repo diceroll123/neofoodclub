@@ -23,6 +23,7 @@ import {
     Tooltip,
     Tr,
     useClipboard,
+    useColorMode,
     useColorModeValue,
     useTheme,
     useToast,
@@ -986,6 +987,7 @@ const PirateTable = (props) => {
 const PayoutExtras = (props) => {
     const {payoutTables, betBinaries, grayAccent} = props;
     const {roundState} = React.useContext(RoundContext);
+    const {colorMode} = useColorMode();
 
     if (payoutTables.odds === undefined) {
         return null;
@@ -1006,7 +1008,7 @@ const PayoutExtras = (props) => {
             datasets: [
                 {
                     data: points,
-                    borderColor: 'rgba(255, 99, 132, 0.8)',
+                    borderColor: 'rgba(255, 85, 85)',
                     tension: 0,
                     showLine: true,
                     stepped: true
@@ -1039,15 +1041,15 @@ const PayoutExtras = (props) => {
                             type: 'line',
                             xMin: doubleProfit,
                             xMax: doubleProfit,
-                            borderColor: 'rgb(46, 204, 113)',
-                            borderWidth: 1,
+                            borderColor: '#50fa7b',
+                            borderWidth: 2,
                         },
                         breakEven: {
                             type: 'line',
                             xMin: breakEven,
                             xMax: breakEven,
-                            borderColor: 'rgb(0, 0, 0)',
-                            borderWidth: 1,
+                            borderColor: '#000',
+                            borderWidth: 2,
                         }
                     }
                 },
@@ -1081,8 +1083,29 @@ const PayoutExtras = (props) => {
             }
         };
 
+        // add custom dark mode changes to options
+        if (colorMode === "dark") {
+            // line color, dracula pink
+            chartData.datasets[0].borderColor = '#ff79c6';
+
+            // tick font color, white
+            options.scales.x.ticks.color = '#ffffff';
+            options.scales.y.ticks = {color: '#ffffff'};
+
+            // grid line color, dracula comment color
+            let gridLineColor = '#6272a4';
+
+            options.scales.x.grid = {};
+            options.scales.x.grid.borderColor = gridLineColor;
+            options.scales.x.grid.color = gridLineColor;
+            options.scales.y.grid = {};
+            options.scales.y.grid.borderColor = gridLineColor;
+            options.scales.y.grid.color = gridLineColor;
+
+        }
+
         return (
-            <Tr backgroundColor={"rgba(255, 255, 255, 0.6)"}>
+            <Tr>
                 <Td colSpan={4} pt={2}>
                     <Scatter data={chartData} options={options}/>
                 </Td>
