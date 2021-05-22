@@ -5,6 +5,7 @@ import {getTableMode, createBetURL, parseBetUrl, reducer} from "./util"
 import useRoundData from "./useRoundData";
 import firebase from "firebase/app";
 import "firebase/database";
+import { ChakraProvider } from "@chakra-ui/react"
 
 const config = {
     apiKey: "AIzaSyA1AJzRRbOTh7iVZi4DfK9lBuSJnfTTbr4",
@@ -64,7 +65,9 @@ function App() {
 
     return (
         <RoundContext.Provider value={{roundState: mergedRoundState, setRoundState}}>
-            <HomePage/>
+            <ChakraProvider>
+                <HomePage/>
+            </ChakraProvider>
         </RoundContext.Provider>
     );
 }

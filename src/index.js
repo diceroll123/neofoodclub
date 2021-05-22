@@ -4,14 +4,11 @@ import './index.css';
 import App from './app/App';
 import FaviconGenerator from "./app/FaviconGenerator";
 import reportWebVitals from './reportWebVitals';
-import { ChakraProvider } from "@chakra-ui/react"
 
 ReactDOM.render(
     <React.StrictMode>
-        <ChakraProvider>
-            <FaviconGenerator/>
-            <App/>
-        </ChakraProvider>
+        <FaviconGenerator/>
+        <App/>
     </React.StrictMode>,
     document.getElementById('root')
 );
