@@ -18,6 +18,11 @@ export default function RoundInput() {
     const [hasFocus, setHasFocus] = useState(false);
 
     function changeCurrentSelectedRound(value) {
+
+        if (value === roundState.currentSelectedRound) {
+            return;
+        }
+
         if (value > 0) {
             setRoundState({
                 currentSelectedRound: value,
