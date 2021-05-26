@@ -41,6 +41,7 @@ import {
     computeProbabilities
 } from "./maths";
 import {
+    amountAbbreviation,
     createBetURL,
     determineBetAmount,
     displayAsPercent,
@@ -1065,15 +1066,7 @@ const PayoutExtras = (props) => {
             scales: {
                 x: {
                     ticks: {
-                        callback: function (value, index, array) {
-                            if (Math.abs(value) >= 1000000) {
-                                return `${value / 1000000}M`;
-                            }
-                            if (Math.abs(value) >= 1000) {
-                                return `${value / 1000}k`;
-                            }
-                            return value;
-                        }
+                        callback: (value, index, array) => amountAbbreviation(value)
                     }
                 },
                 y: {

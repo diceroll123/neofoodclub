@@ -252,5 +252,16 @@ export function determineBetAmount(maxBet, betCap) {
     // if we've made it this far,
     // we must go with the smallest of maxBet, betCap, or 500K
     return Math.min(maxBet, betCap, 500_000)
+}
 
+export function amountAbbreviation(value) {
+    if (!isNaN(value)) {
+        if (Math.abs(value) >= 1000000) {
+            return `${value / 1000000}M`;
+        }
+        if (Math.abs(value) >= 1000) {
+            return `${value / 1000}k`;
+        }
+    }
+    return value;
 }
