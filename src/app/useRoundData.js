@@ -31,7 +31,8 @@ export default function useRoundData(firebase, currentSelectedRound) {
                 return;
             }
             setRoundData(roundData => {
-                if (roundData && roundData[name] === value) {
+                // skip the re-render if it's not needed
+                if (roundData && JSON.stringify(roundData[name]) === JSON.stringify(value)) {
                     return roundData;
                 }
 
