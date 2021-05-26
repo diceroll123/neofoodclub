@@ -12,7 +12,7 @@ export default function useRoundData(firebase, currentSelectedRound) {
     useEffect(() => {
         firebase.database().ref().child("current_round").once('value').then((snapshot) => {
             const newCurrentRound = snapshot.val();
-            setCurrentRound(newCurrentRound);
+            setCurrentRound(parseInt(newCurrentRound));
         });
     }, [firebase]);
 
@@ -31,9 +31,13 @@ export default function useRoundData(firebase, currentSelectedRound) {
                 return;
             }
             setRoundData(roundData => {
+                if (roundData && roundData[name] === value) {
+                    return roundData;
+                }
+
                 return {
                     ...roundData,
-                    [name]: snapshot.val()
+                    [name]: value
                 }
             })
         }
@@ -49,14 +53,8 @@ export default function useRoundData(firebase, currentSelectedRound) {
             }
         };
         const winnersRef = ref.child("winners");
-
-        const onCurrentOddsChange = (snapshot) => update(snapshot, "currentOdds");
         const currentOddsRef = ref.child("currentOdds");
-
-        const onTimestampChange = (snapshot) => update(snapshot, "timestamp");
         const timestampRef = ref.child("timestamp");
-
-        const onLastChangeChange = (snapshot) => update(snapshot, "lastChange");
         const lastChangeRef = ref.child("lastChange");
 
         const addFirebaseHandlers = () => {
@@ -71,17 +69,11 @@ export default function useRoundData(firebase, currentSelectedRound) {
             }
 
             // and now we grab the changeable data points rather than the entire state every time
-            winnersRef.on('value', onWinnersChange);
-            currentOddsRef.on('value', onCurrentOddsChange);
-            timestampRef.on('value', onTimestampChange);
-            lastChangeRef.on('value', onLastChangeChange);
+            firebase.database().goOnline();
         }
 
         const removeFirebaseHandlers = () => {
-            winnersRef.off('value', onWinnersChange);
-            currentOddsRef.off('value', onCurrentOddsChange);
-            timestampRef.off('value', onTimestampChange);
-            lastChangeRef.off('value', onLastChangeChange);
+            firebase.database().goOffline();
         }
 
         // get the entire round state once
@@ -101,7 +93,10 @@ export default function useRoundData(firebase, currentSelectedRound) {
             }
         }).then(() => {
             // after getting round state...
-            addFirebaseHandlers();
+            winnersRef.on('value', onWinnersChange);
+            currentOddsRef.on('value', (snapshot) => update(snapshot, "currentOdds"));
+            timestampRef.on('value', (snapshot) => update(snapshot, "timestamp"));
+            lastChangeRef.on('value', (snapshot) => update(snapshot, "lastChange"));
         });
 
         window.addEventListener("blur", removeFirebaseHandlers);
@@ -110,7 +105,10 @@ export default function useRoundData(firebase, currentSelectedRound) {
         return () => {
             window.removeEventListener("blur", removeFirebaseHandlers);
             window.removeEventListener("focus", addFirebaseHandlers);
-            removeFirebaseHandlers();
+            winnersRef.off();
+            currentOddsRef.off();
+            timestampRef.off();
+            lastChangeRef.off();
         }
     }, [
         toast,

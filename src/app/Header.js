@@ -120,7 +120,7 @@ function RoundInfo() {
 
     let element = <SkeletonText noOfLines={3} minWidth={skeletonWidth}/>;
 
-    if (roundState.roundData !== null) {
+    if (roundState.roundData) {
         if (roundState.roundData.winners[0] > 0) {
             element = <PreviousRoundInfo/>;
         } else {
@@ -148,7 +148,7 @@ function MaxBetInput() {
     }, [roundState.currentSelectedRound]);
 
     return (
-        <Skeleton isLoaded={roundState.roundData !== null}>
+        <Skeleton isLoaded={roundState.roundData}>
             <InputGroup
                 size="xs">
                 <InputLeftAddon children="Max Bet"/>

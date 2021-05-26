@@ -365,7 +365,7 @@ const NormalTable = (props) => {
                                 <Td backgroundColor={grayAccent} colSpan={2}/>
                                 <CustomOddsElement as={Td} backgroundColor={grayAccent}/>
                                 {/*<Td>showOddsTimeline</Td>*/}
-                                {roundState.roundData !== null ? <>
+                                {roundState.roundData ? <>
                                     {[...Array(amountOfBets)].map((bet, betNum) => {
                                         return (
                                             <Td key={betNum} backgroundColor={grayAccent}>
@@ -394,7 +394,7 @@ const NormalTable = (props) => {
 
                             {pirates.map((pirateId, pirateIndex) => {
 
-                                if (roundState.roundData === null) {
+                                if (!roundState.roundData) {
                                     // big ol skeleton
                                     return (
                                         <Tr key={pirateIndex}>

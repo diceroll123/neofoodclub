@@ -49,7 +49,7 @@ function App() {
     // If we don't have a selected round yet, initialize it to the current round ID, once it loads in.
     useEffect(() => {
         if (roundState.currentSelectedRound === null) {
-            setRoundState({currentSelectedRound: currentRound});
+            setRoundState({currentSelectedRound: parseInt(currentRound)});
         }
     }, [roundState.currentSelectedRound, currentRound]);
 
