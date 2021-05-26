@@ -1001,7 +1001,7 @@ const PayoutExtras = (props) => {
             let obj = data[dataObj];
             points.push({
                 x: parseInt(obj.value),
-                y: obj.cumulative
+                y: obj.probability
             });
         }
 
