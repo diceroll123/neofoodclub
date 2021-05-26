@@ -1009,10 +1009,8 @@ const PayoutExtras = (props) => {
             datasets: [
                 {
                     data: points,
-                    borderColor: 'rgba(255, 85, 85)',
-                    tension: 0,
-                    showLine: true,
-                    stepped: true
+                    borderColor: 'rgb(255, 85, 85)',
+                    backgroundColor: 'rgb(255, 85, 85)',
                 },
             ],
         };
@@ -1020,6 +1018,7 @@ const PayoutExtras = (props) => {
         // this will be our "double units/profit" line
         let breakEven = 0;
         let doubleProfit = 0;
+        let type = 'units';
 
         if (title === "Odds") {
             let validBets = Object.values(betBinaries).filter(x => x > 0);
@@ -1029,6 +1028,7 @@ const PayoutExtras = (props) => {
             let totalBetAmount = Object.values(roundState.betAmounts).reduce((a, b) => a + b);
             breakEven = totalBetAmount;
             doubleProfit = totalBetAmount * 2;
+            type = 'NP';
         }
 
         const options = {
@@ -1054,11 +1054,23 @@ const PayoutExtras = (props) => {
                         }
                     }
                 },
+                tooltip: {
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return [`${amountAbbreviation(context.parsed.x)} ${type}`, `${displayAsPercent(context.parsed.y, 3)}`];
+                        }
+                    }
+                }
             },
             elements: {
                 point:{
-                    radius: 0
+                    radius: 4
                 }
+            },
+            interaction: {
+                mode: "index",
+                intersect: false,
             },
             animation: {
                 duration: 0
