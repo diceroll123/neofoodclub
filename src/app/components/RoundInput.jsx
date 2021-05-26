@@ -1,5 +1,5 @@
-import {useContext, useEffect, useState} from "react";
-import RoundContext from "./RoundState";
+import { useContext, useEffect, useState } from "react";
+import RoundContext from "../RoundState";
 import {
     InputGroup,
     InputLeftAddon,
@@ -7,18 +7,21 @@ import {
     NumberIncrementStepper,
     NumberInput,
     NumberInputField,
-    NumberInputStepper
+    NumberInputStepper,
 } from "@chakra-ui/react";
 
-export default function RoundInput() {
-    const {roundState, setRoundState} = useContext(RoundContext);
+// this element is the number input to say which round's data you're viewing
+
+const RoundInput = () => {
+    const { roundState, setRoundState } = useContext(RoundContext);
 
     const [timeoutId, setTimeoutId] = useState(null);
-    const [roundNumber, setRoundNumber] = useState(roundState.currentSelectedRound || 0);
+    const [roundNumber, setRoundNumber] = useState(
+        roundState.currentSelectedRound || 0
+    );
     const [hasFocus, setHasFocus] = useState(false);
 
     function changeCurrentSelectedRound(value) {
-
         if (value === roundState.currentSelectedRound) {
             return;
         }
@@ -41,9 +44,8 @@ export default function RoundInput() {
     }, [roundState.currentSelectedRound]);
 
     return (
-        <InputGroup
-            size="xs">
-            <InputLeftAddon children="Round"/>
+        <InputGroup size="xs">
+            <InputLeftAddon children="Round" />
             <NumberInput
                 isDisabled={roundNumber === 0}
                 value={roundNumber}
@@ -81,15 +83,18 @@ export default function RoundInput() {
                         setRoundNumber(roundState.currentRound);
                         changeCurrentSelectedRound(roundState.currentRound);
                     }
-                }}>
-                <NumberInputField/>
-                {hasFocus &&
-                <NumberInputStepper>
-                    <NumberIncrementStepper/>
-                    <NumberDecrementStepper/>
-                </NumberInputStepper>
-                }
+                }}
+            >
+                <NumberInputField />
+                {hasFocus && (
+                    <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                    </NumberInputStepper>
+                )}
             </NumberInput>
         </InputGroup>
-    )
-}
+    );
+};
+
+export default RoundInput;

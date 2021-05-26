@@ -2,40 +2,51 @@ import Cookies from "universal-cookie/es6";
 import moment from "moment";
 
 export function reducer(state, item) {
-    return {...state, ...item}
+    return { ...state, ...item };
 }
 
 function parseBets(betString) {
-    return betString.split("").map((char) => {
-        return "abcdefghijklmnopqrstuvwxy".indexOf(char);
-    }).reduce((prev, next) => {
-        prev.push(Math.floor(next / 5), next % 5);
-        return prev;
-    }, []).reduce((t, e, r) => {
-        let div = r % 5;
-        if (div === 0) {
-            t.push([0, 0, 0, 0, 0]);
-        }
-        t[t.length - 1][div] = e;
-        return t;
-    }, []).reduce((t, e, r) => {
-        t[r + 1] = e;
-        return t;
-    }, {});
+    return betString
+        .split("")
+        .map((char) => {
+            return "abcdefghijklmnopqrstuvwxy".indexOf(char);
+        })
+        .reduce((prev, next) => {
+            prev.push(Math.floor(next / 5), next % 5);
+            return prev;
+        }, [])
+        .reduce((t, e, r) => {
+            let div = r % 5;
+            if (div === 0) {
+                t.push([0, 0, 0, 0, 0]);
+            }
+            t[t.length - 1][div] = e;
+            return t;
+        }, [])
+        .reduce((t, e, r) => {
+            t[r + 1] = e;
+            return t;
+        }, {});
 }
 
 function parseBetAmounts(betAmountsString) {
-    return betAmountsString.match(/.{1,3}/g).map((chunk) => {
-        let val = 0;
-        for (let char = 0; char < chunk.length; char++) {
-            val *= 52;
-            val += "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(chunk[char]);
-        }
-        return val - 70304;
-    }).reduce((t, e, r) => {
-        t[r + 1] = e
-        return t
-    }, {});
+    return betAmountsString
+        .match(/.{1,3}/g)
+        .map((chunk) => {
+            let val = 0;
+            for (let char = 0; char < chunk.length; char++) {
+                val *= 52;
+                val +=
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(
+                        chunk[char]
+                    );
+            }
+            return val - 70304;
+        })
+        .reduce((t, e, r) => {
+            t[r + 1] = e;
+            return t;
+        }, {});
 }
 
 export function parseBetUrl() {
@@ -61,7 +72,14 @@ export function parseBetUrl() {
 
     // force data if none exists for bets and amounts alike
     // allow up to 15 bets
-    let amountOfBets = Math.max(Object.keys(tempBets).length, Object.keys(tempBetAmounts).length, 10) > 10 ? 15 : 10;
+    let amountOfBets =
+        Math.max(
+            Object.keys(tempBets).length,
+            Object.keys(tempBetAmounts).length,
+            10
+        ) > 10
+            ? 15
+            : 10;
     for (let index = 1; index <= amountOfBets; index++) {
         bets[index] = tempBets[index] || [0, 0, 0, 0, 0];
         betAmounts[index] = tempBetAmounts[index] || -1000;
@@ -75,51 +93,63 @@ export function parseBetUrl() {
 }
 
 function makeBetUrl(bets) {
-    return Object.keys(bets).sort((t, e) => {
-        return t - e
-    }).map((t) => {
-        return bets[t];
-    }).reduce((t, e) => {
-        t.push(...e);
-        return t;
-    }, []).reduce((t, e, r) => {
-        if (r % 2 === 0) {
-            t.push(5 * e);
-        } else {
-            t[t.length - 1] += e;
-        }
-        return t;
-    }, []).map((t) => {
-        return "abcdefghijklmnopqrstuvwxy"[t];
-    }).join("");
+    return Object.keys(bets)
+        .sort((t, e) => {
+            return t - e;
+        })
+        .map((t) => {
+            return bets[t];
+        })
+        .reduce((t, e) => {
+            t.push(...e);
+            return t;
+        }, [])
+        .reduce((t, e, r) => {
+            if (r % 2 === 0) {
+                t.push(5 * e);
+            } else {
+                t[t.length - 1] += e;
+            }
+            return t;
+        }, [])
+        .map((t) => {
+            return "abcdefghijklmnopqrstuvwxy"[t];
+        })
+        .join("");
 }
 
 function makeBetAmountsUrl(betAmounts) {
-    return Object.keys(betAmounts).sort((t, e) => {
-        return t - e;
-    }).map((t) => {
-        return betAmounts[t];
-    }).map((t) => {
-        let e = "";
-        t = (parseInt(t) || 0) % 70304 + 70304;
-        for (let r = 0; r < 3; r++) {
-            let n = t % 52;
-            e = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"[n] + e;
-            t = (t - n) / 52;
-        }
-        return e;
-    }).join("");
+    return Object.keys(betAmounts)
+        .sort((t, e) => {
+            return t - e;
+        })
+        .map((t) => {
+            return betAmounts[t];
+        })
+        .map((t) => {
+            let e = "";
+            t = ((parseInt(t) || 0) % 70304) + 70304;
+            for (let r = 0; r < 3; r++) {
+                let n = t % 52;
+                e =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"[n] +
+                    e;
+                t = (t - n) / 52;
+            }
+            return e;
+        })
+        .join("");
 }
 
 export function displayAsPercent(value, decimals) {
     if (decimals === undefined) {
-        return `${(100 * value)}%`;
+        return `${100 * value}%`;
     }
     return `${(100 * value).toFixed(decimals)}%`;
 }
 
 export function displayAsPlusMinus(value) {
-    return `${(0 < value ? "+" : "")}${value}`;
+    return `${0 < value ? "+" : ""}${value}`;
 }
 
 export function numberWithCommas(x) {
@@ -136,7 +166,7 @@ export function calculateBaseMaxBet(maxBet, round) {
 
 export function getMaxBet(currentSelectedRound) {
     const cookies = new Cookies();
-    let maxBet = cookies.get('baseMaxBet');
+    let maxBet = cookies.get("baseMaxBet");
     if (maxBet === undefined) {
         return -1000;
     }
@@ -160,7 +190,9 @@ export function getTableMode() {
 }
 
 export function anyBetsExist(betsObject) {
-    return Object.values(betsObject).some(pirates => pirates.some(index => index > 0));
+    return Object.values(betsObject).some((pirates) =>
+        pirates.some((index) => index > 0)
+    );
 }
 
 export function createBetURL(roundState, ignoreBetAmounts) {
@@ -182,15 +214,17 @@ export function createBetURL(roundState, ignoreBetAmounts) {
         return betURL;
     }
 
-    betURL += '&b=' + makeBetUrl(roundState.bets);
+    betURL += "&b=" + makeBetUrl(roundState.bets);
 
     if (ignoreBetAmounts) {
         return betURL;
     }
 
-    let addBetAmounts = Object.values(roundState.betAmounts).some(value => value >= 50);
+    let addBetAmounts = Object.values(roundState.betAmounts).some(
+        (value) => value >= 50
+    );
     if (addBetAmounts) {
-        return betURL + '&a=' + makeBetAmountsUrl(roundState.betAmounts);
+        return betURL + "&a=" + makeBetAmountsUrl(roundState.betAmounts);
     }
     return betURL;
 }
@@ -198,10 +232,13 @@ export function createBetURL(roundState, ignoreBetAmounts) {
 export function calculateRoundOverPercentage(roundState) {
     let now = moment();
     let start = moment(roundState.roundData.start);
-    let end = moment(roundState.roundData.start).add(1, 'day');
+    let end = moment(roundState.roundData.start).add(1, "day");
     let totalMillisInRange = end.valueOf() - start.valueOf();
     let elapsedMillis = now.valueOf() - start.valueOf();
-    return Math.max(0, Math.min(100, 100 * (elapsedMillis / totalMillisInRange)));
+    return Math.max(
+        0,
+        Math.min(100, 100 * (elapsedMillis / totalMillisInRange))
+    );
 }
 
 export function cloneArray(arr) {
@@ -251,7 +288,7 @@ export function determineBetAmount(maxBet, betCap) {
 
     // if we've made it this far,
     // we must go with the smallest of maxBet, betCap, or 500K
-    return Math.min(maxBet, betCap, 500_000)
+    return Math.min(maxBet, betCap, 500_000);
 }
 
 export function amountAbbreviation(value) {

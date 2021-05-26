@@ -1,20 +1,32 @@
-import {NEGATIVE_FAS, POSITIVE_FAS} from "./constants";
+import { NEGATIVE_FAS, POSITIVE_FAS } from "./constants";
 
 export function computePirateFAs(roundData) {
     // pre-populate with zeroes because really old rounds don't have this data
     // I'm not sure how, but the original neofoodclub somehow made up values to make up for this
     // I will be having none of that here.
-    let fas = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+    let fas = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+    ];
 
     if (roundData.foods) {
         for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
             fas[arenaIndex] = [];
             for (let pirateIndex = 0; pirateIndex < 4; pirateIndex++) {
-                for (let foodIndex = fas[arenaIndex][pirateIndex] = 0; foodIndex < 10; foodIndex++) {
+                for (
+                    let foodIndex = (fas[arenaIndex][pirateIndex] = 0);
+                    foodIndex < 10;
+                    foodIndex++
+                ) {
                     let foodId = roundData.foods[arenaIndex][foodIndex];
                     let pirateId = roundData.pirates[arenaIndex][pirateIndex];
-                    fas[arenaIndex][pirateIndex] += POSITIVE_FAS[pirateId][foodId];
-                    fas[arenaIndex][pirateIndex] -= NEGATIVE_FAS[pirateId][foodId];
+                    fas[arenaIndex][pirateIndex] +=
+                        POSITIVE_FAS[pirateId][foodId];
+                    fas[arenaIndex][pirateIndex] -=
+                        NEGATIVE_FAS[pirateId][foodId];
                 }
             }
         }
@@ -27,7 +39,7 @@ export function computeProbabilities(roundData, customProbs) {
         min: [],
         std: [],
         max: [],
-        used: []
+        used: [],
     };
     for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
         returnValue.min[arenaIndex] = [1];
@@ -57,12 +69,21 @@ export function computeProbabilities(roundData, customProbs) {
             let pirateOdd = roundData.openingOdds[arenaIndex][pirateIndex];
             let minOrig = returnValue.min[arenaIndex][pirateIndex];
             let maxOrig = returnValue.max[arenaIndex][pirateIndex];
-            returnValue.min[arenaIndex][pirateIndex] = Math.max(minOrig, 1 + maxOrig - max);
-            returnValue.max[arenaIndex][pirateIndex] = Math.min(maxOrig, 1 + minOrig - min);
+            returnValue.min[arenaIndex][pirateIndex] = Math.max(
+                minOrig,
+                1 + maxOrig - max
+            );
+            returnValue.max[arenaIndex][pirateIndex] = Math.min(
+                maxOrig,
+                1 + minOrig - min
+            );
             if (pirateOdd === 13) {
                 returnValue.std[arenaIndex][pirateIndex] = 0.05;
             } else {
-                returnValue.std[arenaIndex][pirateIndex] = (returnValue.min[arenaIndex][pirateIndex] + returnValue.max[arenaIndex][pirateIndex]) / 2;
+                returnValue.std[arenaIndex][pirateIndex] =
+                    (returnValue.min[arenaIndex][pirateIndex] +
+                        returnValue.max[arenaIndex][pirateIndex]) /
+                    2;
             }
         }
 
@@ -74,24 +95,41 @@ export function computeProbabilities(roundData, customProbs) {
             let maxRectifyValue = 1;
             for (pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
                 stdTotal += returnValue.std[arenaIndex][pirateIndex];
-                if (roundData.openingOdds[arenaIndex][pirateIndex] <= rectifyLevel) {
+                if (
+                    roundData.openingOdds[arenaIndex][pirateIndex] <=
+                    rectifyLevel
+                ) {
                     rectifyCount++;
-                    rectifyValue += returnValue.std[arenaIndex][pirateIndex] - returnValue.min[arenaIndex][pirateIndex];
-                    maxRectifyValue = Math.min(maxRectifyValue, returnValue.max[arenaIndex][pirateIndex] - returnValue.min[arenaIndex][pirateIndex]);
+                    rectifyValue +=
+                        returnValue.std[arenaIndex][pirateIndex] -
+                        returnValue.min[arenaIndex][pirateIndex];
+                    maxRectifyValue = Math.min(
+                        maxRectifyValue,
+                        returnValue.max[arenaIndex][pirateIndex] -
+                            returnValue.min[arenaIndex][pirateIndex]
+                    );
                 }
             }
             if (stdTotal === 1) {
                 break;
             }
-            if (stdTotal - rectifyValue > 1 || rectifyCount === 0 || rectifyValue + 1 - stdTotal > maxRectifyValue * rectifyCount) {
+            if (
+                stdTotal - rectifyValue > 1 ||
+                rectifyCount === 0 ||
+                rectifyValue + 1 - stdTotal > maxRectifyValue * rectifyCount
+            ) {
                 rectifyLevel++;
                 continue;
             }
             rectifyValue += 1 - stdTotal; // positive or 0
             rectifyValue /= rectifyCount;
             for (pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
-                if (roundData.openingOdds[arenaIndex][pirateIndex] <= rectifyLevel) {
-                    returnValue.std[arenaIndex][pirateIndex] = returnValue.min[arenaIndex][pirateIndex] + rectifyValue;
+                if (
+                    roundData.openingOdds[arenaIndex][pirateIndex] <=
+                    rectifyLevel
+                ) {
+                    returnValue.std[arenaIndex][pirateIndex] =
+                        returnValue.min[arenaIndex][pirateIndex] + rectifyValue;
                 }
             }
             break;
@@ -99,12 +137,15 @@ export function computeProbabilities(roundData, customProbs) {
 
         let sum = 0;
         for (pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
-            returnValue.used[arenaIndex][pirateIndex] = customProbs[arenaIndex][pirateIndex] || returnValue.std[arenaIndex][pirateIndex];
+            returnValue.used[arenaIndex][pirateIndex] =
+                customProbs[arenaIndex][pirateIndex] ||
+                returnValue.std[arenaIndex][pirateIndex];
             sum += returnValue.used[arenaIndex][pirateIndex];
         }
 
         for (pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
-            returnValue.used[arenaIndex][pirateIndex] = returnValue.used[arenaIndex][pirateIndex] / sum;
+            returnValue.used[arenaIndex][pirateIndex] =
+                returnValue.used[arenaIndex][pirateIndex] / sum;
         }
     }
     return returnValue;
@@ -126,7 +167,7 @@ export function calculateArenaRatios(customOdds) {
 function tableToList(oddsTable) {
     let oddsList = [];
     for (let odds in oddsTable) {
-        oddsList.push({value: odds, probability: oddsTable[odds]});
+        oddsList.push({ value: odds, probability: oddsTable[odds] });
     }
     oddsList.sort((a, b) => a.value - b.value);
     let cumulative = 0;
@@ -140,7 +181,12 @@ function tableToList(oddsTable) {
     return oddsList;
 }
 
-export function calculatePayoutTables(roundState, probabilities, betOdds, betPayoffs) {
+export function calculatePayoutTables(
+    roundState,
+    probabilities,
+    betOdds,
+    betPayoffs
+) {
     /*
     ib is a binary format to represent bets.
     It works on 20 bits (because there are 20 pirates).
@@ -174,7 +220,13 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
     // checks if there are possible winning combinations for ib
     function ibDoable(ib) {
         // checks whether ib accepts at least one pirate in each arena
-        return (ib & arIb[0]) && (ib & arIb[1]) && (ib & arIb[2]) && (ib & arIb[3]) && (ib & arIb[4]);
+        return (
+            ib & arIb[0] &&
+            ib & arIb[1] &&
+            ib & arIb[2] &&
+            ib & arIb[3] &&
+            ib & arIb[4]
+        );
     }
 
     /*
@@ -212,7 +264,7 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
                         let tst = ibKey ^ (com & ar);
                         if (ibDoable(tst)) {
                             res[tst] = valKey;
-                            ibKey = (ibKey & (~ar)) | (com & ar);
+                            ibKey = (ibKey & ~ar) | (com & ar);
                         }
                     }
                 }
@@ -228,7 +280,9 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
             let arProb = 0;
             for (let j = 0; j < 4; j++) {
                 if (ib & arIb[i] & pirIb[j]) {
-                    arProb += roundState.customProbs[i][j+1] || probabilities[i][j+1];
+                    arProb +=
+                        roundState.customProbs[i][j + 1] ||
+                        probabilities[i][j + 1];
                 }
             }
             totProb *= arProb;
@@ -271,7 +325,7 @@ export function calculatePayoutTables(roundState, probabilities, betOdds, betPay
 
     return {
         odds: winTblOdds,
-        winnings: winTblWinnings
+        winnings: winTblWinnings,
     };
 }
 
@@ -288,7 +342,7 @@ export function computePiratesBinary(piratesArray) {
     for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
         let pirateIndex = piratesArray[arenaIndex];
         if (pirateIndex > 0) {
-            value |= computePirateBinary(arenaIndex, pirateIndex)
+            value |= computePirateBinary(arenaIndex, pirateIndex);
         }
     }
     return value;
@@ -301,7 +355,7 @@ export function computeBinaryToPirates(bin) {
         if (value > 0) {
             value = 4 - ((value.toString(2).length - 1) % 4);
         }
-        indices.push(value)
-    })
+        indices.push(value);
+    });
     return indices;
 }

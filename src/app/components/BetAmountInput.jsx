@@ -3,16 +3,20 @@ import {
     NumberIncrementStepper,
     NumberInput,
     NumberInputField,
-    NumberInputStepper
+    NumberInputStepper,
 } from "@chakra-ui/react";
-import React, {useEffect, useState} from "react";
-import RoundContext from "./RoundState";
+import { useEffect, useState, useContext } from "react";
+import RoundContext from "../RoundState";
+
+// this is the number input element next to bets
 
 export default function BetAmountInput(props) {
-    const {roundState, setRoundState} = React.useContext(RoundContext);
-    const {betIndex, ...rest} = props;
+    const { roundState, setRoundState } = useContext(RoundContext);
+    const { betIndex, ...rest } = props;
 
-    const [tempMaxBet, setTempMaxBet] = useState(roundState.betAmounts[betIndex + 1]);
+    const [tempMaxBet, setTempMaxBet] = useState(
+        roundState.betAmounts[betIndex + 1]
+    );
 
     useEffect(() => {
         setTempMaxBet(roundState.betAmounts[betIndex + 1]);
@@ -36,21 +40,22 @@ export default function BetAmountInput(props) {
 
                 setTempMaxBet(value);
 
-                let betAmounts = {...roundState.betAmounts};
+                let betAmounts = { ...roundState.betAmounts };
                 betAmounts[betIndex + 1] = value;
-                setRoundState({betAmounts});
+                setRoundState({ betAmounts });
             }}
             onFocus={(e) => e.target.select()}
             size="sm"
             min={-1000}
             max={500000}
             allowMouseWheel
-            width="90px">
-            <NumberInputField/>
+            width="90px"
+        >
+            <NumberInputField />
             <NumberInputStepper width="16px">
-                <NumberIncrementStepper/>
-                <NumberDecrementStepper/>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
             </NumberInputStepper>
         </NumberInput>
-    )
+    );
 }

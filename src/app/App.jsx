@@ -1,11 +1,11 @@
-import React, {useEffect, useCallback} from "react"
-import RoundContext from "./RoundState"
+import React, { useEffect, useCallback, useReducer } from "react";
+import RoundContext from "./RoundState";
 import HomePage from "./HomePage";
-import {getTableMode, createBetURL, parseBetUrl, reducer} from "./util"
+import { getTableMode, createBetURL, parseBetUrl, reducer } from "./util";
 import useRoundData from "./useRoundData";
 import firebase from "firebase/app";
 import "firebase/database";
-import { ChakraProvider } from "@chakra-ui/react"
+import { ChakraProvider } from "@chakra-ui/react";
 
 const config = {
     apiKey: "AIzaSyA1AJzRRbOTh7iVZi4DfK9lBuSJnfTTbr4",
@@ -15,7 +15,7 @@ const config = {
     storageBucket: "neofoodclub.appspot.com",
     messagingSenderId: "1085231429788",
     appId: "1:1085231429788:web:6a5ce4dbe8a5021e64d559",
-    measurementId: "G-TPEBSBBBTR"
+    measurementId: "G-TPEBSBBBTR",
 };
 
 if (!firebase.apps.length) {
@@ -25,7 +25,7 @@ if (!firebase.apps.length) {
 function App() {
     const initialState = parseBetUrl();
 
-    const [roundState, setRoundState] = React.useReducer(reducer, {
+    const [roundState, setRoundState] = useReducer(reducer, {
         roundData: null,
         currentRound: null,
         currentSelectedRound: initialState.round,
@@ -38,18 +38,21 @@ function App() {
             bigBrain: true,
             faDetails: false,
             customOddsMode: false,
-            oddsTimeline: false
+            oddsTimeline: false,
         },
     });
 
     useRoundStateURLs(roundState, setRoundState);
 
-    const [currentRound, roundData] = useRoundData(firebase, roundState.currentSelectedRound);
+    const [currentRound, roundData] = useRoundData(
+        firebase,
+        roundState.currentSelectedRound
+    );
 
     // If we don't have a selected round yet, initialize it to the current round ID, once it loads in.
     useEffect(() => {
         if (roundState.currentSelectedRound === null && currentRound) {
-            setRoundState({currentSelectedRound: parseInt(currentRound)});
+            setRoundState({ currentSelectedRound: parseInt(currentRound) });
         }
     }, [roundState.currentSelectedRound, currentRound]);
 
@@ -58,15 +61,22 @@ function App() {
         currentRound,
         // If we have custom odds/probs for this round, use them. Otherwise, use the default values.
         customOdds: roundState.customOdds || roundData?.currentOdds || null,
-        customProbs: roundState.customProbs ||
-            [[1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0]],
+        customProbs: roundState.customProbs || [
+            [1, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+        ],
         roundData,
     };
 
     return (
-        <RoundContext.Provider value={{roundState: mergedRoundState, setRoundState}}>
+        <RoundContext.Provider
+            value={{ roundState: mergedRoundState, setRoundState }}
+        >
             <ChakraProvider>
-                <HomePage/>
+                <HomePage />
             </ChakraProvider>
         </RoundContext.Provider>
     );
@@ -90,9 +100,18 @@ function useRoundStateURLs(roundState, setRoundState) {
             currentSelectedRound: data.round,
             bets: data.bets,
             betAmounts: data.betAmounts,
-            roundData: parseInt(data.round) === parseInt(roundState.currentSelectedRound) ? roundState.roundData : null
+            roundData:
+                parseInt(data.round) ===
+                parseInt(roundState.currentSelectedRound)
+                    ? roundState.roundData
+                    : null,
         });
-    }, [roundState.currentRound, roundState.currentSelectedRound, roundState.roundData, setRoundState]);
+    }, [
+        roundState.currentRound,
+        roundState.currentSelectedRound,
+        roundState.roundData,
+        setRoundState,
+    ]);
 
     useEffect(() => {
         window.addEventListener("hashchange", onHashChange);
