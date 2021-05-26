@@ -58,14 +58,14 @@ export default function useRoundData(firebase, currentSelectedRound) {
         const timestampRef = ref.child("timestamp");
         const lastChangeRef = ref.child("lastChange");
 
-        const addFirebaseHandlers = () => {
-            if (currentRound === null) {
-                return;
-            }
+        const isCurrentOrPreviousRound = () => {
+            return [currentRound, currentRound - 1].includes(parseInt(currentSelectedRound));
+        }
 
-            if ([currentRound, currentRound - 1].includes(parseInt(currentSelectedRound)) === false) {
+        const addFirebaseHandlers = () => {
+            if (isCurrentOrPreviousRound() === false) {
                 // we don't need live data for old rounds
-                // but allow live update on the previous round just in case!
+                // but allow live update on the previous round just in case of last-minute odds reverts!
                 return;
             }
 
@@ -93,11 +93,13 @@ export default function useRoundData(firebase, currentSelectedRound) {
                 });
             }
         }).then(() => {
-            // after getting round state...
-            winnersRef.on('value', onWinnersChange);
-            currentOddsRef.on('value', (snapshot) => update(snapshot, "currentOdds"));
-            timestampRef.on('value', (snapshot) => update(snapshot, "timestamp"));
-            lastChangeRef.on('value', (snapshot) => update(snapshot, "lastChange"));
+            // after getting round state, add listeners if this is current/previous round
+            if (isCurrentOrPreviousRound()) {
+                winnersRef.on('value', onWinnersChange);
+                currentOddsRef.on('value', (snapshot) => update(snapshot, "currentOdds"));
+                timestampRef.on('value', (snapshot) => update(snapshot, "timestamp"));
+                lastChangeRef.on('value', (snapshot) => update(snapshot, "lastChange"));
+            }
         });
 
         window.addEventListener("blur", removeFirebaseHandlers);
