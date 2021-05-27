@@ -79,13 +79,7 @@ export default function useRoundData(firebase, currentSelectedRound) {
         };
 
         const addFirebaseHandlers = () => {
-            if (isCurrentOrPreviousRound() === false) {
-                // we don't need live data for old rounds
-                // but allow live update on the previous round just in case of last-minute odds reverts!
-                return;
-            }
-
-            // and now we grab the changeable data points rather than the entire state every time
+            // grab the changeable data points rather than the entire state every time
             firebase.database().goOnline();
         };
 
