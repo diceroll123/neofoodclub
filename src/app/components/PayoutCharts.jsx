@@ -100,9 +100,7 @@ const PayoutCharts = (props) => {
                     callbacks: {
                         label: function (context) {
                             return [
-                                `${amountAbbreviation(
-                                    context.parsed.x
-                                )} ${type}`,
+                                `${numberWithCommas(context.parsed.x)} ${type}`,
                                 `${displayAsPercent(context.parsed.y, 3)}`,
                             ];
                         },
