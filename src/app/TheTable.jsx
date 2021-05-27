@@ -839,45 +839,49 @@ export default function TheTable(props) {
                 arenaRatios={arenaRatios}
             />
 
-            <BetExtras
-                background={grayAccent}
-                betBinaries={betBinaries}
-                betOdds={betOdds}
-            />
+            {Object.values(betBinaries).reduce((a, b) => a + b) > 0 && (
+                <>
+                    <BetExtras
+                        background={grayAccent}
+                        betBinaries={betBinaries}
+                        betOdds={betOdds}
+                    />
 
-            <HorizontalScrollingBox>
-                <PayoutTable
-                    betBinaries={betBinaries}
-                    betProbabilities={betProbabilities}
-                    betExpectedRatios={betExpectedRatios}
-                    betNetExpected={betNetExpected}
-                    betOdds={betOdds}
-                    betMaxBets={betMaxBets}
-                    betPayoffs={betPayoffs}
-                    winningBetBinary={winningBetBinary}
-                    getPirateBgColor={getPirateBgColor}
-                    orange={orange}
-                    red={red}
-                    yellow={yellow}
-                    green={green}
-                />
-            </HorizontalScrollingBox>
+                    <HorizontalScrollingBox>
+                        <PayoutTable
+                            betBinaries={betBinaries}
+                            betProbabilities={betProbabilities}
+                            betExpectedRatios={betExpectedRatios}
+                            betNetExpected={betNetExpected}
+                            betOdds={betOdds}
+                            betMaxBets={betMaxBets}
+                            betPayoffs={betPayoffs}
+                            winningBetBinary={winningBetBinary}
+                            getPirateBgColor={getPirateBgColor}
+                            orange={orange}
+                            red={red}
+                            yellow={yellow}
+                            green={green}
+                        />
+                    </HorizontalScrollingBox>
 
-            <CopyPayouts
-                background={grayAccent}
-                betBinaries={betBinaries}
-                betOdds={betOdds}
-                betExpectedRatios={betExpectedRatios}
-                payoutTables={payoutTables}
-            />
+                    <CopyPayouts
+                        background={grayAccent}
+                        betBinaries={betBinaries}
+                        betOdds={betOdds}
+                        betExpectedRatios={betExpectedRatios}
+                        payoutTables={payoutTables}
+                    />
 
-            <HorizontalScrollingBox>
-                <PayoutCharts
-                    payoutTables={payoutTables}
-                    betBinaries={betBinaries}
-                    grayAccent={grayAccent}
-                />
-            </HorizontalScrollingBox>
+                    <HorizontalScrollingBox>
+                        <PayoutCharts
+                            payoutTables={payoutTables}
+                            betBinaries={betBinaries}
+                            grayAccent={grayAccent}
+                        />
+                    </HorizontalScrollingBox>
+                </>
+            )}
         </>
     );
 }
