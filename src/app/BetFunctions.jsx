@@ -26,6 +26,7 @@ import {
     makeEmptyBetAmounts,
     makeEmptyBets,
     shuffleArray,
+    sortedIndices,
 } from "./util";
 import { computeBinaryToPirates, computePiratesBinary } from "./maths";
 import {
@@ -39,8 +40,8 @@ import SettingsBox from "./components/SettingsBox";
 const cartesian = (...a) =>
     a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
 
-const BetsSaver = (props) => {
-    const { probabilities, ...rest } = props;
+const BetFunctions = (props) => {
+    const { probabilities, arenaRatios, ...rest } = props;
     const { roundState, setRoundState } = useContext(RoundContext);
     const [currentBet, setCurrentBet] = useState("0");
 
@@ -56,6 +57,8 @@ const BetsSaver = (props) => {
     const winningPiratesBinary = computePiratesBinary(
         roundState.roundData?.winners || [0, 0, 0, 0, 0]
     );
+
+    const positiveArenas = arenaRatios.filter((x) => x > 0).length;
 
     class BetsMaker {
         #odds;
@@ -270,6 +273,129 @@ const BetsSaver = (props) => {
         addNewSet(`Gambit Set (${maxBet} NP)`, bets, betAmounts, true);
     }
 
+    function bustproofSet() {
+        const maxBet = getMaxBet(roundState.currentSelectedRound);
+        const maker = new BetsMaker();
+        const { betOdds } = maker.calculate(
+            [0, 1, 2, 3, 4],
+            [0, 1, 2, 3, 4],
+            [0, 1, 2, 3, 4],
+            [0, 1, 2, 3, 4],
+            [0, 1, 2, 3, 4]
+        );
+
+        let bets = makeEmptyBets(10);
+        let betAmounts = makeEmptyBetAmounts(10);
+
+        // reverse it, because it's least -> greatest
+        const bestArenas = sortedIndices(arenaRatios).reverse();
+        const [bestArena, secondBestArena, thirdBestArena] = bestArenas;
+
+        function getBestPirates(arenaIndex) {
+            return sortedIndices(
+                roundState.roundData.currentOdds[arenaIndex]
+            ).reverse();
+        }
+
+        if (positiveArenas === 1) {
+            // If only one arena is positive, we place 1 bet on each of the pirates of that arena. Total bets = 4.
+
+            for (let x = 1; x < 5; x++) {
+                bets[x][bestArena] = x;
+            }
+        } else if (positiveArenas === 2) {
+            // If two arenas are positive, we place 1 bet on each of the three worst pirates of the best arena and
+            // 1 bet on each of the pirates of the second arena + the best pirate of the best arena. Total bets = 7
+
+            const bestPiratesInBestArena = getBestPirates(bestArena);
+
+            const [
+                fourthBestInBest,
+                thirdBestInBest,
+                secondBestInBest,
+                bestInBest,
+            ] = bestPiratesInBestArena;
+
+            bets[1][bestArena] = secondBestInBest;
+            bets[2][bestArena] = thirdBestInBest;
+            bets[3][bestArena] = fourthBestInBest;
+
+            for (let x = 1; x < 5; x++) {
+                bets[x + 3][bestArena] = bestInBest;
+                bets[x + 3][secondBestArena] = x;
+            }
+        } else {
+            // If three arenas are positive, we place 1 bet on each of the three worst pirates of the best arena,
+            // If four or more arenas are positive, we only play the three best arenas, seen below
+            // 1 bet on each of the three worst pirates of the second arena + the best pirate of the best arena,
+            // and 1 bet on each of the pirates of the third arena + the best pirate of the best arena + the best pirate
+            // of the second arena. Total bets = 10.
+
+            const bestPiratesInBestArena = getBestPirates(bestArena);
+
+            const [
+                fourthBestInBest,
+                thirdBestInBest,
+                secondBestInBest,
+                bestInBest,
+            ] = bestPiratesInBestArena;
+
+            bets[1][bestArena] = secondBestInBest;
+            bets[2][bestArena] = thirdBestInBest;
+            bets[3][bestArena] = fourthBestInBest;
+
+            //
+
+            const bestPiratesInSecondBestArena =
+                getBestPirates(secondBestArena);
+
+            for (let [index, value] of bestPiratesInSecondBestArena
+                .slice(0, 3)
+                .entries()) {
+                bets[index + 4][bestArena] = bestInBest;
+                bets[index + 4][secondBestArena] = value;
+            }
+
+            //
+            const bestInSecondBest = bestPiratesInSecondBestArena[3];
+
+            for (let x = 1; x < 5; x++) {
+                bets[x + 6][bestArena] = bestInBest;
+                bets[x + 6][secondBestArena] = bestInSecondBest;
+                bets[x + 6][thirdBestArena] = x;
+            }
+        }
+
+        // make per-bet maxbets
+        if (maxBet >= 50) {
+            let odds = [];
+            let bins = [];
+            for (const pirates of Object.values(bets)) {
+                let bin = computePiratesBinary(pirates);
+                if (bin === 0) {
+                    continue;
+                }
+                odds.push(betOdds[bin]);
+                bins.push(bin);
+            }
+
+            let lowestOdds = Math.min(...odds);
+
+            for (let [index, value] of bins.entries()) {
+                betAmounts[index + 1] = Math.floor(
+                    (maxBet * lowestOdds) / betOdds[value]
+                );
+            }
+        }
+
+        addNewSet(
+            `Bustproof Set (round ${roundState.currentSelectedRound})`,
+            bets,
+            betAmounts,
+            true
+        );
+    }
+
     function winningGambitSet() {
         if (winningPiratesBinary === 0) {
             return;
@@ -383,11 +509,11 @@ const BetsSaver = (props) => {
                                     <MenuItem onClick={randomCrazySet}>
                                         Random Crazy set
                                     </MenuItem>
-                                </MenuGroup>
-                                <MenuDivider />
-                                <MenuGroup title="Coming Soon">
-                                    <MenuItem isDisabled>
-                                        Bustproof set
+                                    <MenuItem
+                                        onClick={bustproofSet}
+                                        isDisabled={positiveArenas === 0}
+                                    >
+                                        Bustproof Set
                                     </MenuItem>
                                 </MenuGroup>
                             </MenuList>
@@ -461,4 +587,4 @@ const BetsSaver = (props) => {
     );
 };
 
-export default BetsSaver;
+export default BetFunctions;

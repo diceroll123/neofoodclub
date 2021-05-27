@@ -12,7 +12,7 @@ import {
     Thead,
     Tr,
 } from "@chakra-ui/react";
-import {useContext} from "react";
+import { useContext } from "react";
 import RoundContext from "./RoundState";
 import {
     calculateArenaRatios,
@@ -45,7 +45,7 @@ import BetExtras from "./components/BetExtras";
 import HorizontalScrollingBox from "./components/HorizontalScrollingBox";
 import Td from "./components/Td";
 import Pd from "./components/Pd";
-import BetsSaver from "./BetFunctions";
+import BetFunctions from "./BetFunctions";
 
 const NormalTable = (props) => {
     let {
@@ -734,7 +734,7 @@ export default function TheTable(props) {
 
     let probabilities = {};
     let pirateFAs = {};
-    let arenaRatios = {};
+    let arenaRatios = [];
     let betOdds = {};
     let betPayoffs = {};
     let betProbabilities = {};
@@ -833,7 +833,11 @@ export default function TheTable(props) {
                 />
             </HorizontalScrollingBox>
 
-            <BetsSaver background={grayAccent} probabilities={probabilities} />
+            <BetFunctions
+                background={grayAccent}
+                probabilities={probabilities}
+                arenaRatios={arenaRatios}
+            />
 
             <BetExtras
                 background={grayAccent}

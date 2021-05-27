@@ -302,3 +302,18 @@ export function amountAbbreviation(value) {
     }
     return value;
 }
+
+export function sortedIndices(arr) {
+    // returns the indices of the sorted array in least to greatest value
+    // in: [3,4,1,2]
+    // out:[2,3,0,1]
+    // from https://stackoverflow.com/a/54323161
+    return arr
+        .map((val, ind) => {
+            return { ind, val };
+        })
+        .sort((a, b) => {
+            return a.val > b.val ? 1 : a.val === b.val ? 0 : -1;
+        })
+        .map((obj) => obj.ind);
+}
