@@ -58,7 +58,8 @@ function Footer(props) {
                     affiliation/endorsement with Neopets.
                 </Text>
                 <Text fontSize="sm">
-                    © Neopets, Inc. All rights reserved. Used With Permission
+                    Images/Names © Neopets, Inc. All rights reserved. Used With
+                    Permission
                 </Text>
             </Box>
         </Box>
