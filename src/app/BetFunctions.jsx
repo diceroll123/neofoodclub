@@ -15,9 +15,11 @@ import {
     Text,
     Wrap,
     WrapItem,
+    Icon,
 } from "@chakra-ui/react";
-import { useContext, useEffect, useState } from "react";
-import RoundContext from "./RoundState";
+import { FaCopy, FaPlus, FaTrash, FaChevronDown } from "react-icons/fa";
+import React, { useContext, useEffect, useState } from 'react';
+
 import {
     anyBetsExist,
     cloneArray,
@@ -29,12 +31,7 @@ import {
     sortedIndices,
 } from "./util";
 import { computeBinaryToPirates, computePiratesBinary } from "./maths";
-import {
-    AddIcon,
-    ChevronDownIcon,
-    CopyIcon,
-    DeleteIcon,
-} from "@chakra-ui/icons";
+import RoundContext from "./RoundState";
 import SettingsBox from "./components/SettingsBox";
 
 const cartesian = (...a) =>
@@ -479,8 +476,14 @@ const BetFunctions = (props) => {
                     <Menu>
                         <MenuButton
                             as={Button}
-                            leftIcon={<AddIcon />}
-                            rightIcon={<ChevronDownIcon />}
+                            leftIcon={<Icon as={FaPlus} />}
+                            rightIcon={
+                                <Icon
+                                    as={FaChevronDown}
+                                    w="0.75em"
+                                    h="0.75em"
+                                />
+                            }
                             aria-label="Add New Bet Set"
                         >
                             New
@@ -521,14 +524,14 @@ const BetFunctions = (props) => {
                     </Menu>
 
                     <Button
-                        leftIcon={<CopyIcon />}
+                        leftIcon={<Icon as={FaCopy} />}
                         aria-label="Clone Current Bet Set"
                         onClick={cloneSet}
                     >
                         Clone
                     </Button>
                     <Button
-                        leftIcon={<DeleteIcon />}
+                        leftIcon={<Icon as={FaTrash} />}
                         aria-label="Delete Current Bet Set"
                         onClick={deleteSet}
                     >
