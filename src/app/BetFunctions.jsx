@@ -10,7 +10,6 @@ import {
     MenuGroup,
     MenuItem,
     MenuList,
-    Portal,
     Stack,
     Text,
     Wrap,
@@ -488,39 +487,37 @@ const BetFunctions = (props) => {
                         >
                             New
                         </MenuButton>
-                        <Portal>
-                            <MenuList>
-                                <MenuGroup>
-                                    <MenuItem onClick={newEmptySet}>
-                                        Empty set
-                                    </MenuItem>
-                                </MenuGroup>
-                                <MenuDivider />
-                                <MenuGroup title="Generate a set">
-                                    <MenuItem onClick={merSet}>
-                                        Max TER set
-                                    </MenuItem>
-                                    <MenuItem onClick={gambitSet}>
-                                        Gambit set
-                                    </MenuItem>
-                                    <MenuItem
-                                        hidden={winningPiratesBinary === 0}
-                                        onClick={winningGambitSet}
-                                    >
-                                        Winning Gambit set
-                                    </MenuItem>
-                                    <MenuItem onClick={randomCrazySet}>
-                                        Random Crazy set
-                                    </MenuItem>
-                                    <MenuItem
-                                        onClick={bustproofSet}
-                                        isDisabled={positiveArenas === 0}
-                                    >
-                                        Bustproof Set
-                                    </MenuItem>
-                                </MenuGroup>
-                            </MenuList>
-                        </Portal>
+                        <MenuList>
+                            <MenuGroup>
+                                <MenuItem onClick={newEmptySet}>
+                                    Empty set
+                                </MenuItem>
+                            </MenuGroup>
+                            <MenuDivider />
+                            <MenuGroup title="Generate a set">
+                                <MenuItem onClick={merSet}>
+                                    Max TER set
+                                </MenuItem>
+                                <MenuItem onClick={gambitSet}>
+                                    Gambit set
+                                </MenuItem>
+                                <MenuItem
+                                    hidden={winningPiratesBinary === 0}
+                                    onClick={winningGambitSet}
+                                >
+                                    Winning Gambit set
+                                </MenuItem>
+                                <MenuItem onClick={randomCrazySet}>
+                                    Random Crazy set
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={bustproofSet}
+                                    isDisabled={positiveArenas === 0}
+                                >
+                                    Bustproof Set
+                                </MenuItem>
+                            </MenuGroup>
+                        </MenuList>
                     </Menu>
 
                     <Button
