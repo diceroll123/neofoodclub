@@ -18,7 +18,7 @@ import {
     Icon,
 } from "@chakra-ui/react";
 import { FaCopy, FaPlus, FaTrash, FaChevronDown } from "react-icons/fa";
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from "react";
 
 import {
     anyBetsExist,

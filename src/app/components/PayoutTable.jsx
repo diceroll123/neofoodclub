@@ -1,5 +1,3 @@
-import { useContext } from "react";
-import RoundContext from "../RoundState";
 import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import {
     Table,
@@ -12,14 +10,17 @@ import {
     Text,
     IconButton,
 } from "@chakra-ui/react";
-import TextTooltip from "./TextTooltip";
+import React, { useContext } from "react";
+
+import { PIRATE_NAMES } from "../constants";
+import { computePirateBinary } from "../maths";
+import { numberWithCommas, displayAsPercent } from "../util";
+import BetAmountInput from "./BetAmountInput";
 import Pd from "./Pd";
 import PlaceThisBetButton from "./PlaceThisBetButton";
+import RoundContext from "../RoundState";
 import Td from "./Td";
-import BetAmountInput from "./BetAmountInput";
-import { numberWithCommas, displayAsPercent } from "../util";
-import { computePirateBinary } from "../maths";
-import { PIRATE_NAMES } from "../constants";
+import TextTooltip from "./TextTooltip";
 
 // this element is the colorful and informative table full of your bet data
 

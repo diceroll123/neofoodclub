@@ -1,5 +1,3 @@
-import { useContext, useEffect, useState } from "react";
-import RoundContext from "../RoundState";
 import {
     InputGroup,
     InputLeftAddon,
@@ -9,6 +7,9 @@ import {
     NumberInputField,
     NumberInputStepper,
 } from "@chakra-ui/react";
+import React, { useContext, useEffect, useState } from "react";
+
+import RoundContext from "../RoundState";
 
 // this element is the number input to say which round's data you're viewing
 

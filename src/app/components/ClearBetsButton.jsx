@@ -1,7 +1,8 @@
-import { useContext } from "react";
-import RoundContext from "../RoundState";
 import { Button } from "@chakra-ui/react";
+import React, { useContext } from "react";
+
 import { makeEmptyBets, makeEmptyBetAmounts } from "../util";
+import RoundContext from "../RoundState";
 
 // this is the "Clear" button on top of the bet table
 

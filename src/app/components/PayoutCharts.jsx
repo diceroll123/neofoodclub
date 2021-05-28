@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { Chart, Scatter } from "react-chartjs-2";
 import {
     HStack,
     Table,
@@ -8,18 +8,18 @@ import {
     Tr,
     useColorMode,
 } from "@chakra-ui/react";
+import React, { useContext } from "react";
+import annotationPlugin from "chartjs-plugin-annotation";
+
 import {
     amountAbbreviation,
     displayAsPercent,
     numberWithCommas,
 } from "../util";
-import TextTooltip from "./TextTooltip";
-import Td from "./Td";
-
-import { Chart, Scatter } from "react-chartjs-2";
 import RoundContext from "../RoundState";
+import Td from "./Td";
+import TextTooltip from "./TextTooltip";
 
-import annotationPlugin from "chartjs-plugin-annotation";
 Chart.register(annotationPlugin);
 
 // this element contains the odds/winnings tables + charts

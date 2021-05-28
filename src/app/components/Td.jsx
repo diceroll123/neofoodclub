@@ -1,4 +1,5 @@
 import { Td as OriginalTd } from "@chakra-ui/react";
+import React from "react";
 
 // this element is a chakra <Td> but with less y-padding, to make our tables a little less large
 

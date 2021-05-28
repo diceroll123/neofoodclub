@@ -5,7 +5,8 @@ import {
     NumberInputField,
     NumberInputStepper,
 } from "@chakra-ui/react";
-import { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
+
 import RoundContext from "../RoundState";
 
 // this is the number input element next to bets

@@ -1,4 +1,3 @@
-import { useContext, useState } from "react";
 import {
     NumberDecrementStepper,
     NumberIncrementStepper,
@@ -6,7 +5,9 @@ import {
     NumberInputField,
     NumberInputStepper,
 } from "@chakra-ui/react";
+import { useContext, useState } from "react";
 import produce from "immer";
+
 import RoundContext from "../RoundState";
 
 // this element is the numnber input for custom probabilities

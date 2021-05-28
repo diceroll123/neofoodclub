@@ -1,6 +1,3 @@
-import { useState, useContext } from "react";
-import RoundContext from "../RoundState";
-import { determineBetAmount, getMaxBet, createBetURL } from "../util";
 import {
     Button,
     Stack,
@@ -9,12 +6,17 @@ import {
     HStack,
     useToast,
     useClipboard,
+    Icon,
 } from "@chakra-ui/react";
-import SettingsBox from "./SettingsBox";
+import { FaLink } from "react-icons/fa";
+import Cookies from "universal-cookie/es6";
+import React, { useState, useContext } from "react";
+
+import { determineBetAmount, getMaxBet, createBetURL } from "../util";
 import ExtraBox from "./ExtraBox";
 import HorizontalScrollingBox from "./HorizontalScrollingBox";
-import Cookies from "universal-cookie/es6";
-import { LinkIcon } from "@chakra-ui/icons";
+import RoundContext from "../RoundState";
+import SettingsBox from "./SettingsBox";
 
 // these are the "Set all to max" + copy url buttons
 
@@ -54,7 +56,7 @@ const CopyLinkButtons = () => {
                 <ButtonGroup size="sm" isAttached variant="outline">
                     <Button
                         mr="-px"
-                        leftIcon={<LinkIcon />}
+                        leftIcon={<Icon as={FaLink} />}
                         onClick={() => copier(urlClip, "Bet URL copied!")}
                     >
                         Copy URL

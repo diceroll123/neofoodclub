@@ -1,4 +1,3 @@
-import { useContext, useState } from "react";
 import {
     HStack,
     RadioGroup,
@@ -8,12 +7,14 @@ import {
     Button,
     Checkbox,
 } from "@chakra-ui/react";
-import RoundContext from "../RoundState";
-import { getTableMode } from "../util";
 import Cookies from "universal-cookie/es6";
+import React, { useContext, useState } from "react";
+
+import { getTableMode } from "../util";
 import ExtraBox from "./ExtraBox";
-import SettingsBox from "./SettingsBox";
 import HorizontalScrollingBox from "./HorizontalScrollingBox";
+import RoundContext from "../RoundState";
+import SettingsBox from "./SettingsBox";
 
 // the element that has table settings such as big brain mode, and the table modes
 

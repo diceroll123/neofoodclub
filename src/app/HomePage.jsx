@@ -1,9 +1,10 @@
-import React from "react";
-import TheTable from "./TheTable";
-import Header from "./Header";
-import Footer from "./Footer";
 import { Box, useTheme, useColorModeValue } from "@chakra-ui/react";
+import React from "react";
+
+import Footer from "./Footer";
+import Header from "./Header";
 import TableSettings from "./components/TableSettings";
+import TheTable from "./TheTable";
 
 export default function HomePage() {
     const theme = useTheme();

@@ -1,5 +1,4 @@
-import { useContext } from "react";
-import RoundContext from "../RoundState";
+import { FaCode, FaMarkdown } from "react-icons/fa";
 import {
     useClipboard,
     useToast,
@@ -8,10 +7,12 @@ import {
     Icon,
     Box,
 } from "@chakra-ui/react";
-import { createBetURL, displayAsPercent } from "../util";
+import React, { useContext } from "react";
+
 import { PIRATE_NAMES } from "../constants";
+import { createBetURL, displayAsPercent } from "../util";
+import RoundContext from "../RoundState";
 import SettingsBox from "./SettingsBox";
-import { FaCode, FaMarkdown } from "react-icons/fa";
 
 // this is the "copy markdown/html"... code
 // previously known as the reddit table code

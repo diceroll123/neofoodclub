@@ -1,11 +1,13 @@
-import React, { useEffect, useCallback, useReducer } from "react";
-import RoundContext from "./RoundState";
-import HomePage from "./HomePage";
-import { getTableMode, createBetURL, parseBetUrl, reducer } from "./util";
-import useRoundData from "./useRoundData";
-import firebase from "firebase/app";
 import "firebase/database";
+
 import { ChakraProvider } from "@chakra-ui/react";
+import React, { useEffect, useCallback, useReducer } from "react";
+import firebase from "firebase/app";
+
+import { getTableMode, createBetURL, parseBetUrl, reducer } from "./util";
+import HomePage from "./HomePage";
+import RoundContext from "./RoundState";
+import useRoundData from "./useRoundData";
 
 const config = {
     apiKey: "AIzaSyA1AJzRRbOTh7iVZi4DfK9lBuSJnfTTbr4",

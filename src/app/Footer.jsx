@@ -1,4 +1,3 @@
-import React from "react";
 import {
     Box,
     Divider,
@@ -9,6 +8,7 @@ import {
     Tooltip,
 } from "@chakra-ui/react";
 import { FaGithub, FaCoffee } from "react-icons/fa";
+import React from "react";
 
 function FooterLink(props) {
     const { icon, href, label } = props;
@@ -54,7 +54,8 @@ function Footer(props) {
                     Website, design, and code © neofood.club
                 </Text>
                 <Text fontSize="sm">
-                    This is an unofficial Neopets fansite with no affiliation/endorsement with Neopets.
+                    This is an unofficial Neopets fansite with no
+                    affiliation/endorsement with Neopets.
                 </Text>
                 <Text fontSize="sm">
                     © Neopets, Inc. All rights reserved. Used With Permission

@@ -1,4 +1,5 @@
-import { Flex } from "@chakra-ui/react"
+import { Flex } from "@chakra-ui/react";
+import React from "react";
 
 // this element is the gray box that contains other elements, for example the "copy markdown code" button
 

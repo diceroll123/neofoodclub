@@ -12,8 +12,15 @@ import {
     Thead,
     Tr,
 } from "@chakra-ui/react";
-import { useContext } from "react";
-import RoundContext from "./RoundState";
+import React, { useContext } from "react";
+
+import {
+    ARENA_NAMES,
+    FOODS,
+    NEGATIVE_FAS,
+    PIRATE_NAMES,
+    POSITIVE_FAS,
+} from "./constants";
 import {
     calculateArenaRatios,
     calculatePayoutTables,
@@ -23,29 +30,22 @@ import {
     computeProbabilities,
 } from "./maths";
 import { displayAsPercent } from "./util";
-import {
-    ARENA_NAMES,
-    FOODS,
-    NEGATIVE_FAS,
-    PIRATE_NAMES,
-    POSITIVE_FAS,
-} from "./constants";
-
+import BetExtras from "./components/BetExtras";
+import BetFunctions from "./BetFunctions";
 import BigBrainElement from "./components/BigBrainElement";
+import ClearBetsButton from "./components/ClearBetsButton";
+import CopyPayouts from "./components/CopyPayouts";
+import CustomOddsElement from "./components/CustomOddsElement";
 import CustomOddsInput from "./components/CustomOddsInput";
 import CustomProbsInput from "./components/CustomProbsInput";
-import CustomOddsElement from "./components/CustomOddsElement";
-import CopyPayouts from "./components/CopyPayouts";
-import PayoutTable from "./components/PayoutTable";
-import ClearBetsButton from "./components/ClearBetsButton";
-import PayoutCharts from "./components/PayoutCharts";
-import TextTooltip from "./components/TextTooltip";
 import FaDetailsElement from "./components/FaDetailsElement";
-import BetExtras from "./components/BetExtras";
 import HorizontalScrollingBox from "./components/HorizontalScrollingBox";
-import Td from "./components/Td";
+import PayoutCharts from "./components/PayoutCharts";
+import PayoutTable from "./components/PayoutTable";
 import Pd from "./components/Pd";
-import BetFunctions from "./BetFunctions";
+import RoundContext from "./RoundState";
+import Td from "./components/Td";
+import TextTooltip from "./components/TextTooltip";
 
 const NormalTable = (props) => {
     let {
