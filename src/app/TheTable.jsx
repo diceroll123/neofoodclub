@@ -839,7 +839,7 @@ export default function TheTable(props) {
                 arenaRatios={arenaRatios}
             />
 
-            {Object.values(betBinaries).reduce(((a, b) => a + b), 0) > 0 && (
+            {Object.values(betBinaries).reduce((a, b) => a + b, 0) > 0 && (
                 <>
                     <BetExtras
                         background={grayAccent}
