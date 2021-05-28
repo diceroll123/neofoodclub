@@ -38,7 +38,7 @@ function Footer(props) {
     return (
         <Box as="footer" mb="3rem" mt={12} textAlign="center" {...props}>
             <Divider />
-            <Box pt={6}>
+            <Box p={6}>
                 <Text fontSize="sm">
                     Made by{" "}
                     <Link href="https://github.com/diceroll123" isExternal>
