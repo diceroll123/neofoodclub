@@ -1,5 +1,5 @@
 {
-  "short_name": "NeoFoodClub",
+  "short_name": "NFC",
   "name": "NeoFoodClub",
   "icons": [
     {
@@ -27,6 +27,6 @@
   "url": "https://neofood.club/",
   "lang": "en",
   "display": "standalone",
-  "background_color": "",
+  "background_color": "#2d3748",
   "orientation": "any"
 }
