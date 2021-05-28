@@ -1,12 +1,19 @@
 import { useContext } from "react";
 import RoundContext from "../RoundState";
-import { useClipboard, useToast, Button, Icon, Box } from "@chakra-ui/react";
+import {
+    useClipboard,
+    useToast,
+    Button,
+    ButtonGroup,
+    Icon,
+    Box,
+} from "@chakra-ui/react";
 import { createBetURL, displayAsPercent } from "../util";
 import { PIRATE_NAMES } from "../constants";
 import SettingsBox from "./SettingsBox";
-import { CopyIcon } from "@chakra-ui/icons";
+import { FaCode, FaMarkdown } from "react-icons/fa";
 
-// this is the "copy markdown table code"... code
+// this is the "copy markdown/html"... code
 // previously known as the reddit table code
 
 const CopyPayouts = (props) => {
@@ -16,6 +23,7 @@ const CopyPayouts = (props) => {
     const toast = useToast();
 
     function createMarkdownTables() {
+        // specifically meant to not be posted on Neopets, so it includes a URL.
         if (payoutTables.odds === undefined) {
             return null;
         }
@@ -72,33 +80,84 @@ const CopyPayouts = (props) => {
         return lines.join("\n");
     }
 
-    const tableCode = createMarkdownTables();
+    function createHtmlTables() {
+        // specifically meant to be posted on Neopets, so it includes the bet hash
+        if (payoutTables.odds === undefined) {
+            return null;
+        }
 
-    const urlClip = useClipboard(tableCode);
+        // bet table
+        let html =
+            "<table><thead><tr><th>Bet</th><th>Shipwreck</th><th>Lagoon</th><th>Treasure</th><th>Hidden</th><th>Harpoon</th></tr></thead><tbody>";
 
-    // disable if there's not a bet url in the code
-    let disabled = tableCode === null || tableCode.includes("&b=") === false;
+        for (let betNum in roundState.bets) {
+            if (betBinaries[betNum] > 0) {
+                let str = `<tr><td>${betNum}</td>`;
+                for (let i = 0; i < 5; i++) {
+                    str += "<td>";
+                    let pirateId =
+                        roundState.roundData.pirates[i][
+                            roundState.bets[betNum][i] - 1
+                        ];
+                    if (pirateId) {
+                        str += PIRATE_NAMES[pirateId];
+                    }
+                    str += "</td>";
+                }
+                html += str;
+                html += "</tr>";
+            }
+        }
+
+        const hash = createBetURL(roundState);
+        html += `</tbody><tfoot><tr><td colspan="6">${hash}</td></tr></tfoot></table>`;
+
+        return html;
+    }
+
+    const markdown = createMarkdownTables();
+    const markdownClip = useClipboard(markdown);
+
+    const html = createHtmlTables();
+    const htmlClip = useClipboard(html);
 
     return (
         <SettingsBox mt={4} {...rest}>
             <Box p={4}>
-                <Button
-                    isDisabled={disabled}
-                    leftIcon={<CopyIcon w="1.4em" h="1.4em" />}
-                    variant="outline"
-                    onClick={() => {
-                        urlClip.onCopy();
-                        toast.closeAll();
-                        toast({
-                            title: `Markdown code copied!`,
-                            status: "success",
-                            duration: 5000,
-                            isClosable: true,
-                        });
-                    }}
-                >
-                    Copy markdown table code
-                </Button>
+                <ButtonGroup isAttached>
+                    <Button
+                        leftIcon={<Icon as={FaMarkdown} w="1.4em" h="1.4em" />}
+                        variant="outline"
+                        onClick={() => {
+                            markdownClip.onCopy();
+                            toast.closeAll();
+                            toast({
+                                title: `Table Markdown copied!`,
+                                status: "success",
+                                duration: 2000,
+                                isClosable: true,
+                            });
+                        }}
+                    >
+                        Copy Markdown
+                    </Button>
+                    <Button
+                        leftIcon={<Icon as={FaCode} w="1.4em" h="1.4em" />}
+                        variant="outline"
+                        onClick={() => {
+                            htmlClip.onCopy();
+                            toast.closeAll();
+                            toast({
+                                title: `Table HTML copied!`,
+                                status: "success",
+                                duration: 2000,
+                                isClosable: true,
+                            });
+                        }}
+                    >
+                        Copy HTML
+                    </Button>
+                </ButtonGroup>
             </Box>
         </SettingsBox>
     );
