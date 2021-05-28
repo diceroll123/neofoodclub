@@ -24,19 +24,21 @@ import {
     useToast,
     VStack,
 } from "@chakra-ui/react";
-import Moment from "react-moment";
-import { SunIcon, MoonIcon } from "@chakra-ui/icons";
-import { useContext, useEffect, useState } from "react";
-import RoundInput from "./components/RoundInput";
-import RoundContext from "./RoundState";
-import moment from "moment";
+import { FaMoon, FaSun } from "react-icons/fa";
 import { useViewportScroll } from "framer-motion";
+import Cookies from "universal-cookie/es6";
+import Moment from "react-moment";
+import React, { useContext, useEffect, useState } from "react";
+import moment from "moment";
+
 import {
     calculateBaseMaxBet,
     calculateRoundOverPercentage,
     getMaxBet,
 } from "./util";
-import Cookies from "universal-cookie/es6";
+import RoundContext from "./RoundState";
+import RoundInput from "./components/RoundInput";
+
 moment.relativeTimeThreshold("ss", 0);
 
 function ColorModeButton() {
@@ -47,7 +49,7 @@ function ColorModeButton() {
         <Tooltip label={label}>
             <IconButton
                 onClick={toggleColorMode}
-                icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
             />
         </Tooltip>
     );
