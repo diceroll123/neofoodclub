@@ -30,6 +30,7 @@ import Cookies from "universal-cookie/es6";
 import Moment from "react-moment";
 import React, { useContext, useEffect, useState } from "react";
 import moment from "moment";
+import NeopointIcon from "./images/np-icon.svg";
 
 import {
     calculateBaseMaxBet,
@@ -150,7 +151,7 @@ function RoundInfo() {
         }
     }
 
-    return <Box display={{ base: "none", md: "block" }}>{element}</Box>;
+    return <Box display={{ base: "none", sm: "block" }}>{element}</Box>;
 }
 
 function MaxBetInput() {
@@ -228,21 +229,38 @@ function MaxBetInput() {
 function TitleHeading(props) {
     return (
         <>
-            <Heading
-                fontSize="xl"
-                display={{ base: "none", lg: "block" }}
-                {...props}
-            >
-                NeoFoodClub
-            </Heading>
-
-            <Heading
-                fontSize="sm"
-                display={{ base: "block", lg: "none" }}
-                {...props}
-            >
-                NFC
-            </Heading>
+            <HStack display={{ base: "none", md: "block" }}>
+                <Box
+                    as="img"
+                    src={NeopointIcon}
+                    height="2em"
+                    width="2em"
+                    display={{ base: "none", md: "inline-block" }}
+                />
+                <Heading
+                    as="h1"
+                    fontFamily="heading"
+                    fontWeight="bold"
+                    fontSize="xl"
+                    display={{ base: "none", lg: "inline-block" }}
+                >
+                    NeoFoodClub
+                </Heading>
+                <Heading
+                    as="h1"
+                    fontFamily="heading"
+                    fontWeight="bold"
+                    fontSize="xl"
+                    display={{
+                        base: "none",
+                        sm: "none",
+                        md: "inline-block",
+                        lg: "none",
+                    }}
+                >
+                    NFC
+                </Heading>
+            </HStack>
         </>
     );
 }
@@ -259,7 +277,7 @@ function HeaderContent() {
                 justify={"space-between"}
                 align={"center"}
             >
-                <TitleHeading as="h1" fontFamily="heading" fontWeight="bold" />
+                <TitleHeading />
 
                 <Box
                     p={2}
