@@ -66,7 +66,29 @@ export const PIRATE_NAMES = {
     18: "Blackbeard",
     19: "Buck",
     20: "Tailhook",
-}
+};
+export const FULL_PIRATE_NAMES = {
+    1: "Scurvy Dan the Blade",
+    2: "Young Sproggie",
+    3: "Orvinn the First Mate",
+    4: "Lucky McKyriggan",
+    5: "Sir Edmund Ogletree",
+    6: "Peg Leg Percival",
+    7: "Bonnie Pip Culliford",
+    8: "Puffo the Waister",
+    9: "Stuff-A-Roo",
+    10: "Squire Venable",
+    11: "Captain Crossblades",
+    12: "Ol' Stripey",
+    13: "Ned the Skipper",
+    14: "Fairfax the Deckhand",
+    15: "Gooblah the Grarrl",
+    16: "Franchisco Corvallio",
+    17: "Federismo Corvallio",
+    18: "Admiral Blackbeard",
+    19: "Buck Cutlass",
+    20: "The Tailhook Kid",
+};
 export const FOODS = {
     1: "Hotfish",
     2: "Broccoli",
@@ -108,4 +130,4 @@ export const FOODS = {
     38: "Rasmelon",
     39: "Mustard Ice Cream",
     40: "Worm and Leech Pizza"
-}
+};
