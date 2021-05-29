@@ -198,7 +198,7 @@ function MaxBetInput() {
                             roundState.currentSelectedRound
                         );
                         cookies.set("baseMaxBet", baseMaxBet, {
-                            expires: moment().add(28, "days").toDate(),
+                            expires: moment().add(100, "years").toDate(),
                         });
 
                         toast.closeAll();
