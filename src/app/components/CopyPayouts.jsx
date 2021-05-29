@@ -81,7 +81,7 @@ const CopyPayouts = (props) => {
         return lines.join("\n");
     }
 
-    function createHtmlTables() {
+    function createHtmlTable() {
         // specifically meant to be posted on Neopets, so it includes the bet hash
         if (payoutTables.odds === undefined) {
             return null;
@@ -89,7 +89,7 @@ const CopyPayouts = (props) => {
 
         // bet table
         let html =
-            "<table><thead><tr><th>Bet</th><th>Shipwreck</th><th>Lagoon</th><th>Treasure</th><th>Hidden</th><th>Harpoon</th></tr></thead><tbody>";
+            "<table><thead><tr><th>Bet</th><th>Shipwreck</th><th>Lagoon</th><th>Treasure</th><th>Hidden</th><th>Harpoon</th><th>Odds</th></tr></thead><tbody>";
 
         for (let betNum in roundState.bets) {
             if (betBinaries[betNum] > 0) {
@@ -106,12 +106,13 @@ const CopyPayouts = (props) => {
                     str += "</td>";
                 }
                 html += str;
+                html += `<td>${betOdds[betNum]}:1</td>`;
                 html += "</tr>";
             }
         }
 
         const hash = createBetURL(roundState);
-        html += `</tbody><tfoot><tr><td colspan="6">${hash}</td></tr></tfoot></table>`;
+        html += `</tbody><tfoot><tr><td colspan="7">${hash}</td></tr></tfoot></table>`;
 
         return html;
     }
@@ -119,7 +120,7 @@ const CopyPayouts = (props) => {
     const markdown = createMarkdownTables();
     const markdownClip = useClipboard(markdown);
 
-    const html = createHtmlTables();
+    const html = createHtmlTable();
     const htmlClip = useClipboard(html);
 
     return (
