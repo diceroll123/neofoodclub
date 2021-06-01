@@ -507,11 +507,9 @@ const DropDownTable = (props) => {
         <Table size="sm" width="auto" {...rest}>
             <Thead>
                 <Tr>
-                    <Th>Shipwreck</Th>
-                    <Th>Lagoon</Th>
-                    <Th>Treasure</Th>
-                    <Th>Hidden</Th>
-                    <Th>Harpoon</Th>
+                    {ARENA_NAMES.map((arenaName, arenaId) => {
+                        return <Th>{arenaName}</Th>;
+                    })}
                     <Th>
                         <ClearBetsButton />
                     </Th>
