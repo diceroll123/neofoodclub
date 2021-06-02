@@ -61,8 +61,10 @@ const PayoutTable = (props) => {
             if ((winningBetBinary & betBinary) === betBinary) {
                 // bet won
                 totalWinningOdds += betOdds[betIndex];
-                totalWinningPayoff +=
-                    betOdds[betIndex] * roundState.betAmounts[betIndex];
+                totalWinningPayoff += Math.min(
+                    betOdds[betIndex] * roundState.betAmounts[betIndex],
+                    1000000
+                );
             }
         }
     }
