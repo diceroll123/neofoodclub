@@ -39,35 +39,17 @@ const PayoutTable = (props) => {
         red,
         green,
         yellow,
+        totalBetAmounts,
+        totalBetExpectedRatios,
+        totalBetNetExpected,
+        totalWinningPayoff,
+        totalWinningOdds,
+        totalEnabledBets,
         ...rest
     } = props;
 
     const { roundState, setRoundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
-    let totalBetAmounts = 0;
-    let totalBetExpectedRatios = 0;
-    let totalBetNetExpected = 0;
-    let totalWinningPayoff = 0;
-    let totalWinningOdds = 0;
-    let totalEnabledBets = 0;
-
-    for (let betIndex in roundState.bets) {
-        let betBinary = betBinaries[betIndex];
-        if (betBinary > 0) {
-            totalEnabledBets += 1;
-            totalBetAmounts += roundState.betAmounts[betIndex];
-            totalBetExpectedRatios += betExpectedRatios[betIndex];
-            totalBetNetExpected += betNetExpected[betIndex];
-            if ((winningBetBinary & betBinary) === betBinary) {
-                // bet won
-                totalWinningOdds += betOdds[betIndex];
-                totalWinningPayoff += Math.min(
-                    betOdds[betIndex] * roundState.betAmounts[betIndex],
-                    1000000
-                );
-            }
-        }
-    }
 
     function swapBets(index, newIndex) {
         let bets = roundState.bets;

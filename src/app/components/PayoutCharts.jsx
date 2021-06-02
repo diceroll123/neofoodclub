@@ -25,7 +25,16 @@ Chart.register(annotationPlugin);
 // this element contains the odds/winnings tables + charts
 
 const PayoutCharts = (props) => {
-    const { payoutTables, betBinaries, grayAccent } = props;
+    const {
+        payoutTables,
+        betBinaries,
+        grayAccent,
+        totalWinningPayoff,
+        totalWinningOdds,
+        winningBetBinary,
+        red,
+        green,
+    } = props;
     const { roundState } = useContext(RoundContext);
     const { colorMode } = useColorMode();
 
@@ -39,7 +48,7 @@ const PayoutCharts = (props) => {
         for (const dataObj in data) {
             let obj = data[dataObj];
             points.push({
-                x: parseInt(obj.value),
+                x: obj.value,
                 y: obj.probability,
             });
         }
@@ -166,8 +175,24 @@ const PayoutCharts = (props) => {
         let tableRows = Object.keys(data).map((key) => {
             const dataObj = data[key];
 
+            let bgColor = "transparent";
+
+            if (winningBetBinary > 0) {
+                if (
+                    (title === "Odds" && totalWinningOdds === dataObj.value) ||
+                    (title === "Winnings" &&
+                        totalWinningPayoff === dataObj.value)
+                ) {
+                    if (dataObj.value === 0) {
+                        bgColor = red;
+                    } else {
+                        bgColor = green;
+                    }
+                }
+            }
+
             return (
-                <Tr key={key}>
+                <Tr key={key} backgroundColor={bgColor}>
                     <Td isNumeric>{numberWithCommas(dataObj.value)}</Td>
                     <Td isNumeric>
                         <TextTooltip

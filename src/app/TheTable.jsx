@@ -743,6 +743,14 @@ export default function TheTable(props) {
     let payoutTables = {};
     let winningBetBinary = 0;
 
+    // for payouttable + charts:
+    let totalBetAmounts = 0;
+    let totalBetExpectedRatios = 0;
+    let totalBetNetExpected = 0;
+    let totalWinningPayoff = 0;
+    let totalWinningOdds = 0;
+    let totalEnabledBets = 0;
+
     if (roundState.roundData) {
         probabilities = computeProbabilities(
             roundState.roundData,
@@ -798,6 +806,25 @@ export default function TheTable(props) {
             }
         }
 
+        for (let betIndex in roundState.bets) {
+            let betBinary = betBinaries[betIndex];
+            if (betBinary > 0) {
+                totalEnabledBets += 1;
+                totalBetAmounts += roundState.betAmounts[betIndex];
+                totalBetExpectedRatios += betExpectedRatios[betIndex];
+                totalBetNetExpected += betNetExpected[betIndex];
+                if ((winningBetBinary & betBinary) === betBinary) {
+                    // bet won
+                    totalWinningOdds += betOdds[betIndex];
+                    totalWinningPayoff += Math.min(
+                        betOdds[betIndex] * roundState.betAmounts[betIndex],
+                        1000000
+                    );
+                }
+            }
+        }
+
+        // for charts
         payoutTables = calculatePayoutTables(
             roundState,
             probabilities.used,
@@ -860,6 +887,12 @@ export default function TheTable(props) {
                             red={red}
                             yellow={yellow}
                             green={green}
+                            totalBetAmounts={totalBetAmounts}
+                            totalBetExpectedRatios={totalBetExpectedRatios}
+                            totalBetNetExpected={totalBetNetExpected}
+                            totalWinningPayoff={totalWinningPayoff}
+                            totalWinningOdds={totalWinningOdds}
+                            totalEnabledBets={totalEnabledBets}
                         />
                     </HorizontalScrollingBox>
 
@@ -876,6 +909,11 @@ export default function TheTable(props) {
                             payoutTables={payoutTables}
                             betBinaries={betBinaries}
                             grayAccent={grayAccent}
+                            totalWinningPayoff={totalWinningPayoff}
+                            totalWinningOdds={totalWinningOdds}
+                            winningBetBinary={winningBetBinary}
+                            red={red}
+                            green={green}
                         />
                     </HorizontalScrollingBox>
                 </>

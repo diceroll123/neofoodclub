@@ -173,6 +173,7 @@ function tableToList(oddsTable) {
     let cumulative = 0;
     let tail = 1;
     for (let i = 0; i < oddsList.length; i++) {
+        oddsList[i].value = parseInt(oddsList[i].value); // it was converted to a string while sorting
         cumulative += oddsList[i].probability;
         oddsList[i].cumulative = cumulative;
         oddsList[i].tail = tail;
