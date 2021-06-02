@@ -117,7 +117,7 @@ const NormalExtras = (props) => {
                             h={brainSize}
                             style={{
                                 transition:
-                                    "width 0.3s ease-in-out, height 0.3s ease-in-out",
+                                    "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
                             }}
                         />
                     }
