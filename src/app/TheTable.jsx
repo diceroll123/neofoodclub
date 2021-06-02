@@ -176,12 +176,13 @@ const NormalTable = (props) => {
                             <Td rowSpan={5}>{arenaName}</Td>
                             <BigBrainElement as={Td} rowSpan={5} isNumeric>
                                 {roundState.roundData ? (
-                                    <Text>
-                                        {displayAsPercent(
+                                    <TextTooltip
+                                        text={displayAsPercent(
                                             arenaRatios[arenaId],
                                             1
                                         )}
-                                    </Text>
+                                        label={arenaRatios[arenaId] * 100}
+                                    />
                                 ) : (
                                     <Skeleton>
                                         <Box>&nbsp;</Box>
