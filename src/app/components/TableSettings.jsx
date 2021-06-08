@@ -13,7 +13,7 @@ import React, { useContext, useState } from "react";
 import { getTableMode } from "../util";
 import ExtraBox from "./ExtraBox";
 import HorizontalScrollingBox from "./HorizontalScrollingBox";
-import RoundContext from "../RoundState";
+import { RoundContext } from "../RoundState";
 import SettingsBox from "./SettingsBox";
 
 // the element that has table settings such as big brain mode, and the table modes

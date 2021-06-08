@@ -20,32 +20,26 @@ import {
     NEGATIVE_FAS,
     PIRATE_NAMES,
     POSITIVE_FAS,
-} from "./constants";
-import {
-    calculateArenaRatios,
-    calculatePayoutTables,
-    computePirateBinary,
-    computePirateFAs,
-    computePiratesBinary,
-    computeProbabilities,
-} from "./maths";
-import { displayAsPercent } from "./util";
-import BetExtras from "./components/BetExtras";
-import BetFunctions from "./BetFunctions";
-import BigBrainElement from "./components/BigBrainElement";
-import ClearBetsButton from "./components/ClearBetsButton";
-import CopyPayouts from "./components/CopyPayouts";
-import CustomOddsElement from "./components/CustomOddsElement";
-import CustomOddsInput from "./components/CustomOddsInput";
-import CustomProbsInput from "./components/CustomProbsInput";
-import FaDetailsElement from "./components/FaDetailsElement";
-import HorizontalScrollingBox from "./components/HorizontalScrollingBox";
-import PayoutCharts from "./components/PayoutCharts";
-import PayoutTable from "./components/PayoutTable";
-import Pd from "./components/Pd";
-import RoundContext from "./RoundState";
-import Td from "./components/Td";
-import TextTooltip from "./components/TextTooltip";
+} from "../constants";
+import { computePirateBinary } from "../maths";
+import { displayAsPercent, calculateRoundData } from "../util";
+import BetExtras from "../components/BetExtras";
+import BetFunctions from "../BetFunctions";
+import BigBrainElement from "../components/BigBrainElement";
+import ClearBetsButton from "../components/ClearBetsButton";
+import CopyPayouts from "../components/CopyPayouts";
+import CustomOddsElement from "../components/CustomOddsElement";
+import CustomOddsInput from "../components/CustomOddsInput";
+import CustomProbsInput from "../components/CustomProbsInput";
+import FaDetailsElement from "../components/FaDetailsElement";
+import HorizontalScrollingBox from "../components/HorizontalScrollingBox";
+import PayoutCharts from "../components/PayoutCharts";
+import PayoutTable from "../components/PayoutTable";
+import Pd from "../components/Pd";
+import { RoundContext } from "../RoundState";
+import Td from "../components/Td";
+import TextTooltip from "../components/TextTooltip";
+import TableSettings from "../components/TableSettings";
 
 const NormalTable = (props) => {
     let {
@@ -727,123 +721,36 @@ const PirateTable = (props) => {
     return <NormalTable changeBet={changeBet} {...props} />;
 };
 
-export default function TheTable(props) {
+export default function EditBets(props) {
     const { roundState } = useContext(RoundContext);
-    const { blue, green, red, orange, yellow, grayAccent } = props;
+    const { blue, green, red, orange, yellow, grayAccent, getPirateBgColor } =
+        props;
 
-    let probabilities = {};
-    let pirateFAs = {};
-    let arenaRatios = [];
-    let betOdds = {};
-    let betPayoffs = {};
-    let betProbabilities = {};
-    let betExpectedRatios = {};
-    let betNetExpected = {};
-    let betMaxBets = {};
-    let betBinaries = {};
-    let payoutTables = {};
-    let winningBetBinary = 0;
-
-    // for payouttable + charts:
-    let totalBetAmounts = 0;
-    let totalBetExpectedRatios = 0;
-    let totalBetNetExpected = 0;
-    let totalWinningPayoff = 0;
-    let totalWinningOdds = 0;
-    let totalEnabledBets = 0;
-
-    if (roundState.roundData) {
-        probabilities = computeProbabilities(
-            roundState.roundData,
-            roundState.customProbs
-        );
-
-        pirateFAs = computePirateFAs(roundState.roundData);
-        arenaRatios = calculateArenaRatios(roundState.customOdds);
-        winningBetBinary = computePiratesBinary(roundState.roundData.winners);
-
-        // keep the "cache" of bet data up to date
-        for (
-            let betIndex = 1;
-            betIndex <= Object.keys(roundState.bets).length;
-            betIndex++
-        ) {
-            betBinaries[betIndex] = computePiratesBinary(
-                roundState.bets[betIndex]
-            );
-            betOdds[betIndex] = 0;
-            betProbabilities[betIndex] = 0;
-
-            for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
-                let pirateIndex = roundState.bets[betIndex][arenaIndex];
-                if (pirateIndex > 0) {
-                    let odd =
-                        roundState.customOdds[arenaIndex][pirateIndex] ||
-                        roundState.roundData.currentOdds[arenaIndex][
-                            pirateIndex
-                        ];
-                    let prob =
-                        roundState.customProbs[arenaIndex][pirateIndex] ||
-                        probabilities.used[arenaIndex][pirateIndex];
-                    betOdds[betIndex] = (betOdds[betIndex] || 1) * odd;
-                    betProbabilities[betIndex] =
-                        (betProbabilities[betIndex] || 1) * prob;
-                }
-            }
-            // yes, the for-loop above had to be separate.
-            for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
-                betPayoffs[betIndex] = Math.min(
-                    1_000_000,
-                    roundState.betAmounts[betIndex] * betOdds[betIndex]
-                );
-                betExpectedRatios[betIndex] =
-                    betOdds[betIndex] * betProbabilities[betIndex];
-                betNetExpected[betIndex] =
-                    betPayoffs[betIndex] * betProbabilities[betIndex] -
-                    roundState.betAmounts[betIndex];
-                betMaxBets[betIndex] = Math.floor(
-                    1_000_000 / betOdds[betIndex]
-                );
-            }
-        }
-
-        for (let betIndex in roundState.bets) {
-            let betBinary = betBinaries[betIndex];
-            if (betBinary > 0) {
-                totalEnabledBets += 1;
-                totalBetAmounts += roundState.betAmounts[betIndex];
-                totalBetExpectedRatios += betExpectedRatios[betIndex];
-                totalBetNetExpected += betNetExpected[betIndex];
-                if ((winningBetBinary & betBinary) === betBinary) {
-                    // bet won
-                    totalWinningOdds += betOdds[betIndex];
-                    totalWinningPayoff += Math.min(
-                        betOdds[betIndex] * roundState.betAmounts[betIndex],
-                        1000000
-                    );
-                }
-            }
-        }
-
-        // for charts
-        payoutTables = calculatePayoutTables(
-            roundState,
-            probabilities.used,
-            betOdds,
-            betPayoffs
-        );
-    }
-
-    function getPirateBgColor(openingOdds) {
-        // for the cell that has the pirate name in the big table
-        if ([3, 4, 5].includes(openingOdds)) return blue;
-        if ([6, 7, 8, 9].includes(openingOdds)) return orange;
-        if ([10, 11, 12, 13].includes(openingOdds)) return red;
-        return green;
-    }
+    let {
+        probabilities,
+        pirateFAs,
+        arenaRatios,
+        betOdds,
+        betPayoffs,
+        betProbabilities,
+        betExpectedRatios,
+        betNetExpected,
+        betMaxBets,
+        betBinaries,
+        payoutTables,
+        winningBetBinary,
+        totalBetAmounts,
+        totalBetExpectedRatios,
+        totalBetNetExpected,
+        totalWinningPayoff,
+        totalWinningOdds,
+        totalEnabledBets,
+    } = calculateRoundData(roundState);
 
     return (
         <>
+            <TableSettings background={grayAccent} />
+
             <HorizontalScrollingBox>
                 <PirateTable
                     m={4}

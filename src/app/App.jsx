@@ -1,12 +1,12 @@
 import "firebase/database";
 
 import { ChakraProvider } from "@chakra-ui/react";
-import React, { useEffect, useCallback, useReducer } from "react";
+import React, { useEffect, useCallback, useReducer, useContext } from "react";
 import firebase from "firebase/app";
 
 import { getTableMode, createBetURL, parseBetUrl, reducer } from "./util";
 import HomePage from "./HomePage";
-import RoundContext from "./RoundState";
+import { RoundContext } from "./RoundState";
 import useRoundData from "./useRoundData";
 
 const config = {
@@ -25,24 +25,7 @@ if (!firebase.apps.length) {
 }
 
 function App() {
-    const initialState = parseBetUrl();
-
-    const [roundState, setRoundState] = useReducer(reducer, {
-        roundData: null,
-        currentRound: null,
-        currentSelectedRound: initialState.round,
-        bets: initialState.bets,
-        betAmounts: initialState.betAmounts,
-        customOdds: null,
-        customProbs: null,
-        tableMode: getTableMode(),
-        advanced: {
-            bigBrain: true,
-            faDetails: false,
-            customOddsMode: false,
-            oddsTimeline: false,
-        },
-    });
+    const { roundState, setRoundState } = useContext(RoundContext);
 
     useRoundStateURLs(roundState, setRoundState);
 
@@ -53,34 +36,34 @@ function App() {
 
     // If we don't have a selected round yet, initialize it to the current round ID, once it loads in.
     useEffect(() => {
+        let data = { currentRound: parseInt(currentRound) };
         if (roundState.currentSelectedRound === null && currentRound) {
-            setRoundState({ currentSelectedRound: parseInt(currentRound) });
+            data = { ...data, currentSelectedRound: parseInt(currentRound) };
         }
+
+        setRoundState(data);
     }, [roundState.currentSelectedRound, currentRound]);
 
-    const mergedRoundState = {
-        ...roundState,
-        currentRound,
-        // If we have custom odds/probs for this round, use them. Otherwise, use the default values.
-        customOdds: roundState.customOdds || roundData?.currentOdds || null,
-        customProbs: roundState.customProbs || [
-            [1, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0],
-        ],
-        roundData,
-    };
+    useEffect(() => {
+        if (currentRound && roundData) {
+            setRoundState({
+                roundData: roundData,
+                customOdds: roundState.customOdds || roundData?.currentOdds,
+                customProbs: roundState.customProbs || [
+                    [1, 0, 0, 0, 0],
+                    [1, 0, 0, 0, 0],
+                    [1, 0, 0, 0, 0],
+                    [1, 0, 0, 0, 0],
+                    [1, 0, 0, 0, 0],
+                ],
+            });
+        }
+    }, [roundData]);
 
     return (
-        <RoundContext.Provider
-            value={{ roundState: mergedRoundState, setRoundState }}
-        >
-            <ChakraProvider>
-                <HomePage />
-            </ChakraProvider>
-        </RoundContext.Provider>
+        <ChakraProvider>
+            <HomePage />
+        </ChakraProvider>
     );
 }
 
@@ -90,7 +73,7 @@ function useRoundStateURLs(roundState, setRoundState) {
             return;
         }
 
-        window.history.replaceState(null, "", createBetURL(roundState));
+        window.history.replaceState(null, "", createBetURL(roundState, false));
     }, [roundState]);
 
     const onHashChange = useCallback(() => {
@@ -102,6 +85,7 @@ function useRoundStateURLs(roundState, setRoundState) {
             currentSelectedRound: data.round,
             bets: data.bets,
             betAmounts: data.betAmounts,
+            viewMode: false,
             roundData:
                 parseInt(data.round) ===
                 parseInt(roundState.currentSelectedRound)

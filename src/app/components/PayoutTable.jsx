@@ -18,7 +18,7 @@ import { numberWithCommas, displayAsPercent } from "../util";
 import BetAmountInput from "./BetAmountInput";
 import Pd from "./Pd";
 import PlaceThisBetButton from "./PlaceThisBetButton";
-import RoundContext from "../RoundState";
+import { RoundContext } from "../RoundState";
 import Td from "./Td";
 import TextTooltip from "./TextTooltip";
 
@@ -78,7 +78,7 @@ const PayoutTable = (props) => {
         <Table size="sm" width="auto" {...rest}>
             <Thead>
                 <Tr>
-                    <Th>Bet</Th>
+                    <Th>Bet #</Th>
                     <Th>Amount</Th>
                     <Th>Odds</Th>
                     <Th>Payoff</Th>
@@ -139,35 +139,42 @@ const PayoutTable = (props) => {
                                         <HStack>
                                             <Spacer />
                                             <Text>{betIndex + 1}</Text>
-                                            <HStack spacing="1px">
-                                                <IconButton
-                                                    size="xs"
-                                                    height="20px"
-                                                    icon={<ArrowUpIcon />}
-                                                    onClick={() =>
-                                                        swapBets(
-                                                            betIndex + 1,
-                                                            betIndex
-                                                        )
-                                                    }
-                                                    isDisabled={betIndex === 0}
-                                                />
-                                                <IconButton
-                                                    size="xs"
-                                                    height="20px"
-                                                    icon={<ArrowDownIcon />}
-                                                    onClick={() =>
-                                                        swapBets(
-                                                            betIndex + 1,
-                                                            betIndex + 2
-                                                        )
-                                                    }
-                                                    isDisabled={
-                                                        betIndex ===
-                                                        amountOfBets - 1
-                                                    }
-                                                />
-                                            </HStack>
+
+                                            {roundState.viewMode === false && (
+                                                <HStack spacing="1px">
+                                                    <IconButton
+                                                        size="xs"
+                                                        height="20px"
+                                                        icon={<ArrowUpIcon />}
+                                                        onClick={() =>
+                                                            swapBets(
+                                                                betIndex + 1,
+                                                                betIndex
+                                                            )
+                                                        }
+                                                        isDisabled={
+                                                            betIndex === 0
+                                                        }
+                                                    />
+                                                    <IconButton
+                                                        size="xs"
+                                                        height="20px"
+                                                        icon={<ArrowDownIcon />}
+                                                        onClick={() =>
+                                                            swapBets(
+                                                                betIndex + 1,
+                                                                betIndex + 2
+                                                            )
+                                                        }
+                                                        isDisabled={
+                                                            betIndex ===
+                                                            amountOfBets - 1
+                                                        }
+                                                    />
+                                                </HStack>
+                                            )}
+
+                                            <Spacer />
                                         </HStack>
                                     </Pd>
                                     <Pd>

@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
-import RoundContext from "../RoundState";
+import { RoundContext } from "../RoundState";
 
 // this element will only show children (which are only expected to be food data in the normal table) if they exist and the FA checkbox is checked
 

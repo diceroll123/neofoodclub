@@ -16,7 +16,7 @@ import {
     displayAsPercent,
     numberWithCommas,
 } from "../util";
-import RoundContext from "../RoundState";
+import { RoundContext } from "../RoundState";
 import Td from "./Td";
 import TextTooltip from "./TextTooltip";
 

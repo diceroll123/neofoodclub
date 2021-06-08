@@ -5,11 +5,14 @@ import App from "./app/App";
 import FaviconGenerator from "./app/FaviconGenerator";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import reportWebVitals from "./reportWebVitals";
+import { StateProvider } from "./app/RoundState";
 
 ReactDOM.render(
     <React.StrictMode>
         <FaviconGenerator />
-        <App />
+        <StateProvider>
+            <App />
+        </StateProvider>
     </React.StrictMode>,
     document.getElementById("root")
 );

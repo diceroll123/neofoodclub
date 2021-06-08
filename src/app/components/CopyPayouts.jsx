@@ -11,7 +11,7 @@ import React, { useContext } from "react";
 
 import { PIRATE_NAMES } from "../constants";
 import { createBetURL, displayAsPercent } from "../util";
-import RoundContext from "../RoundState";
+import { RoundContext } from "../RoundState";
 import SettingsBox from "./SettingsBox";
 
 // this is the "copy markdown/html"... code
@@ -126,10 +126,9 @@ const CopyPayouts = (props) => {
     return (
         <SettingsBox mt={4} {...rest}>
             <Box p={4}>
-                <ButtonGroup isAttached>
+                <ButtonGroup>
                     <Button
                         leftIcon={<Icon as={FaMarkdown} w="1.4em" h="1.4em" />}
-                        variant="outline"
                         onClick={() => {
                             markdownClip.onCopy();
                             toast.closeAll();
@@ -145,7 +144,6 @@ const CopyPayouts = (props) => {
                     </Button>
                     <Button
                         leftIcon={<Icon as={FaCode} w="1.4em" h="1.4em" />}
-                        variant="outline"
                         onClick={() => {
                             htmlClip.onCopy();
                             toast.closeAll();

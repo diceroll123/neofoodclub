@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
-import RoundContext from "../RoundState";
+import { RoundContext } from "../RoundState";
 
 // elements inside of this element will only show when custom mode is on
 

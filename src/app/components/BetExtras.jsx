@@ -12,11 +12,12 @@ import { FaLink } from "react-icons/fa";
 import Cookies from "universal-cookie/es6";
 import React, { useState, useContext } from "react";
 
-import { determineBetAmount, getMaxBet, createBetURL } from "../util";
+import { createBetURL } from "../util";
 import ExtraBox from "./ExtraBox";
 import HorizontalScrollingBox from "./HorizontalScrollingBox";
-import RoundContext from "../RoundState";
+import { RoundContext } from "../RoundState";
 import SettingsBox from "./SettingsBox";
+import SetAllToMaxButton from "./SetAllToMaxButton";
 
 // these are the "Set all to max" + copy url buttons
 
@@ -53,7 +54,7 @@ const CopyLinkButtons = () => {
     return (
         <ExtraBox whiteSpace="nowrap">
             <Stack>
-                <ButtonGroup size="sm" isAttached variant="outline">
+                <ButtonGroup size="sm" isAttached>
                     <Button
                         mr="-px"
                         leftIcon={<Icon as={FaLink} />}
@@ -91,39 +92,15 @@ const CopyLinkButtons = () => {
 
 const BetExtras = (props) => {
     const { betOdds, betBinaries, ...rest } = props;
-    const { roundState, setRoundState } = useContext(RoundContext);
-
-    function setAllBets(value) {
-        let betAmounts = { ...roundState.betAmounts };
-        for (let index in roundState.betAmounts) {
-            if (betBinaries[index] > 0) {
-                betAmounts[index] = determineBetAmount(
-                    value,
-                    Math.ceil(1000000 / betOdds[index])
-                );
-            } else {
-                betAmounts[index] = -1000;
-            }
-        }
-        setRoundState({ betAmounts });
-    }
 
     return (
         <SettingsBox mt={4} {...rest}>
             <HorizontalScrollingBox whiteSpace="nowrap" p={4}>
                 <HStack>
-                    <Button
-                        minWidth="unset"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                            setAllBets(
-                                getMaxBet(roundState.currentSelectedRound)
-                            );
-                        }}
-                    >
-                        Set all to max
-                    </Button>
+                    <SetAllToMaxButton
+                        betOdds={betOdds}
+                        betBinaries={betBinaries}
+                    />
                     <CopyLinkButtons />
                 </HStack>
             </HorizontalScrollingBox>

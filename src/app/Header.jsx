@@ -37,7 +37,7 @@ import {
     calculateRoundOverPercentage,
     getMaxBet,
 } from "./util";
-import RoundContext from "./RoundState";
+import { RoundContext } from "./RoundState";
 import RoundInput from "./components/RoundInput";
 
 moment.relativeTimeThreshold("ss", 0);

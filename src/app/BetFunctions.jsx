@@ -30,7 +30,7 @@ import {
     sortedIndices,
 } from "./util";
 import { computeBinaryToPirates, computePiratesBinary } from "./maths";
-import RoundContext from "./RoundState";
+import { RoundContext } from "./RoundState";
 import SettingsBox from "./components/SettingsBox";
 
 const cartesian = (...a) =>

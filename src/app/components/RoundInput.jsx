@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
 
-import RoundContext from "../RoundState";
+import { RoundContext } from "../RoundState";
 
 // this element is the number input to say which round's data you're viewing
 

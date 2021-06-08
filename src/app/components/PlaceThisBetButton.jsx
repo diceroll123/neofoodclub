@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/react";
 import React, { useEffect, useContext, useState } from "react";
 
-import RoundContext from "../RoundState";
+import { RoundContext } from "../RoundState";
 
 // this element is the "Place Bet" button inside the PayoutTable
 
