@@ -48,12 +48,13 @@ export default function ViewMode(props) {
                                 setRoundState({ viewMode: false });
                             }}
                         >
-                            Edit These Bets
+                            Edit these bets
                         </Button>
 
                         <SetAllToMaxButton
                             betOdds={betOdds}
                             betBinaries={betBinaries}
+                            width={"100%"}
                         />
                     </VStack>
                 </HorizontalScrollingBox>

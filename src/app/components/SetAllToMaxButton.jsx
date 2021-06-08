@@ -31,6 +31,7 @@ const SetAllToMaxButton = (props) => {
 			onClick={() => {
 				setAllBets(getMaxBet(roundState.currentSelectedRound));
 			}}
+			{...rest}
 		>
 			Set all to max
 		</Button>
