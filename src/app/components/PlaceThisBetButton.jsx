@@ -1,5 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import React, { useEffect, useContext, useState } from "react";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 import { RoundContext } from "../RoundState";
 
@@ -69,13 +70,14 @@ const PlaceThisBetButton = (props) => {
 
     return (
         <Button
+            rightIcon={<ExternalLinkIcon />}
             size="sm"
             onClick={() => {
                 generate_bet_link(bet, betNum);
                 setClicked(true);
             }}
         >
-            {clicked ? "Bet placed!" : "Place this bet!"}
+            {clicked ? "Bet placed!" : "Place bet!"}
         </Button>
     );
 };
