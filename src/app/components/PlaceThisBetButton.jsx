@@ -49,11 +49,10 @@ const PlaceThisBetButton = (props) => {
     function generate_bet_link(bet, betNum) {
         let urlString =
             "http://www.neopets.com/pirates/process_foodclub.phtml?";
+        const pirates = roundState.roundData.pirates;
         for (let i = 0; i < 5; i++) {
             if (bet[i] !== 0) {
-                urlString += `winner${i + 1}=${
-                    roundState.roundData.pirates[i][bet[i] - 1]
-                }&`;
+                urlString += `winner${i + 1}=${pirates[i][bet[i] - 1]}&`;
             }
         }
         for (let i = 0; i < 5; i++) {
