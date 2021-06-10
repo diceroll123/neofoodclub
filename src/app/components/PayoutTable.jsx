@@ -210,7 +210,7 @@ const PayoutTable = (props) => {
                                         {er.toFixed(3)}:1
                                     </Td>
                                     <Td isNumeric backgroundColor={neBg}>
-                                        {ne.toFixed(2)}
+                                        {numberWithCommas(ne.toFixed(2))}
                                     </Td>
                                     <Td isNumeric backgroundColor={mbBg}>
                                         {numberWithCommas(
@@ -303,7 +303,11 @@ const PayoutTable = (props) => {
                             <Th isNumeric>
                                 {totalBetExpectedRatios.toFixed(3)}
                             </Th>
-                            <Th isNumeric>{totalBetNetExpected.toFixed(2)}</Th>
+                            <Th isNumeric>
+                                {numberWithCommas(
+                                    totalBetNetExpected.toFixed(2)
+                                )}
+                            </Th>
                             <Th />
                             <Th />
                             <Th />
