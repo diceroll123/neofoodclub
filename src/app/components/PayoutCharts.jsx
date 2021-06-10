@@ -6,6 +6,7 @@ import {
     Th,
     Thead,
     Tr,
+    Skeleton,
     useColorMode,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
@@ -37,10 +38,6 @@ const PayoutCharts = (props) => {
     } = props;
     const { roundState } = useContext(RoundContext);
     const { colorMode } = useColorMode();
-
-    if (payoutTables.odds === undefined) {
-        return null;
-    }
 
     function makeChart(title, data) {
         let points = [];
@@ -172,6 +169,7 @@ const PayoutCharts = (props) => {
     }
 
     function makeTable(title, data) {
+        data = data || {};
         let tableRows = Object.keys(data).map((key) => {
             const dataObj = data[key];
 
@@ -217,26 +215,28 @@ const PayoutCharts = (props) => {
         });
 
         return (
-            <Table
-                size="sm"
-                width="auto"
-                backgroundColor={grayAccent}
-                borderTopLeftRadius="0.5rem"
-                borderTopRightRadius="0.5rem"
-            >
-                <Thead>
-                    <Tr>
-                        <Th>{title}</Th>
-                        <Th>Probability</Th>
-                        <Th>Cumulative</Th>
-                        <Th>Tail</Th>
-                    </Tr>
-                </Thead>
-                <Tbody>
-                    {tableRows}
-                    {makeChart(title, data)}
-                </Tbody>
-            </Table>
+            <Skeleton isLoaded={roundState.roundData}>
+                <Table
+                    size="sm"
+                    width="auto"
+                    backgroundColor={grayAccent}
+                    borderTopLeftRadius="0.5rem"
+                    borderTopRightRadius="0.5rem"
+                >
+                    <Thead>
+                        <Tr>
+                            <Th>{title}</Th>
+                            <Th>Probability</Th>
+                            <Th>Cumulative</Th>
+                            <Th>Tail</Th>
+                        </Tr>
+                    </Thead>
+                    <Tbody>
+                        {tableRows}
+                        {makeChart(title, data)}
+                    </Tbody>
+                </Table>
+            </Skeleton>
         );
     }
 

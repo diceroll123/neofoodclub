@@ -1,5 +1,7 @@
 import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import {
+    Box,
+    Skeleton,
     Table,
     Thead,
     Th,
@@ -101,7 +103,7 @@ const PayoutTable = (props) => {
                 </Tr>
             </Thead>
 
-            {roundState.roundData && (
+            {roundState.roundData ? (
                 <>
                     <Tbody>
                         {[...Array(amountOfBets)].map((e, betIndex) => {
@@ -318,6 +320,20 @@ const PayoutTable = (props) => {
                         </Tr>
                     </Tbody>
                 </>
+            ) : (
+                <Tbody>
+                    {[...Array(amountOfBets)].map((e, betIndex) => {
+                        return (
+                            <Tr>
+                                <Td colSpan={14}>
+                                    <Skeleton height="30px">
+                                        <Box>&nbsp;</Box>
+                                    </Skeleton>
+                                </Td>
+                            </Tr>
+                        );
+                    })}
+                </Tbody>
             )}
         </Table>
     );
