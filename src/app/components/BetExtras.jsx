@@ -29,12 +29,12 @@ const CopyLinkButtons = () => {
         cookies.get("useWebDomain") === "true"
     );
 
-    const betURL = createBetURL(roundState);
-    const amountsBetUrl = createBetURL(roundState, false);
     const origin = useWebDomain ? window.location.origin : "";
 
-    const urlClip = useClipboard(origin + betURL);
-    const urlAmountsClip = useClipboard(origin + amountsBetUrl);
+    const urlClip = useClipboard(origin + createBetURL(roundState));
+    const urlAmountsClip = useClipboard(
+        origin + createBetURL(roundState, false)
+    );
 
     function copier(clip, title) {
         clip.onCopy();
@@ -47,7 +47,7 @@ const CopyLinkButtons = () => {
         });
     }
 
-    if (betURL.includes("&b=") === false) {
+    if (urlClip.value.includes("&b=") === false) {
         return null;
     }
 
@@ -62,7 +62,7 @@ const CopyLinkButtons = () => {
                     >
                         Copy URL
                     </Button>
-                    {amountsBetUrl.includes("&a=") && (
+                    {urlAmountsClip.value.includes("&a=") && (
                         <Button
                             onClick={() =>
                                 copier(
