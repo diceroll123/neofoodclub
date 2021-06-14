@@ -20,6 +20,7 @@ const RoundInput = () => {
     const [roundNumber, setRoundNumber] = useState(
         roundState.currentSelectedRound || 0
     );
+    const [currentRound, setCurrentRound] = useState(0);
     const [hasFocus, setHasFocus] = useState(false);
 
     function changeCurrentSelectedRound(value) {
@@ -42,7 +43,14 @@ const RoundInput = () => {
         if (currentSelected !== null && currentSelected !== roundNumber) {
             setRoundNumber(currentSelected);
         }
-    }, [roundState.currentSelectedRound]);
+
+        if (
+            currentRound !== roundState.currentRound &&
+            roundState.currentRound > 0
+        ) {
+            setCurrentRound(roundState.currentRound);
+        }
+    }, [roundState.currentSelectedRound, roundState.currentRound]);
 
     return (
         <InputGroup size="xs">
@@ -51,7 +59,7 @@ const RoundInput = () => {
                 isDisabled={roundNumber === 0}
                 value={roundNumber}
                 min={1}
-                max={roundState.currentRound}
+                max={currentRound}
                 allowMouseWheel
                 onFocus={(e) => {
                     setHasFocus(true);
