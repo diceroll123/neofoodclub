@@ -14,7 +14,6 @@ import React, { useState, useContext } from "react";
 
 import { createBetURL } from "../util";
 import ExtraBox from "./ExtraBox";
-import HorizontalScrollingBox from "./HorizontalScrollingBox";
 import { RoundContext } from "../RoundState";
 import SettingsBox from "./SettingsBox";
 import SetAllToMaxButton from "./SetAllToMaxButton";
@@ -94,16 +93,14 @@ const BetExtras = (props) => {
     const { betOdds, betBinaries, ...rest } = props;
 
     return (
-        <SettingsBox mt={4} {...rest}>
-            <HorizontalScrollingBox whiteSpace="nowrap" p={4}>
-                <HStack>
-                    <SetAllToMaxButton
-                        betOdds={betOdds}
-                        betBinaries={betBinaries}
-                    />
-                    <CopyLinkButtons />
-                </HStack>
-            </HorizontalScrollingBox>
+        <SettingsBox mt={4} p={4} {...rest}>
+            <Stack>
+                <SetAllToMaxButton
+                    betOdds={betOdds}
+                    betBinaries={betBinaries}
+                />
+                <CopyLinkButtons />
+            </Stack>
         </SettingsBox>
     );
 };

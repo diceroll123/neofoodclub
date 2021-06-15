@@ -47,6 +47,7 @@ export default function ViewMode(props) {
                             onClick={() => {
                                 setRoundState({ viewMode: false });
                             }}
+                            width={"100%"}
                         >
                             Edit these bets
                         </Button>

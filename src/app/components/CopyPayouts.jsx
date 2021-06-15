@@ -5,7 +5,8 @@ import {
     Button,
     ButtonGroup,
     Icon,
-    Box,
+    Wrap,
+    WrapItem,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
@@ -124,9 +125,9 @@ const CopyPayouts = (props) => {
     const htmlClip = useClipboard(html);
 
     return (
-        <SettingsBox mt={4} {...rest}>
-            <Box p={4}>
-                <ButtonGroup>
+        <SettingsBox mt={4} p={4} {...rest}>
+            <Wrap>
+                <WrapItem>
                     <Button
                         leftIcon={<Icon as={FaMarkdown} w="1.4em" h="1.4em" />}
                         onClick={() => {
@@ -142,6 +143,8 @@ const CopyPayouts = (props) => {
                     >
                         Copy Markdown
                     </Button>
+                </WrapItem>
+                <WrapItem>
                     <Button
                         leftIcon={<Icon as={FaCode} w="1.4em" h="1.4em" />}
                         onClick={() => {
@@ -157,8 +160,8 @@ const CopyPayouts = (props) => {
                     >
                         Copy HTML
                     </Button>
-                </ButtonGroup>
-            </Box>
+                </WrapItem>
+            </Wrap>
         </SettingsBox>
     );
 };

@@ -33,7 +33,7 @@ const SetAllToMaxButton = (props) => {
 			}}
 			{...rest}
 		>
-			Set all to max
+			Set bet amounts to max
 		</Button>
 	);
 };
