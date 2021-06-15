@@ -74,7 +74,7 @@ const RoundInput = () => {
 
                     setRoundNumber(value);
 
-                    // debounce number input to 300ms
+                    // debounce number input to 400ms
                     if (timeoutId && typeof timeoutId === "number") {
                         clearTimeout(timeoutId);
                     }
