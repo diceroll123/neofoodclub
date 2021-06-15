@@ -6,12 +6,15 @@ import FaviconGenerator from "./app/FaviconGenerator";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import reportWebVitals from "./reportWebVitals";
 import { StateProvider } from "./app/RoundState";
+import { ChakraProvider } from "@chakra-ui/react";
 
 ReactDOM.render(
     <React.StrictMode>
         <FaviconGenerator />
         <StateProvider>
-            <App />
+            <ChakraProvider>
+                <App />
+            </ChakraProvider>
         </StateProvider>
     </React.StrictMode>,
     document.getElementById("root")

@@ -1,6 +1,5 @@
 import "firebase/database";
 
-import { ChakraProvider } from "@chakra-ui/react";
 import React, { useEffect, useCallback, useReducer, useContext } from "react";
 import firebase from "firebase/app";
 
@@ -60,11 +59,7 @@ function App() {
         }
     }, [roundData]);
 
-    return (
-        <ChakraProvider>
-            <HomePage />
-        </ChakraProvider>
-    );
+    return <HomePage />;
 }
 
 function useRoundStateURLs(roundState, setRoundState) {
