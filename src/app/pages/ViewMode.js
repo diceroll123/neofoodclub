@@ -11,29 +11,9 @@ import { FaEdit } from "react-icons/fa";
 
 export default function ViewMode(props) {
     const { roundState, setRoundState } = useContext(RoundContext);
-    const { blue, green, red, orange, yellow, grayAccent, getPirateBgColor } =
-        props;
+    const { green, red, orange, yellow, grayAccent, getPirateBgColor } = props;
 
-    let {
-        probabilities,
-        pirateFAs,
-        arenaRatios,
-        betOdds,
-        betPayoffs,
-        betProbabilities,
-        betExpectedRatios,
-        betNetExpected,
-        betMaxBets,
-        betBinaries,
-        payoutTables,
-        winningBetBinary,
-        totalBetAmounts,
-        totalBetExpectedRatios,
-        totalBetNetExpected,
-        totalWinningPayoff,
-        totalWinningOdds,
-        totalEnabledBets,
-    } = calculateRoundData(roundState);
+    let calculations = calculateRoundData(roundState);
 
     return (
         <>
@@ -53,8 +33,7 @@ export default function ViewMode(props) {
                         </Button>
 
                         <SetAllToMaxButton
-                            betOdds={betOdds}
-                            betBinaries={betBinaries}
+                            calculations={calculations}
                             width={"100%"}
                         />
                     </VStack>
@@ -62,36 +41,19 @@ export default function ViewMode(props) {
             </SettingsBox>
             <HorizontalScrollingBox>
                 <PayoutTable
-                    betBinaries={betBinaries}
-                    betProbabilities={betProbabilities}
-                    betExpectedRatios={betExpectedRatios}
-                    betNetExpected={betNetExpected}
-                    betOdds={betOdds}
-                    betMaxBets={betMaxBets}
-                    betPayoffs={betPayoffs}
-                    winningBetBinary={winningBetBinary}
+                    calculations={calculations}
                     getPirateBgColor={getPirateBgColor}
                     orange={orange}
                     red={red}
                     yellow={yellow}
                     green={green}
-                    totalBetAmounts={totalBetAmounts}
-                    totalBetExpectedRatios={totalBetExpectedRatios}
-                    totalBetNetExpected={totalBetNetExpected}
-                    totalWinningPayoff={totalWinningPayoff}
-                    totalWinningOdds={totalWinningOdds}
-                    totalEnabledBets={totalEnabledBets}
                 />
             </HorizontalScrollingBox>
 
             <HorizontalScrollingBox mt={4}>
                 <PayoutCharts
-                    payoutTables={payoutTables}
-                    betBinaries={betBinaries}
+                    calculations={calculations}
                     grayAccent={grayAccent}
-                    totalWinningPayoff={totalWinningPayoff}
-                    totalWinningOdds={totalWinningOdds}
-                    winningBetBinary={winningBetBinary}
                     red={red}
                     green={green}
                 />

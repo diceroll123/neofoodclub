@@ -6,7 +6,8 @@ import { FaFillDrip } from "react-icons/fa";
 
 const SetAllToMaxButton = (props) => {
 	const { roundState, setRoundState } = useContext(RoundContext);
-	const { betOdds, betBinaries, ...rest } = props;
+	const { calculations, ...rest } = props;
+	const { betBinaries, betOdds } = calculations;
 
 	function setAllBets(value) {
 		let betAmounts = { ...roundState.betAmounts };

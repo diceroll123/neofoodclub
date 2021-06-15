@@ -3,7 +3,6 @@ import {
     Stack,
     ButtonGroup,
     Checkbox,
-    HStack,
     useToast,
     useClipboard,
     Icon,
@@ -90,15 +89,12 @@ const CopyLinkButtons = () => {
 };
 
 const BetExtras = (props) => {
-    const { betOdds, betBinaries, ...rest } = props;
+    const { calculations, ...rest } = props;
 
     return (
         <SettingsBox mt={4} p={4} {...rest}>
             <Stack>
-                <SetAllToMaxButton
-                    betOdds={betOdds}
-                    betBinaries={betBinaries}
-                />
+                <SetAllToMaxButton calculations={calculations} />
                 <CopyLinkButtons />
             </Stack>
         </SettingsBox>

@@ -37,7 +37,8 @@ const cartesian = (...a) =>
     a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
 
 const BetFunctions = (props) => {
-    const { probabilities, arenaRatios, ...rest } = props;
+    const { calculations, ...rest } = props;
+    const { probabilities, arenaRatios } = calculations;
     const { roundState, setRoundState } = useContext(RoundContext);
     const [currentBet, setCurrentBet] = useState("0");
 

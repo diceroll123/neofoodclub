@@ -1,9 +1,9 @@
 import "firebase/database";
 
-import React, { useEffect, useCallback, useReducer, useContext } from "react";
+import React, { useEffect, useCallback, useContext } from "react";
 import firebase from "firebase/app";
 
-import { getTableMode, createBetURL, parseBetUrl, reducer } from "./util";
+import { createBetURL, parseBetUrl } from "./util";
 import HomePage from "./HomePage";
 import { RoundContext } from "./RoundState";
 import useRoundData from "./useRoundData";

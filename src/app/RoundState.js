@@ -1,11 +1,5 @@
 import { createContext, useReducer } from "react";
-import {
-	getTableMode,
-	reducer,
-	parseBetUrl,
-	makeEmptyBets,
-	makeEmptyBetAmounts,
-} from "./util";
+import { getTableMode, reducer, parseBetUrl } from "./util";
 
 const RoundContext = createContext(null);
 const { Provider } = RoundContext;

@@ -3,7 +3,6 @@ import moment from "moment";
 import {
     calculateArenaRatios,
     calculatePayoutTables,
-    computePirateBinary,
     computePirateFAs,
     computePiratesBinary,
     computeProbabilities,

@@ -43,17 +43,16 @@ import TableSettings from "../components/TableSettings";
 
 const NormalTable = (props) => {
     let {
-        pirateFAs,
-        arenaRatios,
-        probabilities,
+        calculations,
         changeBet,
         getPirateBgColor,
-        winningBetBinary,
         green,
         red,
         yellow,
         grayAccent,
     } = props;
+    const { arenaRatios, winningBetBinary, probabilities, pirateFAs } =
+        calculations;
     const { roundState, setRoundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
 
@@ -723,29 +722,11 @@ const PirateTable = (props) => {
 
 export default function EditBets(props) {
     const { roundState } = useContext(RoundContext);
-    const { blue, green, red, orange, yellow, grayAccent, getPirateBgColor } =
-        props;
+    const { green, red, orange, yellow, grayAccent, getPirateBgColor } = props;
 
-    let {
-        probabilities,
-        pirateFAs,
-        arenaRatios,
-        betOdds,
-        betPayoffs,
-        betProbabilities,
-        betExpectedRatios,
-        betNetExpected,
-        betMaxBets,
-        betBinaries,
-        payoutTables,
-        winningBetBinary,
-        totalBetAmounts,
-        totalBetExpectedRatios,
-        totalBetNetExpected,
-        totalWinningPayoff,
-        totalWinningOdds,
-        totalEnabledBets,
-    } = calculateRoundData(roundState);
+    let calculations = calculateRoundData(roundState);
+
+    const { betBinaries } = calculations;
 
     return (
         <>
@@ -754,11 +735,8 @@ export default function EditBets(props) {
             <HorizontalScrollingBox>
                 <PirateTable
                     m={4}
-                    pirateFAs={pirateFAs}
-                    arenaRatios={arenaRatios}
-                    probabilities={probabilities}
+                    calculations={calculations}
                     getPirateBgColor={getPirateBgColor}
-                    winningBetBinary={winningBetBinary}
                     green={green}
                     red={red}
                     yellow={yellow}
@@ -766,60 +744,35 @@ export default function EditBets(props) {
                 />
             </HorizontalScrollingBox>
 
-            <BetFunctions
-                background={grayAccent}
-                probabilities={probabilities}
-                arenaRatios={arenaRatios}
-            />
+            <BetFunctions background={grayAccent} calculations={calculations} />
 
             {Object.values(betBinaries).reduce((a, b) => a + b, 0) > 0 && (
                 <>
                     <BetExtras
                         background={grayAccent}
-                        betBinaries={betBinaries}
-                        betOdds={betOdds}
+                        calculations={calculations}
                     />
 
                     <HorizontalScrollingBox>
                         <PayoutTable
-                            betBinaries={betBinaries}
-                            betProbabilities={betProbabilities}
-                            betExpectedRatios={betExpectedRatios}
-                            betNetExpected={betNetExpected}
-                            betOdds={betOdds}
-                            betMaxBets={betMaxBets}
-                            betPayoffs={betPayoffs}
-                            winningBetBinary={winningBetBinary}
+                            calculations={calculations}
                             getPirateBgColor={getPirateBgColor}
                             orange={orange}
                             red={red}
                             yellow={yellow}
                             green={green}
-                            totalBetAmounts={totalBetAmounts}
-                            totalBetExpectedRatios={totalBetExpectedRatios}
-                            totalBetNetExpected={totalBetNetExpected}
-                            totalWinningPayoff={totalWinningPayoff}
-                            totalWinningOdds={totalWinningOdds}
-                            totalEnabledBets={totalEnabledBets}
                         />
                     </HorizontalScrollingBox>
 
                     <CopyPayouts
                         background={grayAccent}
-                        betBinaries={betBinaries}
-                        betOdds={betOdds}
-                        betExpectedRatios={betExpectedRatios}
-                        payoutTables={payoutTables}
+                        calculations={calculations}
                     />
 
                     <HorizontalScrollingBox>
                         <PayoutCharts
-                            payoutTables={payoutTables}
-                            betBinaries={betBinaries}
+                            calculations={calculations}
                             grayAccent={grayAccent}
-                            totalWinningPayoff={totalWinningPayoff}
-                            totalWinningOdds={totalWinningOdds}
-                            winningBetBinary={winningBetBinary}
                             red={red}
                             green={green}
                         />

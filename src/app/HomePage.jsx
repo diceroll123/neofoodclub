@@ -7,7 +7,7 @@ import ViewMode from "./pages/ViewMode";
 import EditBets from "./pages/EditBets";
 
 export default function HomePage() {
-    const { roundState, setRoundState } = useContext(RoundContext);
+    const { roundState } = useContext(RoundContext);
     const theme = useTheme();
     const grayAccent = useColorModeValue(
         theme.colors.gray["50"],
@@ -38,7 +38,6 @@ export default function HomePage() {
                         green={green}
                         red={red}
                         orange={orange}
-                        blue={blue}
                         yellow={yellow}
                         grayAccent={grayAccent}
                         getPirateBgColor={getPirateBgColor}
@@ -48,7 +47,6 @@ export default function HomePage() {
                         green={green}
                         red={red}
                         orange={orange}
-                        blue={blue}
                         yellow={yellow}
                         grayAccent={grayAccent}
                         getPirateBgColor={getPirateBgColor}

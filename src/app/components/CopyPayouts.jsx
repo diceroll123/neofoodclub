@@ -3,7 +3,6 @@ import {
     useClipboard,
     useToast,
     Button,
-    ButtonGroup,
     Icon,
     Wrap,
     WrapItem,
@@ -19,8 +18,9 @@ import SettingsBox from "./SettingsBox";
 // previously known as the reddit table code
 
 const CopyPayouts = (props) => {
-    const { payoutTables, betBinaries, betExpectedRatios, betOdds, ...rest } =
-        props;
+    const { calculations, ...rest } = props;
+    const { payoutTables, betBinaries, betExpectedRatios, betOdds } =
+        calculations;
     const { roundState } = useContext(RoundContext);
     const toast = useToast();
 

@@ -26,16 +26,14 @@ Chart.register(annotationPlugin);
 // this element contains the odds/winnings tables + charts
 
 const PayoutCharts = (props) => {
+    const { calculations, grayAccent, red, green } = props;
     const {
         payoutTables,
         betBinaries,
-        grayAccent,
         totalWinningPayoff,
         totalWinningOdds,
         winningBetBinary,
-        red,
-        green,
-    } = props;
+    } = calculations;
     const { roundState } = useContext(RoundContext);
     const { colorMode } = useColorMode();
 

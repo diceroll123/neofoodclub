@@ -28,6 +28,16 @@ import TextTooltip from "./TextTooltip";
 
 const PayoutTable = (props) => {
     const {
+        calculations,
+        getPirateBgColor,
+        orange,
+        red,
+        green,
+        yellow,
+        ...rest
+    } = props;
+
+    const {
         betBinaries,
         betExpectedRatios,
         betProbabilities,
@@ -36,19 +46,13 @@ const PayoutTable = (props) => {
         betPayoffs,
         betMaxBets,
         winningBetBinary,
-        getPirateBgColor,
-        orange,
-        red,
-        green,
-        yellow,
         totalBetAmounts,
         totalBetExpectedRatios,
         totalBetNetExpected,
         totalWinningPayoff,
         totalWinningOdds,
         totalEnabledBets,
-        ...rest
-    } = props;
+    } = calculations;
 
     const { roundState, setRoundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
@@ -270,10 +274,7 @@ const PayoutTable = (props) => {
                                         <PlaceThisBetButton
                                             bet={roundState.bets[betIndex + 1]}
                                             betNum={betIndex + 1}
-                                            betOdds={betOdds}
-                                            betPayoffs={betPayoffs}
-                                            betBinaries={betBinaries}
-                                            winningBetBinary={winningBetBinary}
+                                            calculations={calculations}
                                         />
                                     </Td>
                                 </Tr>
