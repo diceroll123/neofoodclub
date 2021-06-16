@@ -6,11 +6,12 @@ import {
     Icon,
     Wrap,
     WrapItem,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
 import { PIRATE_NAMES } from "../constants";
-import { createBetURL, displayAsPercent, Colors } from "../util";
+import { createBetURL, displayAsPercent } from "../util";
 import { RoundContext } from "../RoundState";
 import SettingsBox from "./SettingsBox";
 
@@ -123,7 +124,7 @@ const CopyPayouts = (props) => {
 
     const html = createHtmlTable();
     const htmlClip = useClipboard(html);
-    const { gray } = Colors();
+    const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
 
     return (
         <SettingsBox mt={4} p={4} bgColor={gray} {...rest}>

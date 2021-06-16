@@ -6,11 +6,12 @@ import {
     Radio,
     Button,
     Checkbox,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import Cookies from "universal-cookie/es6";
 import React, { useContext, useState } from "react";
 
-import { getTableMode, Colors } from "../util";
+import { getTableMode } from "../util";
 import ExtraBox from "./ExtraBox";
 import HorizontalScrollingBox from "./HorizontalScrollingBox";
 import { RoundContext } from "../RoundState";
@@ -181,7 +182,7 @@ const NormalExtras = (props) => {
 };
 
 const TableSettings = (props) => {
-    const { gray } = Colors();
+    const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     return (
         <SettingsBox bgColor={gray} {...props}>
             <HorizontalScrollingBox>

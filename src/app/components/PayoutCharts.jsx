@@ -8,6 +8,7 @@ import {
     Tr,
     Skeleton,
     useColorMode,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import annotationPlugin from "chartjs-plugin-annotation";
@@ -16,7 +17,6 @@ import {
     amountAbbreviation,
     displayAsPercent,
     numberWithCommas,
-    Colors,
 } from "../util";
 import { RoundContext } from "../RoundState";
 import Td from "./Td";
@@ -28,7 +28,9 @@ Chart.register(annotationPlugin);
 
 const PayoutCharts = (props) => {
     const { calculations } = props;
-    const { gray, red, green } = Colors();
+    const green = useColorModeValue("nfc.green", "nfc.greenDark");
+    const red = useColorModeValue("nfc.red", "nfc.redDark");
+    const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     const {
         payoutTables,
         betBinaries,

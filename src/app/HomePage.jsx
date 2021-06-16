@@ -1,4 +1,4 @@
-import { Box, useTheme, useColorModeValue } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import { RoundContext } from "./RoundState";
 import Footer from "./Footer";

@@ -5,7 +5,6 @@ import {
     Stack,
     Text,
     Tooltip,
-    Link,
     Heading,
     Icon,
     Divider,

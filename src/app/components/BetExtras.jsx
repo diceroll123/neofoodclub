@@ -6,12 +6,13 @@ import {
     useToast,
     useClipboard,
     Icon,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import { FaLink } from "react-icons/fa";
 import Cookies from "universal-cookie/es6";
 import React, { useState, useContext } from "react";
 
-import { createBetURL, Colors } from "../util";
+import { createBetURL } from "../util";
 import ExtraBox from "./ExtraBox";
 import { RoundContext } from "../RoundState";
 import SettingsBox from "./SettingsBox";
@@ -90,7 +91,7 @@ const CopyLinkButtons = () => {
 
 const BetExtras = (props) => {
     const { calculations, ...rest } = props;
-    const { gray } = Colors();
+    const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
 
     return (
         <SettingsBox bgColor={gray} mt={4} p={4} {...rest}>

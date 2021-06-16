@@ -11,6 +11,7 @@ import {
     Th,
     Thead,
     Tr,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
@@ -22,12 +23,7 @@ import {
     POSITIVE_FAS,
 } from "../constants";
 import { computePirateBinary } from "../maths";
-import {
-    displayAsPercent,
-    calculateRoundData,
-    PirateBgColor,
-    Colors,
-} from "../util";
+import { displayAsPercent, calculateRoundData } from "../util";
 import BetExtras from "../components/BetExtras";
 import BetFunctions from "../BetFunctions";
 import BigBrainElement from "../components/BigBrainElement";
@@ -56,8 +52,11 @@ const StickyTd = (props) => {
 };
 
 function PirateFA(pirateId, foodId) {
-    const { green, red, yellow } = Colors();
     // returns the FA <td> element for the associated pirate/food
+    const green = useColorModeValue("nfc.green", "nfc.greenDark");
+    const red = useColorModeValue("nfc.red", "nfc.redDark");
+    const yellow = useColorModeValue("nfc.yellow", "nfc.yellowDark");
+
     let pos = POSITIVE_FAS[pirateId][foodId];
     let neg = NEGATIVE_FAS[pirateId][foodId];
 
@@ -91,11 +90,23 @@ function PirateFA(pirateId, foodId) {
 
 const NormalTable = (props) => {
     let { calculations } = props;
-    const { green, red, yellow, gray } = Colors();
+    const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
+    const green = useColorModeValue("nfc.green", "nfc.greenDark");
+    const red = useColorModeValue("nfc.red", "nfc.redDark");
+    const orange = useColorModeValue("nfc.orange", "nfc.orangeDark");
+    const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     const { arenaRatios, winningBetBinary, probabilities, pirateFAs } =
         calculations;
     const { roundState, setRoundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
+
+    function getPirateBgColor(odds) {
+        if ([3, 4, 5].includes(odds)) return blue;
+        if ([6, 7, 8, 9].includes(odds)) return orange;
+        if ([10, 11, 12, 13].includes(odds)) return red;
+
+        return green;
+    }
 
     function changeBet(betIndex, arenaIndex, pirateIndex) {
         // change a single pirate in a single arena
@@ -340,7 +351,9 @@ const NormalTable = (props) => {
                             return (
                                 <Tr key={pirateId} backgroundColor={bgColor}>
                                     <StickyTd
-                                        backgroundColor={PirateBgColor(opening)}
+                                        backgroundColor={getPirateBgColor(
+                                            opening
+                                        )}
                                     >
                                         {PIRATE_NAMES[pirateId]}
                                     </StickyTd>
@@ -491,9 +504,21 @@ const NormalTable = (props) => {
 
 const DropDownTable = (props) => {
     let { winningBetBinary, ...rest } = props;
-    const { green } = Colors();
     const { roundState, setRoundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
+
+    const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
+    const green = useColorModeValue("nfc.green", "nfc.greenDark");
+    const red = useColorModeValue("nfc.red", "nfc.redDark");
+    const orange = useColorModeValue("nfc.orange", "nfc.orangeDark");
+
+    function getPirateBgColor(odds) {
+        if ([3, 4, 5].includes(odds)) return blue;
+        if ([6, 7, 8, 9].includes(odds)) return orange;
+        if ([10, 11, 12, 13].includes(odds)) return red;
+
+        return green;
+    }
 
     function changeBet(betIndex, arenaIndex, pirateIndex) {
         // change a single pirate in a single arena
@@ -561,7 +586,7 @@ const DropDownTable = (props) => {
                                                     ];
 
                                                 let pirateBg =
-                                                    PirateBgColor(opening);
+                                                    getPirateBgColor(opening);
                                                 let trBg = "transparent";
                                                 let pirateBin =
                                                     computePirateBinary(
@@ -646,7 +671,7 @@ const DropDownTable = (props) => {
                                 let pirateBg = "transparent";
 
                                 if (opening > 1) {
-                                    pirateBg = PirateBgColor(opening);
+                                    pirateBg = getPirateBgColor(opening);
                                 }
 
                                 return (
@@ -672,7 +697,7 @@ const DropDownTable = (props) => {
                                                             key={pirateId}
                                                             style={{
                                                                 background:
-                                                                    PirateBgColor(
+                                                                    getPirateBgColor(
                                                                         roundState
                                                                             .roundData
                                                                             .openingOdds[

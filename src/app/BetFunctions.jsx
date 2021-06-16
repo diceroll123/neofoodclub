@@ -15,6 +15,7 @@ import {
     Wrap,
     WrapItem,
     Icon,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import { FaCopy, FaPlus, FaTrash, FaChevronDown } from "react-icons/fa";
 import React, { useContext, useEffect, useState } from "react";
@@ -28,7 +29,6 @@ import {
     makeEmptyBets,
     shuffleArray,
     sortedIndices,
-    Colors,
 } from "./util";
 import { computeBinaryToPirates, computePiratesBinary } from "./maths";
 import { RoundContext } from "./RoundState";
@@ -38,7 +38,7 @@ const cartesian = (...a) =>
     a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
 
 const BetFunctions = (props) => {
-    const { gray } = Colors();
+    const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     const { calculations, ...rest } = props;
     const { probabilities, arenaRatios } = calculations;
     const { roundState, setRoundState } = useContext(RoundContext);

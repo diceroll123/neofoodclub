@@ -7,7 +7,6 @@ import {
     computePiratesBinary,
     computeProbabilities,
 } from "./maths";
-import { useColorModeValue } from "@chakra-ui/react";
 
 export function reducer(state, item) {
     return { ...state, ...item };
@@ -451,24 +450,4 @@ export function calculateRoundData(roundState) {
         totalWinningOdds: totalWinningOdds,
         totalEnabledBets: totalEnabledBets,
     };
-}
-
-export const Colors = () => {
-    const gray = useColorModeValue("gray.50", "gray.700");
-    const green = useColorModeValue("green.200", "#50C17F");
-    const blue = useColorModeValue("blue.200", "#4BA0E4");
-    const orange = useColorModeValue("orange.200", "#F0923E");
-    const red = useColorModeValue("red.200", "#F76C6C");
-    const yellow = useColorModeValue("yellow.200", "#EFCF50");
-    return { red, green, blue, yellow, orange, gray };
-};
-
-export function PirateBgColor(odds) {
-    const { green, blue, orange, red } = Colors();
-
-    if ([3, 4, 5].includes(odds)) return blue;
-    if ([6, 7, 8, 9].includes(odds)) return orange;
-    if ([10, 11, 12, 13].includes(odds)) return red;
-
-    return green;
 }

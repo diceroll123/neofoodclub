@@ -17,12 +17,7 @@ import React, { useContext } from "react";
 
 import { PIRATE_NAMES } from "../constants";
 import { computePirateBinary } from "../maths";
-import {
-    numberWithCommas,
-    displayAsPercent,
-    PirateBgColor,
-    Colors,
-} from "../util";
+import { numberWithCommas, displayAsPercent, PirateBgColor } from "../util";
 import BetAmountInput from "./BetAmountInput";
 import Pd from "./Pd";
 import PlaceThisBetButton from "./PlaceThisBetButton";
@@ -33,8 +28,21 @@ import TextTooltip from "./TextTooltip";
 // this element is the colorful and informative table full of your bet data
 
 const PayoutTable = (props) => {
+    const { roundState, setRoundState } = useContext(RoundContext);
     const { calculations, ...rest } = props;
-    const { orange, red, green, yellow } = Colors();
+    const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
+    const green = useColorModeValue("nfc.green", "nfc.greenDark");
+    const red = useColorModeValue("nfc.red", "nfc.redDark");
+    const orange = useColorModeValue("nfc.orange", "nfc.orangeDark");
+    const yellow = useColorModeValue("nfc.yellow", "nfc.yellowDark");
+
+    function getPirateBgColor(odds) {
+        if ([3, 4, 5].includes(odds)) return blue;
+        if ([6, 7, 8, 9].includes(odds)) return orange;
+        if ([10, 11, 12, 13].includes(odds)) return red;
+
+        return green;
+    }
 
     const {
         betBinaries,
@@ -52,8 +60,6 @@ const PayoutTable = (props) => {
         totalWinningOdds,
         totalEnabledBets,
     } = calculations;
-
-    const { roundState, setRoundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
 
     function swapBets(index, newIndex) {
@@ -245,7 +251,7 @@ const PayoutTable = (props) => {
                                                     bgColor = red;
                                                 }
                                             } else {
-                                                bgColor = PirateBgColor(
+                                                bgColor = getPirateBgColor(
                                                     roundState.roundData
                                                         .openingOdds[
                                                         arenaIndex

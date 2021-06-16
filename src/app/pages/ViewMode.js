@@ -1,7 +1,7 @@
-import { VStack, Button, Icon } from "@chakra-ui/react";
+import { VStack, Button, Icon, useColorModeValue } from "@chakra-ui/react";
 import { RoundContext } from "../RoundState";
 import React, { useContext } from "react";
-import { calculateRoundData, Colors } from "../util";
+import { calculateRoundData } from "../util";
 import HorizontalScrollingBox from "../components/HorizontalScrollingBox";
 import PayoutCharts from "../components/PayoutCharts";
 import PayoutTable from "../components/PayoutTable";
@@ -11,7 +11,7 @@ import { FaEdit } from "react-icons/fa";
 
 export default function ViewMode(props) {
     const { roundState, setRoundState } = useContext(RoundContext);
-    const { gray } = Colors();
+    const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
 
     let calculations = calculateRoundData(roundState);
 
