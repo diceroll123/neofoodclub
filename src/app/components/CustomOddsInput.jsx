@@ -28,31 +28,41 @@ export default function CustomOddsInput(props) {
         setRoundState({ customOdds });
     }
 
+    function verify(value) {
+        // returns false if it needs to be reverted, true if the value is clean
+        // the rules are simple.
+        // it needs to be a valid number between 2 and 13 inclusive.
+        value = parseInt(value);
+        if (isNaN(value)) {
+            return false;
+        }
+        if (!(value >= 2 && value <= 13)) {
+            return false;
+        }
+        return true;
+    }
+
     return (
         <NumberInput
             {...rest}
             value={odds}
             onChange={(value) => {
-                value = parseInt(value);
-                let revert = false;
-                if (isNaN(value)) {
-                    revert = true;
-                }
+                setOdds(value);
 
-                if (!revert && !(value >= 2 && value <= 13)) {
-                    revert = true;
+                if (verify(value)) {
+                    changeOdds(value);
                 }
+            }}
+            onBlur={(e) => {
+                let value = e.target.value;
 
-                if (revert) {
+                if (verify(value) === false) {
                     changeOdds(
                         roundState.roundData.currentOdds[arenaIndex][
                             pirateIndex
                         ]
                     );
-                    return;
                 }
-
-                changeOdds(value);
             }}
             onFocus={(e) => e.target.select()}
             size="sm"
