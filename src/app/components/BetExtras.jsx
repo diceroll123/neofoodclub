@@ -11,7 +11,7 @@ import { FaLink } from "react-icons/fa";
 import Cookies from "universal-cookie/es6";
 import React, { useState, useContext } from "react";
 
-import { createBetURL } from "../util";
+import { createBetURL, Colors } from "../util";
 import ExtraBox from "./ExtraBox";
 import { RoundContext } from "../RoundState";
 import SettingsBox from "./SettingsBox";
@@ -90,9 +90,10 @@ const CopyLinkButtons = () => {
 
 const BetExtras = (props) => {
     const { calculations, ...rest } = props;
+    const { gray } = Colors();
 
     return (
-        <SettingsBox mt={4} p={4} {...rest}>
+        <SettingsBox bgColor={gray} mt={4} p={4} {...rest}>
             <Stack>
                 <SetAllToMaxButton calculations={calculations} />
                 <CopyLinkButtons />

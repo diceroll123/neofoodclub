@@ -10,7 +10,7 @@ import {
 import Cookies from "universal-cookie/es6";
 import React, { useContext, useState } from "react";
 
-import { getTableMode } from "../util";
+import { getTableMode, Colors } from "../util";
 import ExtraBox from "./ExtraBox";
 import HorizontalScrollingBox from "./HorizontalScrollingBox";
 import { RoundContext } from "../RoundState";
@@ -181,8 +181,9 @@ const NormalExtras = (props) => {
 };
 
 const TableSettings = (props) => {
+    const { gray } = Colors();
     return (
-        <SettingsBox {...props}>
+        <SettingsBox bgColor={gray} {...props}>
             <HorizontalScrollingBox>
                 <HStack p={4}>
                     <TableModes />

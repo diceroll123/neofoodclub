@@ -1,7 +1,7 @@
 import { VStack, Button, Icon } from "@chakra-ui/react";
 import { RoundContext } from "../RoundState";
 import React, { useContext } from "react";
-import { calculateRoundData } from "../util";
+import { calculateRoundData, Colors } from "../util";
 import HorizontalScrollingBox from "../components/HorizontalScrollingBox";
 import PayoutCharts from "../components/PayoutCharts";
 import PayoutTable from "../components/PayoutTable";
@@ -11,13 +11,13 @@ import { FaEdit } from "react-icons/fa";
 
 export default function ViewMode(props) {
     const { roundState, setRoundState } = useContext(RoundContext);
-    const { green, red, orange, yellow, grayAccent, getPirateBgColor } = props;
+    const { gray } = Colors();
 
     let calculations = calculateRoundData(roundState);
 
     return (
         <>
-            <SettingsBox mt={4} background={grayAccent}>
+            <SettingsBox mt={4} background={gray}>
                 <HorizontalScrollingBox whiteSpace="nowrap" p={4}>
                     <VStack>
                         <Button
@@ -40,23 +40,11 @@ export default function ViewMode(props) {
                 </HorizontalScrollingBox>
             </SettingsBox>
             <HorizontalScrollingBox>
-                <PayoutTable
-                    calculations={calculations}
-                    getPirateBgColor={getPirateBgColor}
-                    orange={orange}
-                    red={red}
-                    yellow={yellow}
-                    green={green}
-                />
+                <PayoutTable calculations={calculations} />
             </HorizontalScrollingBox>
 
             <HorizontalScrollingBox mt={4}>
-                <PayoutCharts
-                    calculations={calculations}
-                    grayAccent={grayAccent}
-                    red={red}
-                    green={green}
-                />
+                <PayoutCharts calculations={calculations} />
             </HorizontalScrollingBox>
         </>
     );

@@ -22,7 +22,12 @@ import {
     POSITIVE_FAS,
 } from "../constants";
 import { computePirateBinary } from "../maths";
-import { displayAsPercent, calculateRoundData } from "../util";
+import {
+    displayAsPercent,
+    calculateRoundData,
+    PirateBgColor,
+    Colors,
+} from "../util";
 import BetExtras from "../components/BetExtras";
 import BetFunctions from "../BetFunctions";
 import BigBrainElement from "../components/BigBrainElement";
@@ -41,16 +46,52 @@ import Td from "../components/Td";
 import TextTooltip from "../components/TextTooltip";
 import TableSettings from "../components/TableSettings";
 
+const StickyTd = (props) => {
+    const { children, ...rest } = props;
+    return (
+        <Td style={{ position: "sticky", left: "0" }} zIndex={1} {...rest}>
+            {children}
+        </Td>
+    );
+};
+
+function PirateFA(pirateId, foodId) {
+    const { green, red, yellow } = Colors();
+    // returns the FA <td> element for the associated pirate/food
+    let pos = POSITIVE_FAS[pirateId][foodId];
+    let neg = NEGATIVE_FAS[pirateId][foodId];
+
+    // by default, transparent + empty string if FA is 0
+    let color = "transparent";
+    let indicator = "";
+
+    if (pos && neg) {
+        color = yellow;
+        indicator = `+${pos}/-${neg}`;
+    } else if (pos) {
+        color = green;
+        indicator = `+${pos}`;
+    } else if (neg) {
+        color = red;
+        indicator = `-${neg}`;
+    }
+
+    return (
+        <FaDetailsElement
+            key={foodId}
+            as={Pd}
+            isNumeric
+            backgroundColor={color}
+            whiteSpace="nowrap"
+        >
+            <Text as={"b"}>{indicator}</Text>
+        </FaDetailsElement>
+    );
+}
+
 const NormalTable = (props) => {
-    let {
-        calculations,
-        changeBet,
-        getPirateBgColor,
-        green,
-        red,
-        yellow,
-        grayAccent,
-    } = props;
+    let { calculations, changeBet } = props;
+    const { green, red, yellow, gray } = Colors();
     const { arenaRatios, winningBetBinary, probabilities, pirateFAs } =
         calculations;
     const { roundState, setRoundState } = useContext(RoundContext);
@@ -64,48 +105,6 @@ const NormalTable = (props) => {
             newBets[x][arenaIndex] = pirateValue;
         }
         setRoundState({ bets: { ...newBets } }); // hacky way to force an object to update useEffect
-    }
-
-    const StickyTd = (props) => {
-        const { children, ...rest } = props;
-        return (
-            <Td style={{ position: "sticky", left: "0" }} zIndex={1} {...rest}>
-                {children}
-            </Td>
-        );
-    };
-
-    function calculatePirateFA(pirateId, foodId) {
-        // returns the FA <td> element for the associated pirate/food
-        let pos = POSITIVE_FAS[pirateId][foodId];
-        let neg = NEGATIVE_FAS[pirateId][foodId];
-
-        // by default, transparent + empty string if FA is 0
-        let color = "transparent";
-        let indicator = "";
-
-        if (pos && neg) {
-            color = yellow;
-            indicator = `+${pos}/-${neg}`;
-        } else if (pos) {
-            color = green;
-            indicator = `+${pos}`;
-        } else if (neg) {
-            color = red;
-            indicator = `-${neg}`;
-        }
-
-        return (
-            <FaDetailsElement
-                key={foodId}
-                as={Pd}
-                isNumeric
-                backgroundColor={color}
-                whiteSpace="nowrap"
-            >
-                <Text as={"b"}>{indicator}</Text>
-            </FaDetailsElement>
-        );
     }
 
     return (
@@ -183,12 +182,12 @@ const NormalTable = (props) => {
                                 )}
                             </BigBrainElement>
                             <Td
-                                backgroundColor={grayAccent}
+                                backgroundColor={gray}
                                 colSpan={roundState.advanced.bigBrain ? 6 : 1}
                             />
                             <CustomOddsElement
                                 as={Td}
-                                backgroundColor={grayAccent}
+                                backgroundColor={gray}
                                 colSpan={2}
                             />
 
@@ -204,7 +203,7 @@ const NormalTable = (props) => {
                                                     whiteSpace="nowrap"
                                                     overflow="hidden"
                                                     textOverflow="ellipsis"
-                                                    backgroundColor={grayAccent}
+                                                    backgroundColor={gray}
                                                 >
                                                     <TextTooltip text={food} />
                                                 </FaDetailsElement>
@@ -214,11 +213,8 @@ const NormalTable = (props) => {
                                 </>
                             ) : null}
 
-                            <Td backgroundColor={grayAccent} colSpan={2} />
-                            <CustomOddsElement
-                                as={Td}
-                                backgroundColor={grayAccent}
-                            />
+                            <Td backgroundColor={gray} colSpan={2} />
+                            <CustomOddsElement as={Td} backgroundColor={gray} />
                             {/*<Td>showOddsTimeline</Td>*/}
                             {roundState.roundData ? (
                                 <>
@@ -227,7 +223,7 @@ const NormalTable = (props) => {
                                             return (
                                                 <Td
                                                     key={betNum}
-                                                    backgroundColor={grayAccent}
+                                                    backgroundColor={gray}
                                                 >
                                                     <Radio
                                                         name={
@@ -253,7 +249,7 @@ const NormalTable = (props) => {
                                             );
                                         }
                                     )}
-                                    <Td backgroundColor={grayAccent}>
+                                    <Td backgroundColor={gray}>
                                         <Button
                                             size="xs"
                                             variant="outline"
@@ -267,10 +263,7 @@ const NormalTable = (props) => {
                                 </>
                             ) : (
                                 <>
-                                    <Td
-                                        colSpan={100}
-                                        backgroundColor={grayAccent}
-                                    >
+                                    <Td colSpan={100} backgroundColor={gray}>
                                         <Skeleton height="24px">
                                             <Box>&nbsp;</Box>
                                         </Skeleton>
@@ -340,9 +333,7 @@ const NormalTable = (props) => {
                             return (
                                 <Tr key={pirateId} backgroundColor={bgColor}>
                                     <StickyTd
-                                        backgroundColor={getPirateBgColor(
-                                            opening
-                                        )}
+                                        backgroundColor={PirateBgColor(opening)}
                                     >
                                         {PIRATE_NAMES[pirateId]}
                                     </StickyTd>
@@ -399,7 +390,7 @@ const NormalTable = (props) => {
                                             {roundState.roundData.foods[
                                                 arenaId
                                             ].map((foodId) => {
-                                                return calculatePirateFA(
+                                                return PirateFA(
                                                     pirateId,
                                                     foodId
                                                 );
@@ -492,8 +483,8 @@ const NormalTable = (props) => {
 };
 
 const DropDownTable = (props) => {
-    let { changeBet, getPirateBgColor, green, winningBetBinary, ...rest } =
-        props;
+    let { changeBet, winningBetBinary, ...rest } = props;
+    const { green } = Colors();
     const { roundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
 
@@ -556,7 +547,7 @@ const DropDownTable = (props) => {
                                                     ];
 
                                                 let pirateBg =
-                                                    getPirateBgColor(opening);
+                                                    PirateBgColor(opening);
                                                 let trBg = "transparent";
                                                 let pirateBin =
                                                     computePirateBinary(
@@ -641,7 +632,7 @@ const DropDownTable = (props) => {
                                 let pirateBg = "transparent";
 
                                 if (opening > 1) {
-                                    pirateBg = getPirateBgColor(opening);
+                                    pirateBg = PirateBgColor(opening);
                                 }
 
                                 return (
@@ -667,7 +658,7 @@ const DropDownTable = (props) => {
                                                             key={pirateId}
                                                             style={{
                                                                 background:
-                                                                    getPirateBgColor(
+                                                                    PirateBgColor(
                                                                         roundState
                                                                             .roundData
                                                                             .openingOdds[
@@ -722,7 +713,6 @@ const PirateTable = (props) => {
 
 export default function EditBets(props) {
     const { roundState } = useContext(RoundContext);
-    const { green, red, orange, yellow, grayAccent, getPirateBgColor } = props;
 
     let calculations = calculateRoundData(roundState);
 
@@ -730,52 +720,26 @@ export default function EditBets(props) {
 
     return (
         <>
-            <TableSettings background={grayAccent} />
+            <TableSettings />
 
             <HorizontalScrollingBox>
-                <PirateTable
-                    m={4}
-                    calculations={calculations}
-                    getPirateBgColor={getPirateBgColor}
-                    green={green}
-                    red={red}
-                    yellow={yellow}
-                    grayAccent={grayAccent}
-                />
+                <PirateTable m={4} calculations={calculations} />
             </HorizontalScrollingBox>
 
-            <BetFunctions background={grayAccent} calculations={calculations} />
+            <BetFunctions calculations={calculations} />
 
             {Object.values(betBinaries).reduce((a, b) => a + b, 0) > 0 && (
                 <>
-                    <BetExtras
-                        background={grayAccent}
-                        calculations={calculations}
-                    />
+                    <BetExtras calculations={calculations} />
 
                     <HorizontalScrollingBox>
-                        <PayoutTable
-                            calculations={calculations}
-                            getPirateBgColor={getPirateBgColor}
-                            orange={orange}
-                            red={red}
-                            yellow={yellow}
-                            green={green}
-                        />
+                        <PayoutTable calculations={calculations} />
                     </HorizontalScrollingBox>
 
-                    <CopyPayouts
-                        background={grayAccent}
-                        calculations={calculations}
-                    />
+                    <CopyPayouts calculations={calculations} />
 
                     <HorizontalScrollingBox>
-                        <PayoutCharts
-                            calculations={calculations}
-                            grayAccent={grayAccent}
-                            red={red}
-                            green={green}
-                        />
+                        <PayoutCharts calculations={calculations} />
                     </HorizontalScrollingBox>
                 </>
             )}

@@ -11,12 +11,18 @@ import {
     Spacer,
     Text,
     IconButton,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
 import { PIRATE_NAMES } from "../constants";
 import { computePirateBinary } from "../maths";
-import { numberWithCommas, displayAsPercent } from "../util";
+import {
+    numberWithCommas,
+    displayAsPercent,
+    PirateBgColor,
+    Colors,
+} from "../util";
 import BetAmountInput from "./BetAmountInput";
 import Pd from "./Pd";
 import PlaceThisBetButton from "./PlaceThisBetButton";
@@ -27,15 +33,8 @@ import TextTooltip from "./TextTooltip";
 // this element is the colorful and informative table full of your bet data
 
 const PayoutTable = (props) => {
-    const {
-        calculations,
-        getPirateBgColor,
-        orange,
-        red,
-        green,
-        yellow,
-        ...rest
-    } = props;
+    const { calculations, ...rest } = props;
+    const { orange, red, green, yellow } = Colors();
 
     const {
         betBinaries,
@@ -246,7 +245,7 @@ const PayoutTable = (props) => {
                                                     bgColor = red;
                                                 }
                                             } else {
-                                                bgColor = getPirateBgColor(
+                                                bgColor = PirateBgColor(
                                                     roundState.roundData
                                                         .openingOdds[
                                                         arenaIndex

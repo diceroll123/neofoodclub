@@ -16,6 +16,7 @@ import {
     amountAbbreviation,
     displayAsPercent,
     numberWithCommas,
+    Colors,
 } from "../util";
 import { RoundContext } from "../RoundState";
 import Td from "./Td";
@@ -26,7 +27,8 @@ Chart.register(annotationPlugin);
 // this element contains the odds/winnings tables + charts
 
 const PayoutCharts = (props) => {
-    const { calculations, grayAccent, red, green } = props;
+    const { calculations } = props;
+    const { gray, red, green } = Colors();
     const {
         payoutTables,
         betBinaries,
@@ -217,7 +219,7 @@ const PayoutCharts = (props) => {
                 <Table
                     size="sm"
                     width="auto"
-                    backgroundColor={grayAccent}
+                    backgroundColor={gray}
                     borderTopLeftRadius="0.5rem"
                     borderTopRightRadius="0.5rem"
                 >

@@ -28,6 +28,7 @@ import {
     makeEmptyBets,
     shuffleArray,
     sortedIndices,
+    Colors,
 } from "./util";
 import { computeBinaryToPirates, computePiratesBinary } from "./maths";
 import { RoundContext } from "./RoundState";
@@ -37,6 +38,7 @@ const cartesian = (...a) =>
     a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
 
 const BetFunctions = (props) => {
+    const { gray } = Colors();
     const { calculations, ...rest } = props;
     const { probabilities, arenaRatios } = calculations;
     const { roundState, setRoundState } = useContext(RoundContext);
@@ -470,7 +472,7 @@ const BetFunctions = (props) => {
     }
 
     return (
-        <SettingsBox mt={4} {...rest}>
+        <SettingsBox bgColor={gray} mt={4} {...rest}>
             <Stack p={4}>
                 <ButtonGroup size="sm" isAttached variant="outline">
                     <Menu>
