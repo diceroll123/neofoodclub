@@ -90,12 +90,19 @@ function PirateFA(pirateId, foodId) {
 }
 
 const NormalTable = (props) => {
-    let { calculations, changeBet } = props;
+    let { calculations } = props;
     const { green, red, yellow, gray } = Colors();
     const { arenaRatios, winningBetBinary, probabilities, pirateFAs } =
         calculations;
     const { roundState, setRoundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
+
+    function changeBet(betIndex, arenaIndex, pirateIndex) {
+        // change a single pirate in a single arena
+        let newBets = roundState.bets;
+        newBets[betIndex][arenaIndex] = pirateIndex;
+        setRoundState({ bets: { ...newBets } }); // hacky way to force an object to update useEffect
+    }
 
     function changeBetLine(arenaIndex, pirateValue) {
         // change the entire row to pirateValue
@@ -483,10 +490,17 @@ const NormalTable = (props) => {
 };
 
 const DropDownTable = (props) => {
-    let { changeBet, winningBetBinary, ...rest } = props;
+    let { winningBetBinary, ...rest } = props;
     const { green } = Colors();
-    const { roundState } = useContext(RoundContext);
+    const { roundState, setRoundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
+
+    function changeBet(betIndex, arenaIndex, pirateIndex) {
+        // change a single pirate in a single arena
+        let newBets = roundState.bets;
+        newBets[betIndex][arenaIndex] = pirateIndex;
+        setRoundState({ bets: { ...newBets } }); // hacky way to force an object to update useEffect
+    }
 
     return (
         <Table size="sm" width="auto" {...rest}>
@@ -695,20 +709,12 @@ const DropDownTable = (props) => {
 };
 
 const PirateTable = (props) => {
-    const { roundState, setRoundState } = useContext(RoundContext);
-
-    function changeBet(betIndex, arenaIndex, pirateIndex) {
-        // change a single pirate in a single arena
-        let newBets = roundState.bets;
-        newBets[betIndex][arenaIndex] = pirateIndex;
-        setRoundState({ bets: { ...newBets } }); // hacky way to force an object to update useEffect
-    }
-
+    const { roundState } = useContext(RoundContext);
     if (roundState.tableMode === "dropdown") {
-        return <DropDownTable changeBet={changeBet} {...props} />;
+        return <DropDownTable {...props} />;
     }
 
-    return <NormalTable changeBet={changeBet} {...props} />;
+    return <NormalTable {...props} />;
 };
 
 export default function EditBets(props) {
