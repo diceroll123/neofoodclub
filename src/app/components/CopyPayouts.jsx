@@ -19,10 +19,10 @@ import SettingsBox from "./SettingsBox";
 // previously known as the reddit table code
 
 const CopyPayouts = (props) => {
-    const { calculations, ...rest } = props;
+    const { ...rest } = props;
+    const { roundState, calculations } = useContext(RoundContext);
     const { payoutTables, betBinaries, betExpectedRatios, betOdds } =
         calculations;
-    const { roundState } = useContext(RoundContext);
     const toast = useToast();
 
     function createMarkdownTables() {

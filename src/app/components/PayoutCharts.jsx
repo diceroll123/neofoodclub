@@ -27,10 +27,10 @@ Chart.register(annotationPlugin);
 // this element contains the odds/winnings tables + charts
 
 const PayoutCharts = (props) => {
-    const { calculations } = props;
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
     const red = useColorModeValue("nfc.red", "nfc.redDark");
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
+    const { roundState, calculations } = useContext(RoundContext);
     const {
         payoutTables,
         betBinaries,
@@ -38,7 +38,6 @@ const PayoutCharts = (props) => {
         totalWinningOdds,
         winningBetBinary,
     } = calculations;
-    const { roundState } = useContext(RoundContext);
     const { colorMode } = useColorMode();
 
     function makeChart(title, data) {
@@ -217,7 +216,9 @@ const PayoutCharts = (props) => {
         });
 
         return (
-            <Skeleton isLoaded={roundState.roundData}>
+            <Skeleton
+                isLoaded={roundState.roundData && calculations.calculated}
+            >
                 <Table
                     size="sm"
                     width="auto"

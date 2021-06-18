@@ -17,7 +17,7 @@ import React, { useContext } from "react";
 
 import { PIRATE_NAMES } from "../constants";
 import { computePirateBinary } from "../maths";
-import { numberWithCommas, displayAsPercent, PirateBgColor } from "../util";
+import { numberWithCommas, displayAsPercent } from "../util";
 import BetAmountInput from "./BetAmountInput";
 import Pd from "./Pd";
 import PlaceThisBetButton from "./PlaceThisBetButton";
@@ -28,8 +28,9 @@ import TextTooltip from "./TextTooltip";
 // this element is the colorful and informative table full of your bet data
 
 const PayoutTable = (props) => {
-    const { roundState, setRoundState } = useContext(RoundContext);
-    const { calculations, ...rest } = props;
+    const { roundState, setRoundState, calculations } =
+        useContext(RoundContext);
+    const { ...rest } = props;
     const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
     const red = useColorModeValue("nfc.red", "nfc.redDark");
@@ -45,6 +46,7 @@ const PayoutTable = (props) => {
     }
 
     const {
+        calculated,
         betBinaries,
         betExpectedRatios,
         betProbabilities,
@@ -112,7 +114,7 @@ const PayoutTable = (props) => {
                 </Tr>
             </Thead>
 
-            {roundState.roundData ? (
+            {roundState.roundData && calculated ? (
                 <>
                     <Tbody>
                         {[...Array(amountOfBets)].map((e, betIndex) => {
@@ -279,7 +281,6 @@ const PayoutTable = (props) => {
                                         <PlaceThisBetButton
                                             bet={roundState.bets[betIndex + 1]}
                                             betNum={betIndex + 1}
-                                            calculations={calculations}
                                         />
                                     </Td>
                                 </Tr>

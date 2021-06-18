@@ -23,7 +23,7 @@ import {
     POSITIVE_FAS,
 } from "../constants";
 import { computePirateBinary } from "../maths";
-import { displayAsPercent, calculateRoundData } from "../util";
+import { displayAsPercent, anyBetsExist } from "../util";
 import BetExtras from "../components/BetExtras";
 import BetFunctions from "../BetFunctions";
 import BigBrainElement from "../components/BigBrainElement";
@@ -89,15 +89,15 @@ function PirateFA(pirateId, foodId) {
 }
 
 const NormalTable = (props) => {
-    let { calculations } = props;
     const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
     const red = useColorModeValue("nfc.red", "nfc.redDark");
     const orange = useColorModeValue("nfc.orange", "nfc.orangeDark");
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
+    const { roundState, setRoundState, calculations } =
+        useContext(RoundContext);
     const { arenaRatios, winningBetBinary, probabilities, pirateFAs } =
         calculations;
-    const { roundState, setRoundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
 
     function getPirateBgColor(odds) {
@@ -291,7 +291,10 @@ const NormalTable = (props) => {
                         </Tr>
 
                         {pirates.map((pirateId, pirateIndex) => {
-                            if (!roundState.roundData) {
+                            if (
+                                !roundState.roundData ||
+                                !calculations.calculated
+                            ) {
                                 // big ol skeleton
                                 return (
                                     <Tr key={pirateIndex}>
@@ -503,8 +506,10 @@ const NormalTable = (props) => {
 };
 
 const DropDownTable = (props) => {
-    let { winningBetBinary, ...rest } = props;
-    const { roundState, setRoundState } = useContext(RoundContext);
+    let { ...rest } = props;
+    const { roundState, setRoundState, calculations } =
+        useContext(RoundContext);
+    const { winningBetBinary } = calculations;
     const amountOfBets = Object.keys(roundState.bets).length;
 
     const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
@@ -745,32 +750,30 @@ const PirateTable = (props) => {
 export default function EditBets(props) {
     const { roundState } = useContext(RoundContext);
 
-    let calculations = calculateRoundData(roundState);
-
-    const { betBinaries } = calculations;
+    const anyBets = anyBetsExist(roundState.bets);
 
     return (
         <>
             <TableSettings />
 
             <HorizontalScrollingBox>
-                <PirateTable m={4} calculations={calculations} />
+                <PirateTable m={4} />
             </HorizontalScrollingBox>
 
-            <BetFunctions calculations={calculations} />
+            <BetFunctions />
 
-            {Object.values(betBinaries).reduce((a, b) => a + b, 0) > 0 && (
+            {anyBets && (
                 <>
-                    <BetExtras calculations={calculations} />
+                    <BetExtras />
 
                     <HorizontalScrollingBox>
-                        <PayoutTable calculations={calculations} />
+                        <PayoutTable />
                     </HorizontalScrollingBox>
 
-                    <CopyPayouts calculations={calculations} />
+                    <CopyPayouts />
 
                     <HorizontalScrollingBox>
-                        <PayoutCharts calculations={calculations} />
+                        <PayoutCharts />
                     </HorizontalScrollingBox>
                 </>
             )}

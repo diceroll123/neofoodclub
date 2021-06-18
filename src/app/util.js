@@ -327,6 +327,7 @@ export function sortedIndices(arr) {
 
 export function calculateRoundData(roundState) {
     // calculates all of the round's mathy data for visualization purposes.
+    let calculated = false;
     let probabilities = {};
     let pirateFAs = {};
     let arenaRatios = [];
@@ -348,7 +349,7 @@ export function calculateRoundData(roundState) {
     let totalWinningOdds = 0;
     let totalEnabledBets = 0;
 
-    if (roundState.roundData) {
+    if (roundState.roundData && roundState.customOdds) {
         probabilities = computeProbabilities(
             roundState.roundData,
             roundState.customProbs
@@ -428,26 +429,29 @@ export function calculateRoundData(roundState) {
             betOdds,
             betPayoffs
         );
+
+        calculated = true;
     }
 
     return {
-        probabilities: probabilities,
-        pirateFAs: pirateFAs,
-        arenaRatios: arenaRatios,
-        betOdds: betOdds,
-        betPayoffs: betPayoffs,
-        betProbabilities: betProbabilities,
-        betExpectedRatios: betExpectedRatios,
-        betNetExpected: betNetExpected,
-        betMaxBets: betMaxBets,
-        betBinaries: betBinaries,
-        payoutTables: payoutTables,
-        winningBetBinary: winningBetBinary,
-        totalBetAmounts: totalBetAmounts,
-        totalBetExpectedRatios: totalBetExpectedRatios,
-        totalBetNetExpected: totalBetNetExpected,
-        totalWinningPayoff: totalWinningPayoff,
-        totalWinningOdds: totalWinningOdds,
-        totalEnabledBets: totalEnabledBets,
+        calculated,
+        probabilities,
+        pirateFAs,
+        arenaRatios,
+        betOdds,
+        betPayoffs,
+        betProbabilities,
+        betExpectedRatios,
+        betNetExpected,
+        betMaxBets,
+        betBinaries,
+        payoutTables,
+        winningBetBinary,
+        totalBetAmounts,
+        totalBetExpectedRatios,
+        totalBetNetExpected,
+        totalWinningPayoff,
+        totalWinningOdds,
+        totalEnabledBets,
     };
 }

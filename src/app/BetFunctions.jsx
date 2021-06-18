@@ -39,9 +39,10 @@ const cartesian = (...a) =>
 
 const BetFunctions = (props) => {
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
-    const { calculations, ...rest } = props;
+    const { ...rest } = props;
+    const { roundState, setRoundState, calculations } =
+        useContext(RoundContext);
     const { probabilities, arenaRatios } = calculations;
-    const { roundState, setRoundState } = useContext(RoundContext);
     const [currentBet, setCurrentBet] = useState("0");
 
     const [allNames, setAllNames] = useState({ 0: "Starting Set" });

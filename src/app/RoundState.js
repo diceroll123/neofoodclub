@@ -1,5 +1,5 @@
-import { createContext, useReducer } from "react";
-import { getTableMode, reducer, parseBetUrl } from "./util";
+import { createContext, useReducer, useState, useEffect } from "react";
+import { getTableMode, reducer, parseBetUrl, calculateRoundData } from "./util";
 
 const RoundContext = createContext(null);
 const { Provider } = RoundContext;
@@ -29,8 +29,24 @@ const StateProvider = ({ children }) => {
 		viewMode: initialViewMode,
 	});
 
+	const [calculations, setCalculations] = useState(
+		calculateRoundData(roundState)
+	);
+
+	useEffect(() => {
+		setCalculations(calculateRoundData(roundState));
+	}, [
+		roundState.roundData?.foods,
+		roundState.roundData?.winners,
+		roundState.roundData?.currentOdds,
+		roundState.bets,
+		roundState.betAmounts,
+		roundState.customProbs,
+		roundState.customOdds,
+	]);
+
 	return (
-		<Provider value={{ roundState: roundState, setRoundState }}>
+		<Provider value={{ roundState, setRoundState, calculations }}>
 			{children}
 		</Provider>
 	);

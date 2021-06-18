@@ -7,9 +7,9 @@ import { RoundContext } from "../RoundState";
 // this element is the "Place Bet" button inside the PayoutTable
 
 const PlaceThisBetButton = (props) => {
-    const { calculations, bet, betNum } = props;
+    const { bet, betNum } = props;
+    const { roundState, calculations } = useContext(RoundContext);
     const { betBinaries, betOdds, betPayoffs, winningBetBinary } = calculations;
-    const { roundState } = useContext(RoundContext);
     const [clicked, setClicked] = useState(false);
 
     useEffect(() => {

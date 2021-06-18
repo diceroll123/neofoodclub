@@ -80,7 +80,7 @@ function useRoundStateURLs(roundState, setRoundState) {
             currentSelectedRound: data.round,
             bets: data.bets,
             betAmounts: data.betAmounts,
-            customOdds: null,
+            customOdds: roundState.roundData?.currentOdds || null,
             customProbs: [
                 [1, 0, 0, 0, 0],
                 [1, 0, 0, 0, 0],
