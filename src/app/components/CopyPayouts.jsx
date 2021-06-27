@@ -21,13 +21,13 @@ import SettingsBox from "./SettingsBox";
 const CopyPayouts = (props) => {
     const { ...rest } = props;
     const { roundState, calculations } = useContext(RoundContext);
-    const { payoutTables, betBinaries, betExpectedRatios, betOdds } =
+    const { payoutTables, betBinaries, betExpectedRatios, betOdds, calculated } =
         calculations;
     const toast = useToast();
 
     function createMarkdownTables() {
         // specifically meant to not be posted on Neopets, so it includes a URL.
-        if (payoutTables.odds === undefined) {
+        if (payoutTables.odds === undefined || calculated === false) {
             return null;
         }
 
@@ -85,7 +85,7 @@ const CopyPayouts = (props) => {
 
     function createHtmlTable() {
         // specifically meant to be posted on Neopets, so it includes the bet hash
-        if (payoutTables.odds === undefined) {
+        if (payoutTables.odds === undefined || calculated === false) {
             return null;
         }
 
