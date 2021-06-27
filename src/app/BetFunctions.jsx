@@ -25,6 +25,8 @@ import {
     cloneArray,
     determineBetAmount,
     getMaxBet,
+    getOdds,
+    getProbs,
     makeEmptyBetAmounts,
     makeEmptyBets,
     shuffleArray,
@@ -65,30 +67,8 @@ const BetFunctions = (props) => {
         #probs;
 
         constructor() {
-            this.#odds = roundState.roundData.currentOdds;
-            this.#probs = probabilities.std;
-
-            if (
-                roundState.tableMode === "normal" &&
-                roundState.advanced.bigBrain &&
-                roundState.advanced.customOddsMode
-            ) {
-                this.#odds = roundState.customOdds;
-
-                let customProbs = [];
-                for (let x = 0; x < 5; x++) {
-                    let thisArr = [];
-                    for (let y = 0; y < 5; y++) {
-                        thisArr.push(
-                            roundState.customProbs[x][y] ||
-                                probabilities.used[x][y]
-                        );
-                    }
-                    customProbs.push(thisArr);
-                }
-
-                this.#probs = customProbs;
-            }
+            this.#odds = getOdds(roundState);
+            this.#probs = getProbs(roundState) || probabilities.std;
         }
 
         calculate(...pirates) {

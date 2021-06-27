@@ -9,20 +9,24 @@ import { useState, useContext } from "react";
 import produce from "immer";
 
 import { RoundContext } from "../RoundState";
+import { getOdds } from "../util";
 
 // this element is the number input for custom odds
 
 export default function CustomOddsInput(props) {
     const { roundState, setRoundState } = useContext(RoundContext);
     const { arenaIndex, pirateIndex, ...rest } = props;
+
+    const original = getOdds(roundState);
+
     const [odds, setOdds] = useState(
-        roundState.customOdds[arenaIndex][pirateIndex]
+        original[arenaIndex][pirateIndex]
     );
 
     function changeOdds(oddsValue) {
         setOdds(oddsValue);
 
-        const customOdds = produce(roundState.customOdds, (draftCustomOdds) => {
+        const customOdds = produce(roundState.customOdds || roundState.roundData.currentOdds, (draftCustomOdds) => {
             draftCustomOdds[arenaIndex][pirateIndex] = oddsValue;
         });
         setRoundState({ customOdds });
@@ -36,10 +40,7 @@ export default function CustomOddsInput(props) {
         if (isNaN(value)) {
             return false;
         }
-        if (!(value >= 2 && value <= 13)) {
-            return false;
-        }
-        return true;
+        return value >= 2 && value <= 13;
     }
 
     return (

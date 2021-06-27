@@ -25,7 +25,7 @@ export default function CustomProbsInput(props) {
         setProb(probValue);
 
         const customProbs = produce(
-            roundState.customProbs,
+            roundState.customProbs || probabilities.used,
             (draftCustomProbs) => {
                 draftCustomProbs[arenaIndex][pirateIndex] = probValue / 100;
             }

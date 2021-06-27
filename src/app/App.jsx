@@ -47,14 +47,7 @@ function App() {
         if (currentRound && roundData) {
             setRoundState({
                 roundData: roundData,
-                customOdds: roundState.customOdds || roundData?.currentOdds,
-                customProbs: roundState.customProbs || [
-                    [1, 0, 0, 0, 0],
-                    [1, 0, 0, 0, 0],
-                    [1, 0, 0, 0, 0],
-                    [1, 0, 0, 0, 0],
-                    [1, 0, 0, 0, 0],
-                ],
+                currentRound: currentRound
             });
         }
     }, [roundData]);
@@ -80,14 +73,8 @@ function useRoundStateURLs(roundState, setRoundState) {
             currentSelectedRound: data.round,
             bets: data.bets,
             betAmounts: data.betAmounts,
-            customOdds: roundState.roundData?.currentOdds || null,
-            customProbs: [
-                [1, 0, 0, 0, 0],
-                [1, 0, 0, 0, 0],
-                [1, 0, 0, 0, 0],
-                [1, 0, 0, 0, 0],
-                [1, 0, 0, 0, 0],
-            ],
+            customOdds: null,
+            customProbs: null,
             viewMode: false,
             roundData:
                 parseInt(data.round) ===

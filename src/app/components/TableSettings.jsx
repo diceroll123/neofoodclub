@@ -109,14 +109,8 @@ const NormalExtras = (props) => {
                                 ...currentAdvanced,
                                 bigBrain: !bigBrain,
                             },
-                            customOdds: roundState.roundData.currentOdds,
-                            customProbs: [
-                                [1, 0, 0, 0, 0],
-                                [1, 0, 0, 0, 0],
-                                [1, 0, 0, 0, 0],
-                                [1, 0, 0, 0, 0],
-                                [1, 0, 0, 0, 0],
-                            ],
+                            customOdds: null,
+                            customProbs: null,
                         });
                     }}
                     leftIcon={
@@ -146,14 +140,8 @@ const NormalExtras = (props) => {
                                 ...roundState.advanced,
                                 customOddsMode: checked,
                             },
-                            customOdds: roundState.roundData.currentOdds,
-                            customProbs: [
-                                [1, 0, 0, 0, 0],
-                                [1, 0, 0, 0, 0],
-                                [1, 0, 0, 0, 0],
-                                [1, 0, 0, 0, 0],
-                                [1, 0, 0, 0, 0],
-                            ],
+                            customOdds: null,
+                            customProbs: null,
                         });
                     }}
                 >

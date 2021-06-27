@@ -23,7 +23,7 @@ import {
     POSITIVE_FAS,
 } from "../constants";
 import { computePirateBinary } from "../maths";
-import { displayAsPercent, anyBetsExist } from "../util";
+import {displayAsPercent, anyBetsExist, getOdds, getProbs} from "../util";
 import BetExtras from "../components/BetExtras";
 import BetFunctions from "../BetFunctions";
 import BigBrainElement from "../components/BigBrainElement";
@@ -315,8 +315,9 @@ const NormalTable = (props) => {
                                 roundState.roundData.currentOdds[arenaId][
                                     pirateIndex + 1
                                 ];
-                            let custom =
-                                roundState.customOdds[arenaId][pirateIndex + 1];
+
+                            let usedOdds = getOdds(roundState);
+                            let custom = usedOdds[arenaId][pirateIndex + 1];
                             const useCustom =
                                 roundState.advanced.bigBrain &&
                                 roundState.advanced.customOddsMode;
@@ -331,17 +332,8 @@ const NormalTable = (props) => {
                                 bgColor = green;
                             }
 
-                            let prob =
-                                probabilities.used[arenaId][pirateIndex + 1];
-                            if (useCustom) {
-                                let tempProb =
-                                    roundState.customProbs[arenaId][
-                                        pirateIndex + 1
-                                    ];
-                                if (tempProb !== 0) {
-                                    prob = tempProb;
-                                }
-                            }
+                            let probs = getProbs(roundState) || probabilities.used;
+                            let prob = probs[arenaId][pirateIndex + 1];
 
                             const payout = useOdds * prob - 1;
                             let payoutBackground = "transparent";

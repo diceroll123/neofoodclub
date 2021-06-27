@@ -325,6 +325,27 @@ export function sortedIndices(arr) {
         .map((obj) => obj.ind);
 }
 
+export function getOdds(roundState) {
+    // the odds we will use for things.
+    // basically this just checks if the custom mode is on or not, and grabs the proper one.
+    // returns the current round odds if there are no custom odds
+    const odds = roundState?.roundData?.currentOdds;
+    if (roundState?.advanced.bigBrain && roundState?.advanced.customOddsMode) {
+        return roundState?.customOdds || odds;
+    }
+    return odds;
+}
+
+export function getProbs(roundState) {
+    // the probabilities we will use for things.
+    // basically this just checks if the custom mode is on or not, and grabs the proper one.
+    // returns null if there are no custom probabilities
+    if (roundState.advanced.bigBrain && roundState.advanced.customOddsMode) {
+        return roundState.customProbs;
+    }
+    return null;
+}
+
 export function calculateRoundData(roundState) {
     // calculates all of the round's mathy data for visualization purposes.
     let calculated = false;
@@ -349,14 +370,13 @@ export function calculateRoundData(roundState) {
     let totalWinningOdds = 0;
     let totalEnabledBets = 0;
 
-    if (roundState.roundData && roundState.customOdds) {
-        probabilities = computeProbabilities(
-            roundState.roundData,
-            roundState.customProbs
-        );
+    const odds = getOdds(roundState);
+    const probs = getProbs(roundState);
+    if (roundState.roundData && odds) {
+        probabilities = computeProbabilities(roundState.roundData);
 
         pirateFAs = computePirateFAs(roundState.roundData);
-        arenaRatios = calculateArenaRatios(roundState.customOdds);
+        arenaRatios = calculateArenaRatios(odds);
         winningBetBinary = computePiratesBinary(roundState.roundData.winners);
 
         // keep the "cache" of bet data up to date
@@ -374,14 +394,8 @@ export function calculateRoundData(roundState) {
             for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
                 let pirateIndex = roundState.bets[betIndex][arenaIndex];
                 if (pirateIndex > 0) {
-                    let odd =
-                        roundState.customOdds[arenaIndex][pirateIndex] ||
-                        roundState.roundData.currentOdds[arenaIndex][
-                            pirateIndex
-                        ];
-                    let prob =
-                        roundState.customProbs[arenaIndex][pirateIndex] ||
-                        probabilities.used[arenaIndex][pirateIndex];
+                    let odd = odds[arenaIndex][pirateIndex];
+                    let prob = (probs || probabilities.used)[arenaIndex][pirateIndex];
                     betOdds[betIndex] = (betOdds[betIndex] || 1) * odd;
                     betProbabilities[betIndex] =
                         (betProbabilities[betIndex] || 1) * prob;
@@ -425,7 +439,7 @@ export function calculateRoundData(roundState) {
         // for charts
         payoutTables = calculatePayoutTables(
             roundState,
-            probabilities.used,
+            probs || probabilities.used,
             betOdds,
             betPayoffs
         );
