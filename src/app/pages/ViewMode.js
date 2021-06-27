@@ -8,7 +8,7 @@ import SettingsBox from "../components/SettingsBox";
 import SetAllToMaxButton from "../components/SetAllToMaxButton";
 import { FaEdit } from "react-icons/fa";
 
-export default function ViewMode(props) {
+export default function ViewMode() {
     const { setRoundState } = useContext(RoundContext);
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
 

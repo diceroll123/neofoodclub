@@ -329,7 +329,7 @@ const PayoutTable = (props) => {
                 </>
             ) : (
                 <Tbody>
-                    {[...Array(amountOfBets)].map((e, betIndex) => {
+                    {[...Array(amountOfBets)].map(() => {
                         return (
                             <Tr>
                                 <Td colSpan={14}>

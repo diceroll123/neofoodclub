@@ -26,7 +26,7 @@ Chart.register(annotationPlugin);
 
 // this element contains the odds/winnings tables + charts
 
-const PayoutCharts = (props) => {
+const PayoutCharts = () => {
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
     const red = useColorModeValue("nfc.red", "nfc.redDark");
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
@@ -129,7 +129,7 @@ const PayoutCharts = (props) => {
             scales: {
                 x: {
                     ticks: {
-                        callback: (value, index, array) =>
+                        callback: (value) =>
                             amountAbbreviation(value),
                     },
                 },

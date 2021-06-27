@@ -88,7 +88,7 @@ function PirateFA(pirateId, foodId) {
     );
 }
 
-const NormalTable = (props) => {
+const NormalTable = () => {
     const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
     const red = useColorModeValue("nfc.red", "nfc.redDark");
@@ -739,7 +739,7 @@ const PirateTable = (props) => {
     return <NormalTable {...props} />;
 };
 
-export default function EditBets(props) {
+export default function EditBets() {
     const { roundState } = useContext(RoundContext);
 
     const anyBets = anyBetsExist(roundState.bets);
