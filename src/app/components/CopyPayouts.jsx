@@ -27,7 +27,7 @@ const CopyPayouts = (props) => {
 
     function createMarkdownTables() {
         // specifically meant to not be posted on Neopets, so it includes a URL.
-        if (payoutTables.odds === undefined || calculated === false) {
+        if (payoutTables.odds === undefined || calculated === false || roundState.roundData === null) {
             return null;
         }
 
@@ -85,7 +85,7 @@ const CopyPayouts = (props) => {
 
     function createHtmlTable() {
         // specifically meant to be posted on Neopets, so it includes the bet hash
-        if (payoutTables.odds === undefined || calculated === false) {
+        if (payoutTables.odds === undefined || calculated === false || roundState.roundData === null) {
             return null;
         }
 
