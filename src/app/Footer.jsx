@@ -17,7 +17,7 @@ const links = [
     {
         icon: FaCoffee,
         label: "Donate/Buy me a coffee",
-        href: "https://ko-fi/dice",
+        href: "https://ko-fi.com/dice",
     },
     {
         icon: FaGithub,
