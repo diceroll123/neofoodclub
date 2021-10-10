@@ -15,7 +15,7 @@ export default function ViewMode() {
 
     return (
         <>
-            <SettingsBox mt={4} background={gray}>
+            <SettingsBox background={gray}>
                 <HorizontalScrollingBox whiteSpace="nowrap" p={4}>
                     <HStack>
                         <VStack>
