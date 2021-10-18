@@ -10,7 +10,7 @@
     "@emotion/styled": "^11.3.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.1.0",
-    "@testing-library/user-event": "^13.2.1",
+    "@testing-library/user-event": "^13.4.1",
     "chart.js": "^3.5.1",
     "chartjs-plugin-annotation": "^1.0.2",
     "firebase": "^8.9.1",
