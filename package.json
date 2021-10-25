@@ -11,7 +11,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.2.1",
-    "chart.js": "^3.5.1",
+    "chart.js": "^3.6.0",
     "chartjs-plugin-annotation": "^1.0.2",
     "firebase": "^8.9.1",
     "framer-motion": "4.1.17",
