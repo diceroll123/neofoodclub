@@ -8,6 +8,7 @@ import {
     Heading,
     Icon,
     Divider,
+    Link,
 } from "@chakra-ui/react";
 import * as React from "react";
 import NeopointIcon from "./images/np-icon.svg";
@@ -58,8 +59,9 @@ function FooterButton(props) {
     return (
         <Tooltip label={label} aria-label={label}>
             <IconButton
-                as="a"
+                as={Link}
                 href={href}
+                isExternal
                 fontSize="xl"
                 icon={<Icon as={icon} />}
             />
