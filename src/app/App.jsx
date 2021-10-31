@@ -1,7 +1,7 @@
 import "firebase/database";
 
 import React, { useEffect, useCallback, useContext } from "react";
-import firebase from "firebase/app";
+import { initializeApp } from "firebase/app";
 
 import { createBetURL, parseBetUrl } from "./util";
 import HomePage from "./HomePage";
@@ -19,9 +19,7 @@ const config = {
     measurementId: "G-TPEBSBBBTR",
 };
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(config);
-}
+const firebase = initializeApp(config);
 
 function App() {
     const { roundState, setRoundState } = useContext(RoundContext);
@@ -78,7 +76,7 @@ function useRoundStateURLs(roundState, setRoundState) {
             viewMode: false,
             roundData:
                 parseInt(data.round) ===
-                parseInt(roundState.currentSelectedRound)
+                    parseInt(roundState.currentSelectedRound)
                     ? roundState.roundData
                     : null,
         });

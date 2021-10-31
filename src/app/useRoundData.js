@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@chakra-ui/react";
+import { getDatabase, ref, get, child, goOffline, goOnline, off, onValue } from "firebase/database";
 
 export default function useRoundData(firebase, currentSelectedRound) {
     const toast = useToast();
@@ -10,11 +11,7 @@ export default function useRoundData(firebase, currentSelectedRound) {
     // When the page first loads, if there's no round selected yet, get the current round number
     // from Firebase.
     useEffect(() => {
-        firebase
-            .database()
-            .ref()
-            .child("current_round")
-            .once("value")
+        get(child(ref(getDatabase(firebase)), "current_round"))
             .then((snapshot) => {
                 const newCurrentRound = snapshot.val();
                 setCurrentRound(parseInt(newCurrentRound));
@@ -27,10 +24,7 @@ export default function useRoundData(firebase, currentSelectedRound) {
             return;
         }
 
-        const ref = firebase
-            .database()
-            .ref()
-            .child(`rounds/${currentSelectedRound}`);
+        const dbRef = ref(getDatabase(firebase), `rounds/${currentSelectedRound}`);
 
         const update = (snapshot, name) => {
             const value = snapshot.val();
@@ -67,10 +61,10 @@ export default function useRoundData(firebase, currentSelectedRound) {
                 setCurrentRound((currentRound) => currentRound + 1);
             }
         };
-        const winnersRef = ref.child("winners");
-        const currentOddsRef = ref.child("currentOdds");
-        const timestampRef = ref.child("timestamp");
-        const lastChangeRef = ref.child("lastChange");
+        const winnersRef = child(dbRef, "winners");
+        const currentOddsRef = child(dbRef, "currentOdds");
+        const timestampRef = child(dbRef, "timestamp");
+        const lastChangeRef = child(dbRef, "lastChange");
 
         const isCurrentOrPreviousRound = () => {
             return [currentRound, currentRound - 1].includes(
@@ -80,15 +74,15 @@ export default function useRoundData(firebase, currentSelectedRound) {
 
         const addFirebaseHandlers = () => {
             // grab the changeable data points rather than the entire state every time
-            firebase.database().goOnline();
+            goOnline(getDatabase(firebase));
         };
 
         const removeFirebaseHandlers = () => {
-            firebase.database().goOffline();
+            goOffline(getDatabase(firebase));
         };
 
         // get the entire round state once
-        ref.once("value")
+        get(dbRef)
             .then((snapshot) => {
                 let newRoundData = snapshot.val();
                 if (newRoundData) {
@@ -108,14 +102,14 @@ export default function useRoundData(firebase, currentSelectedRound) {
             .then(() => {
                 // after getting round state, add listeners if this is current/previous round
                 if (isCurrentOrPreviousRound()) {
-                    winnersRef.on("value", onWinnersChange);
-                    currentOddsRef.on("value", (snapshot) =>
+                    onValue(winnersRef, onWinnersChange);
+                    onValue(currentOddsRef, (snapshot) =>
                         update(snapshot, "currentOdds")
                     );
-                    timestampRef.on("value", (snapshot) =>
+                    onValue(timestampRef, (snapshot) =>
                         update(snapshot, "timestamp")
                     );
-                    lastChangeRef.on("value", (snapshot) =>
+                    onValue(lastChangeRef, (snapshot) =>
                         update(snapshot, "lastChange")
                     );
                 }
@@ -127,10 +121,10 @@ export default function useRoundData(firebase, currentSelectedRound) {
         return () => {
             window.removeEventListener("blur", removeFirebaseHandlers);
             window.removeEventListener("focus", addFirebaseHandlers);
-            winnersRef.off();
-            currentOddsRef.off();
-            timestampRef.off();
-            lastChangeRef.off();
+            off(winnersRef);
+            off(currentOddsRef);
+            off(timestampRef);
+            off(lastChangeRef);
         };
     }, [toast, firebase, currentSelectedRound, currentRound]);
 
