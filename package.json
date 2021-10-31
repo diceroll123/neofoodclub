@@ -14,7 +14,7 @@
     "chart.js": "^3.6.0",
     "chartjs-plugin-annotation": "^1.0.2",
     "firebase": "^9.2.0",
-    "framer-motion": "4.1.17",
+    "framer-motion": "5.0.0",
     "immer": "^9.0.6",
     "moment": "^2.29.1",
     "moment-duration-format": "^2.3.2",
