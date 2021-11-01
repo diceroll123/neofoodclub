@@ -380,7 +380,7 @@ const NormalTable = () => {
                                         <CustomProbsInput
                                             arenaIndex={arenaId}
                                             pirateIndex={pirateIndex + 1}
-                                            probabilities={probabilities}
+                                            used={probs}
                                         />
                                     </CustomOddsElement>
                                     <CustomOddsElement as={Td} isNumeric>

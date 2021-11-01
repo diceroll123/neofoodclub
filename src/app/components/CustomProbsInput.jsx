@@ -10,13 +10,13 @@ import produce from "immer";
 
 import { RoundContext } from "../RoundState";
 
-// this element is the numnber input for custom probabilities
+// this element is the number input for custom probabilities
 
 export default function CustomProbsInput(props) {
-    const { roundState, setRoundState } = useContext(RoundContext);
-    const { arenaIndex, pirateIndex, probabilities, ...rest } = props;
+    const { setRoundState } = useContext(RoundContext);
+    const { arenaIndex, pirateIndex, used, ...rest } = props;
     const [prob, setProb] = useState(
-        probabilities.used[arenaIndex][pirateIndex] * 100
+        used[arenaIndex][pirateIndex] * 100
     );
 
     // we multiply by 100 to make it visibly a percentage
@@ -25,7 +25,7 @@ export default function CustomProbsInput(props) {
         setProb(probValue);
 
         const customProbs = produce(
-            roundState.customProbs || probabilities.used,
+            used,
             (draftCustomProbs) => {
                 draftCustomProbs[arenaIndex][pirateIndex] = probValue / 100;
             }
@@ -52,7 +52,7 @@ export default function CustomProbsInput(props) {
             onBlur={(e) => {
                 if (e.target.value === "") {
                     changeProbs(
-                        probabilities.used[arenaIndex][pirateIndex] * 100
+                        used[arenaIndex][pirateIndex] * 100
                     );
                 }
             }}
