@@ -120,7 +120,7 @@ const PayoutTable = (props) => {
                         {[...Array(amountOfBets)].map((e, betIndex) => {
                             const betBinary = betBinaries[betIndex + 1];
 
-                            if (betBinary === 0) {
+                            if (betBinary === 0 || betBinary === undefined) {
                                 return null;
                             }
 
