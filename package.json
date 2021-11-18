@@ -13,7 +13,7 @@
     "@testing-library/user-event": "^13.5.0",
     "chart.js": "^3.6.0",
     "chartjs-plugin-annotation": "^1.1.0",
-    "firebase": "^9.2.0",
+    "firebase": "^9.4.1",
     "framer-motion": "4.1.17",
     "immer": "^9.0.6",
     "moment": "^2.29.1",
