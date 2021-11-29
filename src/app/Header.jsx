@@ -45,12 +45,15 @@ moment.relativeTimeThreshold("ss", 0);
 function ColorModeButton() {
     const { colorMode, toggleColorMode } = useColorMode();
     const label = colorMode === "light" ? "Dark mode" : "Light mode";
+    const SwitchIcon = useColorModeValue(FaMoon, FaSun);
 
     return (
         <Tooltip label={label}>
             <IconButton
+                aria-label={`Switch to ${label}`}
                 onClick={toggleColorMode}
-                icon={colorMode === "light" ? <FaMoon /> : <FaSun />}
+                fontSize="lg"
+                icon={<SwitchIcon />}
             />
         </Tooltip>
     );
@@ -113,7 +116,7 @@ function CurrentRoundInfo() {
                 </Text>
                 {roundState.roundData.lastChange &&
                     roundState.roundData.start !==
-                        roundState.roundData.lastChange && (
+                    roundState.roundData.lastChange && (
                         <>
                             <Divider my={1} />
                             <Text fontSize="xs">
