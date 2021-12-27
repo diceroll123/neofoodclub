@@ -13,6 +13,7 @@ import {
 import * as React from "react";
 import NeopointIcon from "./images/np-icon.svg";
 import { FaGithub, FaCoffee } from "react-icons/fa";
+import { VercelCredit } from "./components/VercelCredit";
 
 const links = [
     {
@@ -103,6 +104,7 @@ function Footer(props) {
                     </Stack>
                     {<Copyright alignSelf={{ base: "center", sm: "start" }} />}
                 </Stack>
+                <VercelCredit />
             </Box>
         </>
     );
