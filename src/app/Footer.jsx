@@ -9,6 +9,7 @@ import {
     Icon,
     Divider,
     Link,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import * as React from "react";
 import NeopointIcon from "./images/np-icon.svg";
@@ -85,10 +86,11 @@ function Footer(props) {
         <>
             <Divider pt={6} />
             <Box
+                bg={useColorModeValue('gray.50', 'gray.900')}
                 as="footer"
                 role="contentinfo"
                 mx="auto"
-                maxW="7xl"
+                maxW="full"
                 py="12"
                 px={{ base: "4", md: "8" }}
             >
