@@ -3,29 +3,30 @@ import { extendTheme } from '@chakra-ui/react'
 const config = {
     initialColorMode: 'dark',
     useSystemColorMode: true,
-    colors: {
-        nfc: {
-            blue: "#90CDF4",
-            blueDark: "#4BA0E4",
+}
 
-            gray: "#F7FAFC",
-            grayDark: "#2D3748",
+const colors = {
+    nfc: {
+        blue: "#90CDF4",
+        blueDark: "#4BA0E4",
 
-            green: "#9AE6B4",
-            greenDark: "#50C17F",
+        gray: "#F7FAFC",
+        grayDark: "#2D3748",
 
-            red: "#FEB2B2",
-            redDark: "#F76C6C",
+        green: "#9AE6B4",
+        greenDark: "#50C17F",
 
-            orange: "#FBD38D",
-            orangeDark: "#F0923E",
+        red: "#FEB2B2",
+        redDark: "#F76C6C",
 
-            yellow: "#FAF089",
-            yellowDark: "#EFCF50",
-        },
+        orange: "#FBD38D",
+        orangeDark: "#F0923E",
+
+        yellow: "#FAF089",
+        yellowDark: "#EFCF50",
     },
 }
 
-const theme = extendTheme({ config });
+const theme = extendTheme({ config }, { colors });
 
 export default theme;
