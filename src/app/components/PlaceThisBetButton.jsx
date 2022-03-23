@@ -6,9 +6,24 @@ import { RoundContext } from "../RoundState";
 
 // this element is the "Place Bet" button inside the PayoutTable
 
+const BetButton = (props) => {
+    const { children, ...rest } = props;
+    return <Button size="sm" w="100%" {...rest}>{children}</Button>
+}
+
+const ErrorBetButton = (props) => {
+    const { children, ...rest } = props;
+
+    return (
+        <BetButton colorScheme={"red"} isDisabled {...rest}>
+            {children}
+        </BetButton>
+    );
+}
+
 const PlaceThisBetButton = (props) => {
     const { bet, betNum } = props;
-    const { roundState, calculations } = useContext(RoundContext);
+    const { roundState, calculations } = useContext(RoundContext);   
     const { betBinaries, betOdds, betPayoffs, winningBetBinary } = calculations;
     const [clicked, setClicked] = useState(false);
 
@@ -21,17 +36,17 @@ const PlaceThisBetButton = (props) => {
         roundState.currentSelectedRound < roundState.currentRound
     ) {
         return (
-            <Button size="xs" isDisabled>
+            <ErrorBetButton>
                 Round is over!
-            </Button>
+            </ErrorBetButton>
         );
     }
 
     if (roundState.betAmounts[betNum] < 50) {
         return (
-            <Button size="xs" isDisabled>
+            <ErrorBetButton>
                 Invalid bet amount!
-            </Button>
+            </ErrorBetButton>
         );
     }
 
@@ -40,9 +55,9 @@ const PlaceThisBetButton = (props) => {
             .length > 1
     ) {
         return (
-            <Button size="xs" isDisabled>
+            <ErrorBetButton>
                 Duplicate bet!
-            </Button>
+            </ErrorBetButton>
         );
     }
 
@@ -68,16 +83,15 @@ const PlaceThisBetButton = (props) => {
     }
 
     return (
-        <Button
+        <BetButton
             rightIcon={<ExternalLinkIcon />}
-            size="sm"
             onClick={() => {
                 generate_bet_link(bet, betNum);
                 setClicked(true);
             }}
         >
             {clicked ? "Bet placed!" : "Place bet!"}
-        </Button>
+        </BetButton>
     );
 };
 
