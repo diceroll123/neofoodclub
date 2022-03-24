@@ -202,6 +202,12 @@ export function anyBetsExist(betsObject) {
     );
 }
 
+export function anyBetsDuplicate(betsObject) {
+    // returns false if there are no duplicates
+    // returns true if there are any duplicates
+    return Object.values(betsObject).length !== [...new Set(Object.values(betsObject))];
+}
+
 export function createBetURL(roundState, ignoreBetAmounts) {
     // for this function:
     // bets will only be added if any bets are valid
