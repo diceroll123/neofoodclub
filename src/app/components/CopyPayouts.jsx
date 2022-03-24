@@ -14,6 +14,7 @@ import { PIRATE_NAMES } from "../constants";
 import { createBetURL, displayAsPercent } from "../util";
 import { RoundContext } from "../RoundState";
 import SettingsBox from "./SettingsBox";
+import DuplicateBetTooltip from "./DuplicateBetTooltip";
 
 // this is the "copy markdown/html"... code
 // previously known as the reddit table code
@@ -128,42 +129,44 @@ const CopyPayouts = (props) => {
 
     return (
         <SettingsBox mt={4} p={4} bgColor={gray} {...rest}>
-            <Wrap>
-                <WrapItem>
-                    <Button
-                        leftIcon={<Icon as={FaMarkdown} w="1.4em" h="1.4em" />}
-                        onClick={() => {
-                            markdownClip.onCopy();
-                            toast.closeAll();
-                            toast({
-                                title: `Table Markdown copied!`,
-                                status: "success",
-                                duration: 2000,
-                                isClosable: true,
-                            });
-                        }}
-                    >
-                        Copy Markdown
-                    </Button>
-                </WrapItem>
-                <WrapItem>
-                    <Button
-                        leftIcon={<Icon as={FaCode} w="1.4em" h="1.4em" />}
-                        onClick={() => {
-                            htmlClip.onCopy();
-                            toast.closeAll();
-                            toast({
-                                title: `Table HTML copied!`,
-                                status: "success",
-                                duration: 2000,
-                                isClosable: true,
-                            });
-                        }}
-                    >
-                        Copy HTML
-                    </Button>
-                </WrapItem>
-            </Wrap>
+            <DuplicateBetTooltip>
+                <Wrap>
+                    <WrapItem>
+                        <Button
+                            leftIcon={<Icon as={FaMarkdown} w="1.4em" h="1.4em" />}
+                            onClick={() => {
+                                markdownClip.onCopy();
+                                toast.closeAll();
+                                toast({
+                                    title: `Table Markdown copied!`,
+                                    status: "success",
+                                    duration: 2000,
+                                    isClosable: true,
+                                });
+                            }}
+                        >
+                            Copy Markdown
+                        </Button>
+                    </WrapItem>
+                    <WrapItem>
+                        <Button
+                            leftIcon={<Icon as={FaCode} w="1.4em" h="1.4em" />}
+                            onClick={() => {
+                                htmlClip.onCopy();
+                                toast.closeAll();
+                                toast({
+                                    title: `Table HTML copied!`,
+                                    status: "success",
+                                    duration: 2000,
+                                    isClosable: true,
+                                });
+                            }}
+                        >
+                            Copy HTML
+                        </Button>
+                    </WrapItem>
+                </Wrap>
+            </DuplicateBetTooltip>
         </SettingsBox>
     );
 };

@@ -13,9 +13,10 @@ import Cookies from "universal-cookie/es6";
 import React, { useState, useContext } from "react";
 import { createBetURL, anyBetsExist } from "../util";
 import ExtraBox from "./ExtraBox";
+import DuplicateBetTooltip from "./DuplicateBetTooltip";
 import { RoundContext } from "../RoundState";
 
-const CopyLinkButtons = (props) => {
+const CopyLinkButtons = () => {
     const toast = useToast();
     const cookies = new Cookies();
     const { roundState } = useContext(RoundContext);
@@ -48,27 +49,29 @@ const CopyLinkButtons = (props) => {
     return (
         <ExtraBox whiteSpace="nowrap">
             <Stack>
-                <ButtonGroup size="sm" isAttached>
-                    <Button
-                        mr="-px"
-                        leftIcon={<Icon as={FaLink} />}
-                        onClick={() => copier(urlClip, "Bet URL copied!")}
-                    >
-                        Copy URL
-                    </Button>
-                    {urlAmountsClip.value.includes("&a=") && (
+                <DuplicateBetTooltip>
+                    <ButtonGroup size="sm" isAttached>
                         <Button
-                            onClick={() =>
-                                copier(
-                                    urlAmountsClip,
-                                    "Bet URL + Amounts copied!"
-                                )
-                            }
+                            mr="-px"
+                            leftIcon={<Icon as={FaLink} />}
+                            onClick={() => copier(urlClip, "Bet URL copied!")}
                         >
-                            + Amounts
+                            Copy URL
                         </Button>
-                    )}
-                </ButtonGroup>
+                        {urlAmountsClip.value.includes("&a=") && (
+                            <Button
+                                onClick={() =>
+                                    copier(
+                                        urlAmountsClip,
+                                        "Bet URL + Amounts copied!"
+                                    )
+                                }
+                            >
+                                + Amounts
+                            </Button>
+                        )}
+                    </ButtonGroup>
+                </DuplicateBetTooltip>
                 <Checkbox
                     isChecked={useWebDomain}
                     onChange={(e) => {
