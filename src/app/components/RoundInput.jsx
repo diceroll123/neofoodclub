@@ -59,7 +59,6 @@ const RoundInput = () => {
                 isDisabled={roundNumber === 0}
                 value={roundNumber}
                 min={1}
-                max={currentRound}
                 allowMouseWheel
                 onFocus={(e) => {
                     setHasFocus(true);
