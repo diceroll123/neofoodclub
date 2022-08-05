@@ -73,7 +73,7 @@ export function parseBetUrl() {
 
     // parse Bet Amounts
     let amounts = urlParams.get("a");
-    if (amounts !== null) {
+    if (amounts !== null && amounts !== "") {
         tempBetAmounts = parseBetAmounts(amounts);
     }
 
