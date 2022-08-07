@@ -89,6 +89,7 @@ const PlaceThisBetButton = (props) => {
                 generate_bet_link(bet, betNum);
                 setClicked(true);
             }}
+            colorScheme={clicked ? undefined : "green"}
         >
             {clicked ? "Bet placed!" : "Place bet!"}
         </BetButton>
