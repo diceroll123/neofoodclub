@@ -23,7 +23,7 @@ import {
     POSITIVE_FAS,
 } from "../constants";
 import { computePirateBinary } from "../maths";
-import {displayAsPercent, anyBetsExist, getOdds, getProbs} from "../util";
+import { displayAsPercent, anyBetsExist, getOdds, getProbs } from "../util";
 import BetExtras from "../components/BetExtras";
 import BetFunctions from "../BetFunctions";
 import BigBrainElement from "../components/BigBrainElement";
@@ -204,7 +204,7 @@ const NormalTable = () => {
                         <TextTooltip text="Custom Odds" />
                     </CustomOddsElement>
                     {/*<Th>Timeline</Th>*/}
-                    {[...Array(amountOfBets)].map((e, i) => {
+                    {[...Array(amountOfBets)].map((_e, i) => {
                         return <Th key={i}>Bet {i + 1}</Th>;
                     })}
                     <Th>
@@ -227,10 +227,7 @@ const NormalTable = () => {
                             <BigBrainElement as={Td} rowSpan={5} isNumeric>
                                 {roundState.roundData ? (
                                     <TextTooltip
-                                        text={displayAsPercent(
-                                            arenaRatios[arenaId],
-                                            1
-                                        )}
+                                        text={displayAsPercent(arenaRatios[arenaId], 1)}
                                         label={arenaRatios[arenaId] * 100}
                                     />
                                 ) : (
@@ -277,30 +274,17 @@ const NormalTable = () => {
                             {roundState.roundData ? (
                                 <>
                                     {[...Array(amountOfBets)].map(
-                                        (bet, betNum) => {
+                                        (_bet, betNum) => {
                                             return (
-                                                <Td
-                                                    key={betNum}
-                                                    backgroundColor={gray}
-                                                >
+                                                <Td key={betNum} backgroundColor={gray}>
                                                     <Radio
-                                                        name={
-                                                            "bet" +
-                                                            (betNum + 1) +
-                                                            arenaId
-                                                        }
+                                                        name={`bet${betNum + 1}${arenaId}`}
                                                         value={0}
                                                         onChange={() =>
-                                                            changeBet(
-                                                                betNum + 1,
-                                                                arenaId,
-                                                                0
-                                                            )
+                                                            changeBet(betNum + 1, arenaId, 0)
                                                         }
                                                         isChecked={
-                                                            roundState.bets[
-                                                                betNum + 1
-                                                            ][arenaId] === 0
+                                                            roundState.bets[betNum + 1][arenaId] === 0
                                                         }
                                                     />
                                                 </Td>
@@ -331,10 +315,7 @@ const NormalTable = () => {
                         </Tr>
 
                         {pirates.map((pirateId, pirateIndex) => {
-                            if (
-                                !roundState.roundData ||
-                                !calculations.calculated
-                            ) {
+                            if (!roundState.roundData || !calculations.calculated) {
                                 // big ol skeleton
                                 return (
                                     <Tr key={pirateIndex}>
@@ -347,27 +328,16 @@ const NormalTable = () => {
                                 );
                             }
 
-                            let opening =
-                                roundState.roundData.openingOdds[arenaId][
-                                    pirateIndex + 1
-                                ];
-                            let current =
-                                roundState.roundData.currentOdds[arenaId][
-                                    pirateIndex + 1
-                                ];
+                            let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
+                            let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
 
                             let usedOdds = getOdds(roundState);
                             let custom = usedOdds[arenaId][pirateIndex + 1];
-                            const useCustom =
-                                roundState.advanced.bigBrain &&
-                                roundState.advanced.customOddsMode;
+                            const useCustom = roundState.advanced.bigBrain && roundState.advanced.customOddsMode;
                             const useOdds = useCustom ? custom : current;
 
                             let bgColor = "transparent";
-                            let pirateBin = computePirateBinary(
-                                arenaId,
-                                pirateIndex + 1
-                            );
+                            let pirateBin = computePirateBinary(arenaId, pirateIndex + 1);
                             if ((winningBetBinary & pirateBin) === pirateBin) {
                                 bgColor = green;
                             }
@@ -385,36 +355,17 @@ const NormalTable = () => {
 
                             return (
                                 <Tr key={pirateId} backgroundColor={bgColor}>
-                                    <StickyTd
-                                        backgroundColor={getPirateBgColor(
-                                            opening
-                                        )}
-                                    >
+                                    <StickyTd backgroundColor={getPirateBgColor(opening)}>
                                         {PIRATE_NAMES[pirateId]}
                                     </StickyTd>
                                     <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(
-                                            probabilities.min[arenaId][
-                                                pirateIndex + 1
-                                            ],
-                                            1
-                                        )}
+                                        {displayAsPercent(probabilities.min[arenaId][pirateIndex + 1], 1)}
                                     </BigBrainElement>
                                     <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(
-                                            probabilities.max[arenaId][
-                                                pirateIndex + 1
-                                            ],
-                                            1
-                                        )}
+                                        {displayAsPercent(probabilities.max[arenaId][pirateIndex + 1], 1)}
                                     </BigBrainElement>
                                     <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(
-                                            probabilities.std[arenaId][
-                                                pirateIndex + 1
-                                            ],
-                                            1
-                                        )}
+                                        {displayAsPercent(probabilities.std[arenaId][pirateIndex + 1], 1)}
                                     </BigBrainElement>
                                     <CustomOddsElement as={Td} isNumeric>
                                         <CustomProbsInput
@@ -436,11 +387,7 @@ const NormalTable = () => {
                                     {roundState.roundData?.foods ? (
                                         <>
                                             <BigBrainElement as={Td} isNumeric>
-                                                {
-                                                    pirateFAs[arenaId][
-                                                        pirateIndex
-                                                    ]
-                                                }
+                                                {pirateFAs[arenaId][pirateIndex]}
                                             </BigBrainElement>
                                             {roundState.roundData.foods[
                                                 arenaId
@@ -472,9 +419,7 @@ const NormalTable = () => {
                                                 style={{ stroke: "#000000" }}
                                             />
                                         )}
-                                        <Text
-                                            as={current === opening ? "" : "b"}
-                                        >
+                                        <Text as={current === opening ? "" : "b"}>
                                             {current}:1
                                         </Text>
                                     </Td>
@@ -486,28 +431,17 @@ const NormalTable = () => {
                                     </CustomOddsElement>
                                     {/* Odds Timeline */}
                                     {[...Array(amountOfBets)].map(
-                                        (bet, betNum) => {
+                                        (_bet, betNum) => {
                                             return (
                                                 <Td key={betNum}>
                                                     <Radio
-                                                        name={
-                                                            "bet" +
-                                                            (betNum + 1) +
-                                                            arenaId
-                                                        }
+                                                        name={`bet${betNum + 1}${arenaId}`}
                                                         value={pirateIndex + 1}
                                                         onChange={() =>
-                                                            changeBet(
-                                                                betNum + 1,
-                                                                arenaId,
-                                                                pirateIndex + 1
-                                                            )
+                                                            changeBet(betNum + 1, arenaId, pirateIndex + 1)
                                                         }
                                                         isChecked={
-                                                            roundState.bets[
-                                                                betNum + 1
-                                                            ][arenaId] ===
-                                                            pirateIndex + 1
+                                                            roundState.bets[betNum + 1][arenaId] === pirateIndex + 1
                                                         }
                                                     />
                                                 </Td>
@@ -568,7 +502,7 @@ const DropDownTable = (props) => {
         <Table size="sm" width="auto" {...rest}>
             <Thead>
                 <Tr>
-                    {ARENA_NAMES.map((arenaName, arenaId) => {
+                    {ARENA_NAMES.map((arenaName, _arenaId) => {
                         return <Th>{arenaName}</Th>;
                     })}
                     <Th>
@@ -592,18 +526,12 @@ const DropDownTable = (props) => {
                                     <Tbody>
                                         {pirates.map(
                                             (pirateId, pirateIndex) => {
-                                                if (
-                                                    roundState.roundData ===
-                                                    null
-                                                ) {
+                                                if (roundState.roundData === null) {
                                                     // big ol skeleton
                                                     return (
                                                         <Tr key={pirateIndex}>
                                                             <Pd>
-                                                                <Skeleton
-                                                                    width="150px"
-                                                                    height="24px"
-                                                                >
+                                                                <Skeleton width="150px" height="24px">
                                                                     &nbsp;
                                                                 </Skeleton>
                                                             </Pd>
@@ -611,63 +539,28 @@ const DropDownTable = (props) => {
                                                     );
                                                 }
 
-                                                let opening =
-                                                    roundState.roundData
-                                                        .openingOdds[arenaId][
-                                                        pirateIndex + 1
-                                                    ];
-                                                let current =
-                                                    roundState.roundData
-                                                        .currentOdds[arenaId][
-                                                        pirateIndex + 1
-                                                    ];
+                                                let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
+                                                let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
 
-                                                let pirateBg =
-                                                    getPirateBgColor(opening);
+                                                let pirateBg = getPirateBgColor(opening);
                                                 let trBg = "transparent";
-                                                let pirateBin =
-                                                    computePirateBinary(
-                                                        arenaId,
-                                                        pirateIndex + 1
-                                                    );
-                                                if (
-                                                    (winningBetBinary &
-                                                        pirateBin) ===
-                                                    pirateBin
-                                                ) {
+                                                let pirateBin = computePirateBinary(arenaId, pirateIndex + 1);
+
+                                                if ((winningBetBinary & pirateBin) === pirateBin) {
                                                     trBg = green;
                                                     pirateBg = green;
                                                 }
 
                                                 return (
-                                                    <Tr
-                                                        key={pirateId}
-                                                        backgroundColor={trBg}
-                                                    >
-                                                        <Pd
-                                                            whiteSpace="nowrap"
-                                                            backgroundColor={
-                                                                pirateBg
-                                                            }
-                                                        >
-                                                            {
-                                                                PIRATE_NAMES[
-                                                                    pirateId
-                                                                ]
-                                                            }
+                                                    <Tr key={pirateId} backgroundColor={trBg}>
+                                                        <Pd whiteSpace="nowrap" backgroundColor={pirateBg}>
+                                                            {PIRATE_NAMES[pirateId]}
                                                         </Pd>
                                                         <Pd isNumeric>
                                                             {opening}:1
                                                         </Pd>
                                                         <Pd isNumeric>
-                                                            <Text
-                                                                as={
-                                                                    current ===
-                                                                    opening
-                                                                        ? ""
-                                                                        : "b"
-                                                                }
-                                                            >
+                                                            <Text as={current === opening ? "" : "b"}>
                                                                 {current}:1
                                                             </Text>
                                                         </Pd>
@@ -683,7 +576,7 @@ const DropDownTable = (props) => {
                 </Tr>
             </Tbody>
             <Tbody>
-                {[...Array(amountOfBets)].map((bet, betNum) => {
+                {[...Array(amountOfBets)].map((_bet, betNum) => {
                     return (
                         <Tr key={betNum}>
                             {[...Array(5)].map((_, arenaId) => {
