@@ -88,6 +88,46 @@ function PirateFA(pirateId, foodId) {
     );
 }
 
+const PirateSelect = (props) => {
+    let { arenaId, pirateValue, getPirateBgColor, ...rest } = props;
+    const { roundState } = useContext(RoundContext);
+
+    let pirates = roundState.roundData.pirates[arenaId];
+    let openingOdds = roundState.roundData.openingOdds[arenaId];
+
+    let pirateBg = "transparent";
+
+    let currentOpeningOdds = openingOdds[pirateValue];
+    if (currentOpeningOdds > 1) {
+        pirateBg = getPirateBgColor(currentOpeningOdds);
+    }
+
+    return (
+        <Select
+            size="sm"
+            height="1.5rem"
+            backgroundColor={pirateBg}
+            value={pirateValue}
+            {...rest}>
+            <option value="0" />
+            {pirates.map(
+                (pirateId, pirateIndex) => {
+                    // some browsers support colored backgrounds for <option> elements, so we use that here!
+                    let bgColor = getPirateBgColor(openingOdds[pirateIndex + 1]);
+                    return (
+                        <option
+                            key={pirateId}
+                            style={{ background: bgColor }}
+                            value={pirateIndex + 1}>
+                            {PIRATE_NAMES[pirateId]}
+                        </option>
+                    );
+                }
+            )}
+        </Select>
+    )
+}
+
 const NormalTable = () => {
     const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
@@ -656,69 +696,18 @@ const DropDownTable = (props) => {
                                         </Pd>
                                     );
                                 }
-                                let pirates =
-                                    roundState.roundData.pirates[arenaId];
-                                let pirateIndex =
-                                    roundState.bets[betNum + 1][arenaId];
-                                let opening =
-                                    roundState.roundData.openingOdds[arenaId][
-                                        pirateIndex
-                                    ];
-
-                                let pirateBg = "transparent";
-
-                                if (opening > 1) {
-                                    pirateBg = getPirateBgColor(opening);
-                                }
+                                let pirateIndex = roundState.bets[betNum + 1][arenaId];
 
                                 return (
                                     <Pd key={arenaId}>
-                                        <Select
-                                            size="sm"
-                                            height="1.5rem"
-                                            backgroundColor={pirateBg}
-                                            value={pirateIndex}
+                                        <PirateSelect
+                                            arenaId={arenaId}
+                                            pirateValue={pirateIndex}
+                                            getPirateBgColor={getPirateBgColor}
                                             onChange={(e) =>
-                                                changeBet(
-                                                    betNum + 1,
-                                                    arenaId,
-                                                    parseInt(e.target.value)
-                                                )
+                                                changeBet(betNum + 1, arenaId, parseInt(e.target.value))
                                             }
-                                        >
-                                            <option value="0" />
-                                            {pirates.map(
-                                                (pirateId, pirateIndex) => {
-                                                    return (
-                                                        <option
-                                                            key={pirateId}
-                                                            style={{
-                                                                background:
-                                                                    getPirateBgColor(
-                                                                        roundState
-                                                                            .roundData
-                                                                            .openingOdds[
-                                                                            arenaId
-                                                                        ][
-                                                                            pirateIndex +
-                                                                                1
-                                                                        ]
-                                                                    ),
-                                                            }}
-                                                            value={
-                                                                pirateIndex + 1
-                                                            }
-                                                        >
-                                                            {
-                                                                PIRATE_NAMES[
-                                                                    pirateId
-                                                                ]
-                                                            }
-                                                        </option>
-                                                    );
-                                                }
-                                            )}
-                                        </Select>
+                                        />
                                     </Pd>
                                 );
                             })}
