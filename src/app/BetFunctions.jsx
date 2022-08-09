@@ -1,4 +1,5 @@
 import {
+    Flex,
     Button,
     ButtonGroup,
     Editable,
@@ -6,18 +7,25 @@ import {
     EditablePreview,
     Menu,
     MenuButton,
-    MenuDivider,
-    MenuGroup,
     MenuItem,
     MenuList,
+    Modal,
+    ModalBody,
+    ModalContent,
+    ModalCloseButton,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
     Stack,
     Text,
     Wrap,
+    Spacer,
     WrapItem,
     Icon,
-    useColorModeValue,
+    useDisclosure,
+    HStack,
 } from "@chakra-ui/react";
-import { FaCopy, FaPlus, FaTrash, FaChevronDown } from "react-icons/fa";
+import { FaCopy, FaPlus, FaTrash, FaChevronDown, FaMagic, FaShapes, FaRandom } from "react-icons/fa";
 import React, { useContext, useEffect, useState } from "react";
 
 import {
@@ -31,19 +39,190 @@ import {
     makeEmptyBets,
     shuffleArray,
     sortedIndices,
+    generateRandomPirateIndex,
+    generateRandomIntegerInRange,
 } from "./util";
 import { computeBinaryToPirates, computePiratesBinary } from "./maths";
 import { RoundContext } from "./RoundState";
+import PirateSelect from "./components/PirateSelect";
 import SettingsBox from "./components/SettingsBox";
 
 const cartesian = (...a) =>
     a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
 
+const BuildSetMenu = (props) => {
+    const { addNewSet, gambitWithPirates, getPirateBgColor, tenbetSet } = props;
+    const { roundState } = useContext(RoundContext);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [mode, setMode] = React.useState(''); // currently can only be "Ten-bet" or "Gambit"
+    const [pirateIndices, setPirateIndices] = React.useState([0, 0, 0, 0, 0]); // indices of the pirates to be included in the set
+    const [min, setMin] = React.useState(0); // minimum pirate amount
+    const [max, setMax] = React.useState(0); // maximum pirate amount
+    const [buildButtonEnabled, setBuildButtonEnabled] = React.useState(false); // whether the build button is enabled, if we're within min/max to do so
+
+    const maxBet = getMaxBet(roundState.currentSelectedRound);
+
+    const handleChange = (arenaIndex, pirateIndex) => {
+        let newPirateIndices = cloneArray(pirateIndices);
+        newPirateIndices[arenaIndex] = pirateIndex;
+        setPirateIndices(newPirateIndices);
+    }
+
+    useEffect(() => {
+        recount();
+    }, [pirateIndices]);
+
+    const recount = () => {
+        // count the amount of non-zero elements in pirateIndices
+        let amount = pirateIndices.reduce((a, b) => a + (b !== 0 ? 1 : 0), 0);
+        setBuildButtonEnabled(amount >= min && amount <= max);
+    }
+
+    const handleTenBetClick = () => {
+        setMode('Ten-bet');
+        // reset state
+        setMin(1);
+        setMax(3);
+        setPirateIndices([0, 0, 0, 0, 0]);
+        onOpen();
+    }
+
+    const handleGambitClick = () => {
+        setMode('Gambit');
+        // reset state
+        setMin(5);
+        setMax(5);
+        setPirateIndices([0, 0, 0, 0, 0]);
+        onOpen();
+    }
+
+    const handleBuildClick = () => {
+        if (mode === 'Ten-bet') {
+            const { bets, betAmounts } = tenbetSet(pirateIndices);
+            addNewSet(`Custom Ten-bet Set (${maxBet} NP)`, bets, betAmounts, true);
+        } else if (mode === 'Gambit') {
+            const { bets, betAmounts } = gambitWithPirates(pirateIndices);
+
+            addNewSet(`Custom Gambit Set (${maxBet} NP)`, bets, betAmounts, true);
+        }
+        onClose();
+    }
+
+    return (
+        <>
+            <Menu>
+                <MenuButton
+                    as={Button}
+                    leftIcon={<Icon as={FaShapes} />}
+                    rightIcon={
+                        <Icon
+                            as={FaChevronDown}
+                            w="0.75em"
+                            h="0.75em"
+                        />
+                    }
+                    aria-label="Generate New Bet Set">
+                    Build set
+                </MenuButton>
+                <MenuList>
+                    <MenuItem onClick={handleGambitClick}>
+                        Gambit set
+                    </MenuItem>
+                    <MenuItem onClick={handleTenBetClick}>
+                        Ten-bet set
+                    </MenuItem>
+                </MenuList>
+            </Menu>
+
+            <Modal isCentered
+                size="2xl"
+                isOpen={isOpen}
+                onClose={onClose}
+                motionPreset='slideInBottom'>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Custom {mode} builder</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <HStack>
+                            {[...Array(5)].map((_e, arenaIndex) => {
+                                return (
+                                    <PirateSelect
+                                        arenaId={arenaIndex}
+                                        pirateValue={pirateIndices[arenaIndex]}
+                                        getPirateBgColor={getPirateBgColor}
+                                        onChange={(e) =>
+                                            handleChange(arenaIndex, parseInt(e.target.value))
+                                        }
+                                    />
+                                );
+                            })}
+                        </HStack>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Flex width="2xl">
+                            <Button
+                                leftIcon={<Icon as={FaRandom} />}
+                                mr={3}
+                                onClick={() => {
+                                    // generate a full set of random indices
+                                    let newIndices = [
+                                        generateRandomPirateIndex(),
+                                        generateRandomPirateIndex(),
+                                        generateRandomPirateIndex(),
+                                        generateRandomPirateIndex(),
+                                        generateRandomPirateIndex()
+                                    ];
+
+                                    // remove random indices as needed
+                                    if (max - min > 0) {
+                                        let indices = [0, 1, 2, 3, 4];
+                                        shuffleArray(indices);
+                                        let rand = generateRandomIntegerInRange(max - min, max + min);
+                                        let randomIndices = indices.slice(0, rand);
+                                        // set these indices to 0
+                                        randomIndices.forEach((index) => {
+                                            newIndices[index] = 0;
+                                        });
+                                    }
+
+                                    // this allows us to stay within the boundaries without having per-algorithm functions to do this
+
+                                    setPirateIndices(newIndices);
+                                }}>
+                                Randomize
+                            </Button>
+                            {
+                                pirateIndices.some((e) => e !== 0) && (
+                                    <Button
+                                        leftIcon={<Icon as={FaTrash} />}
+                                        onClick={() => { setPirateIndices([0, 0, 0, 0, 0]) }}>
+                                        Clear
+                                    </Button>
+                                )
+                            }
+                            <Spacer />
+                            <Button
+                                disabled={!buildButtonEnabled}
+                                variant="solid"
+                                colorScheme='blue'
+                                mr={3}
+                                onClick={() => { handleBuildClick() }}>
+                                Build {mode} set
+                            </Button>
+                            <Button variant="solid" onClick={onClose}>Cancel</Button>
+                        </Flex>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        </>
+    )
+}
+
 const BetFunctions = (props) => {
-    const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
-    const { ...rest } = props;
-    const { roundState, setRoundState, calculations } =
-        useContext(RoundContext);
+
+    const { blue, orange, red, green, yellow, gray, getPirateBgColor, ...rest } = props;
+    const { roundState, setRoundState, calculations } = useContext(RoundContext);
     const { probabilities, arenaRatios } = calculations;
     const [currentBet, setCurrentBet] = useState("0");
 
@@ -233,6 +412,44 @@ const BetFunctions = (props) => {
         }
 
         addNewSet(`Max TER Set (${maxBet} NP)`, newBets, newBetAmounts, true);
+    }
+
+    function tenbetSet(tenbetIndices) {
+        const maxBet = getMaxBet(roundState.currentSelectedRound);
+        const tenbetBinary = computePiratesBinary(tenbetIndices);
+
+        const maker = new BetsMaker();
+        const { betCaps, pirateCombos } = maker.calculate(
+            [0, 1, 2, 3, 4],
+            [0, 1, 2, 3, 4],
+            [0, 1, 2, 3, 4],
+            [0, 1, 2, 3, 4],
+            [0, 1, 2, 3, 4]
+        );
+
+        let topRatios = Object.entries(pirateCombos).map(([k, v]) => [k, v]);
+        topRatios.sort((a, b) => b[1] - a[1]);
+
+        let bets = {};
+        let betAmounts = {};
+        let bet = 0;
+        while (Object.keys(bets).length < Object.keys(roundState.bets).length) {
+            const pirateBinary = topRatios[bet][0];
+            if ((pirateBinary & tenbetBinary) == tenbetBinary) {
+                const index = Object.keys(bets).length + 1;
+
+                bets[index] = computeBinaryToPirates(
+                    pirateBinary
+                );
+
+                betAmounts[index] = determineBetAmount(
+                    maxBet,
+                    betCaps[pirateBinary]
+                );
+            }
+            bet += 1;
+        }
+        return { bets, betAmounts };
     }
 
     function gambitSet() {
@@ -461,70 +678,88 @@ const BetFunctions = (props) => {
     return (
         <SettingsBox bgColor={gray} mt={4} {...rest}>
             <Stack p={4}>
-                <ButtonGroup size="sm" isAttached variant="outline">
-                    <Menu>
-                        <MenuButton
-                            as={Button}
-                            leftIcon={<Icon as={FaPlus} />}
-                            rightIcon={
-                                <Icon
-                                    as={FaChevronDown}
-                                    w="0.75em"
-                                    h="0.75em"
-                                />
-                            }
-                            aria-label="Add New Bet Set"
-                        >
-                            New
-                        </MenuButton>
-                        <MenuList>
-                            <MenuGroup>
-                                <MenuItem onClick={newEmptySet}>
-                                    Empty set
-                                </MenuItem>
-                            </MenuGroup>
-                            <MenuDivider />
-                            <MenuGroup title="Generate a set">
-                                <MenuItem onClick={merSet}>
-                                    Max TER set
-                                </MenuItem>
-                                <MenuItem onClick={gambitSet}>
-                                    Gambit set
-                                </MenuItem>
-                                <MenuItem
-                                    hidden={winningPiratesBinary === 0}
-                                    onClick={winningGambitSet}
-                                >
-                                    Winning Gambit set
-                                </MenuItem>
-                                <MenuItem onClick={randomCrazySet}>
-                                    Random Crazy set
-                                </MenuItem>
-                                <MenuItem
-                                    onClick={bustproofSet}
-                                    isDisabled={positiveArenas === 0}
-                                >
-                                    Bustproof Set
-                                </MenuItem>
-                            </MenuGroup>
-                        </MenuList>
-                    </Menu>
+                <Wrap>
+                    <WrapItem>
+                        <ButtonGroup size="sm" isAttached variant="outline">
+                            <Button
+                                leftIcon={<Icon as={FaPlus} />}
+                                aria-label=""
+                                onClick={newEmptySet}
+                            >
+                                New set
+                            </Button>
 
-                    <Button
-                        leftIcon={<Icon as={FaCopy} />}
-                        aria-label="Clone Current Bet Set"
-                        onClick={cloneSet}
-                    >
-                        Clone
-                    </Button>
-                    <Button
-                        leftIcon={<Icon as={FaTrash} />}
-                        aria-label="Delete Current Bet Set"
-                        onClick={deleteSet}
-                    >
-                        {Object.keys(allBets).length === 1 ? "Clear" : "Delete"}
-                    </Button>
-                </ButtonGroup>
+                            <Button
+                                leftIcon={<Icon as={FaCopy} />}
+                                aria-label="Clone Current Bet Set"
+                                onClick={cloneSet}
+                            >
+                                Clone
+                            </Button>
+
+                            <Button
+                                leftIcon={<Icon as={FaTrash} />}
+                                aria-label="Delete Current Bet Set"
+                                onClick={deleteSet}
+                            >
+                                {Object.keys(allBets).length === 1 ? "Clear" : "Delete"}
+                            </Button>
+                        </ButtonGroup>
+                    </WrapItem>
+
+                    <WrapItem>
+                        <ButtonGroup size="sm" isAttached variant="outline">
+                            <Menu>
+                                <MenuButton
+                                    as={Button}
+                                    leftIcon={<Icon as={FaMagic} />}
+                                    rightIcon={
+                                        <Icon
+                                            as={FaChevronDown}
+                                            w="0.75em"
+                                            h="0.75em"
+                                        />
+                                    }
+                                    aria-label="Generate New Bet Set"
+                                >
+                                    Generate set
+                                </MenuButton>
+                                <MenuList>
+                                    <MenuItem onClick={merSet}>
+                                        Max TER set
+                                    </MenuItem>
+                                    <MenuItem onClick={gambitSet}>
+                                        Gambit set
+                                    </MenuItem>
+                                    <MenuItem
+                                        hidden={winningPiratesBinary === 0}
+                                        onClick={winningGambitSet}
+                                    >
+                                        Winning Gambit set
+                                    </MenuItem>
+                                    <MenuItem onClick={randomCrazySet}>
+                                        Random Crazy set
+                                    </MenuItem>
+                                    <MenuItem
+                                        onClick={bustproofSet}
+                                        isDisabled={positiveArenas === 0}
+                                    >
+                                        Bustproof Set
+                                    </MenuItem>
+                                </MenuList>
+                            </Menu>
+
+                            <BuildSetMenu
+                                addNewSet={addNewSet}
+                                gambitWithPirates={gambitWithPirates}
+                                getPirateBgColor={getPirateBgColor}
+                                tenbetSet={tenbetSet}
+                            />
+
+                        </ButtonGroup>
+                    </WrapItem>
+                </Wrap>
+
                 <Wrap>
                     {Object.keys(allBets).map((e) => {
                         return (

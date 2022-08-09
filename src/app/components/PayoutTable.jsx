@@ -11,7 +11,6 @@ import {
     Spacer,
     Text,
     IconButton,
-    useColorModeValue,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
@@ -28,22 +27,9 @@ import TextTooltip from "./TextTooltip";
 // this element is the colorful and informative table full of your bet data
 
 const PayoutTable = (props) => {
+    const { blue, orange, green, red, yellow, getPirateBgColor, ...rest } = props;
     const { roundState, setRoundState, calculations } =
         useContext(RoundContext);
-    const { ...rest } = props;
-    const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
-    const green = useColorModeValue("nfc.green", "nfc.greenDark");
-    const red = useColorModeValue("nfc.red", "nfc.redDark");
-    const orange = useColorModeValue("nfc.orange", "nfc.orangeDark");
-    const yellow = useColorModeValue("nfc.yellow", "nfc.yellowDark");
-
-    function getPirateBgColor(odds) {
-        if ([3, 4, 5].includes(odds)) return blue;
-        if ([6, 7, 8, 9].includes(odds)) return orange;
-        if ([10, 11, 12, 13].includes(odds)) return red;
-
-        return green;
-    }
 
     const {
         calculated,

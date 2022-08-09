@@ -12,6 +12,14 @@ export function reducer(state, item) {
     return { ...state, ...item };
 }
 
+export function generateRandomIntegerInRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function generateRandomPirateIndex() {
+    return generateRandomIntegerInRange(1, 4);
+}
+
 function parseBets(betString) {
     return betString
         .split("")
@@ -277,6 +285,7 @@ export function makeEmptyBetAmounts(length) {
 }
 
 export function shuffleArray(array) {
+    // shuffles the array in-place
     // from https://stackoverflow.com/a/12646864
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));

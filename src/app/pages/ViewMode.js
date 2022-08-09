@@ -1,4 +1,4 @@
-import { VStack, Button, Icon, useColorModeValue, HStack } from "@chakra-ui/react";
+import { VStack, Button, Icon, HStack } from "@chakra-ui/react";
 import { RoundContext } from "../RoundState";
 import React, { useContext } from "react";
 import HorizontalScrollingBox from "../components/HorizontalScrollingBox";
@@ -9,9 +9,9 @@ import CopyLinkButtons from "../components/CopyLinkButtons";
 import SetAllToMaxButton from "../components/SetAllToMaxButton";
 import { FaEdit } from "react-icons/fa";
 
-export default function ViewMode() {
+export default function ViewMode(props) {
+    const { blue, orange, green, red, yellow, gray, getPirateBgColor } = props;
     const { setRoundState } = useContext(RoundContext);
-    const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
 
     return (
         <>
@@ -39,7 +39,14 @@ export default function ViewMode() {
                 </HorizontalScrollingBox>
             </SettingsBox>
             <HorizontalScrollingBox>
-                <PayoutTable />
+                <PayoutTable
+                    blue={blue}
+                    orange={orange}
+                    red={red}
+                    green={green}
+                    yellow={yellow}
+                    getPirateBgColor={getPirateBgColor}
+                />
             </HorizontalScrollingBox>
 
             <HorizontalScrollingBox mt={4}>

@@ -2,7 +2,6 @@ import {
     Box,
     Button,
     Radio,
-    Select,
     Skeleton,
     StatArrow,
     Table,
@@ -36,6 +35,7 @@ import FaDetailsElement from "../components/FaDetailsElement";
 import HorizontalScrollingBox from "../components/HorizontalScrollingBox";
 import PayoutCharts from "../components/PayoutCharts";
 import PayoutTable from "../components/PayoutTable";
+import PirateSelect from "../components/PirateSelect";
 import Pd from "../components/Pd";
 import { RoundContext } from "../RoundState";
 import Td from "../components/Td";
@@ -88,51 +88,8 @@ function PirateFA(pirateId, foodId) {
     );
 }
 
-const PirateSelect = (props) => {
-    let { arenaId, pirateValue, getPirateBgColor, ...rest } = props;
-    const { roundState } = useContext(RoundContext);
-
-    let pirates = roundState.roundData.pirates[arenaId];
-    let openingOdds = roundState.roundData.openingOdds[arenaId];
-
-    let pirateBg = "transparent";
-
-    let currentOpeningOdds = openingOdds[pirateValue];
-    if (currentOpeningOdds > 1) {
-        pirateBg = getPirateBgColor(currentOpeningOdds);
-    }
-
-    return (
-        <Select
-            size="sm"
-            height="1.5rem"
-            backgroundColor={pirateBg}
-            value={pirateValue}
-            {...rest}>
-            <option value="0" />
-            {pirates.map(
-                (pirateId, pirateIndex) => {
-                    // some browsers support colored backgrounds for <option> elements, so we use that here!
-                    let bgColor = getPirateBgColor(openingOdds[pirateIndex + 1]);
-                    return (
-                        <option
-                            key={pirateId}
-                            style={{ background: bgColor }}
-                            value={pirateIndex + 1}>
-                            {PIRATE_NAMES[pirateId]}
-                        </option>
-                    );
-                }
-            )}
-        </Select>
-    )
-}
-
-const NormalTable = () => {
-    const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
-    const green = useColorModeValue("nfc.green", "nfc.greenDark");
-    const red = useColorModeValue("nfc.red", "nfc.redDark");
-    const orange = useColorModeValue("nfc.orange", "nfc.orangeDark");
+const NormalTable = (props) => {
+    const { red, green, getPirateBgColor } = props;
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     const { roundState, setRoundState, calculations } =
         useContext(RoundContext);
@@ -140,13 +97,6 @@ const NormalTable = () => {
         calculations;
     const amountOfBets = Object.keys(roundState.bets).length;
 
-    function getPirateBgColor(odds) {
-        if ([3, 4, 5].includes(odds)) return blue;
-        if ([6, 7, 8, 9].includes(odds)) return orange;
-        if ([10, 11, 12, 13].includes(odds)) return red;
-
-        return green;
-    }
 
     function changeBet(betIndex, arenaIndex, pirateIndex) {
         // change a single pirate in a single arena
@@ -621,7 +571,9 @@ const PirateTable = (props) => {
     return <NormalTable {...props} />;
 };
 
-export default function EditBets() {
+export default function EditBets(props) {
+    const { blue, orange, green, red, yellow, gray, getPirateBgColor } = props;
+
     const { roundState } = useContext(RoundContext);
 
     const anyBets = anyBetsExist(roundState.bets);
@@ -631,17 +583,37 @@ export default function EditBets() {
             <TableSettings />
 
             <HorizontalScrollingBox>
-                <PirateTable m={4} />
+                <PirateTable
+                    m={4}
+                    red={red}
+                    green={green}
+                    getPirateBgColor={getPirateBgColor}
+                />
             </HorizontalScrollingBox>
 
-            <BetFunctions />
+            <BetFunctions
+                blue={blue}
+                orange={orange}
+                red={red}
+                green={green}
+                yellow={yellow}
+                gray={gray}
+                getPirateBgColor={getPirateBgColor}
+            />
 
             {anyBets && (
                 <>
                     <BetExtras />
 
                     <HorizontalScrollingBox>
-                        <PayoutTable />
+                        <PayoutTable
+                            blue={blue}
+                            orange={orange}
+                            red={red}
+                            green={green}
+                            yellow={yellow}
+                            getPirateBgColor={getPirateBgColor}
+                        />
                     </HorizontalScrollingBox>
 
                     <CopyPayouts />
