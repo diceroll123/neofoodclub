@@ -24,6 +24,7 @@ import {
     Icon,
     useDisclosure,
     HStack,
+    VStack,
 } from "@chakra-ui/react";
 import { FaCopy, FaPlus, FaTrash, FaChevronDown, FaMagic, FaShapes, FaRandom } from "react-icons/fa";
 import React, { useContext, useEffect, useState } from "react";
@@ -144,6 +145,13 @@ const BuildSetMenu = (props) => {
                     <ModalHeader>Custom {mode} builder</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
+                        <VStack mb={3}>
+                            {min == max ? (
+                                <Text as={"i"}>Please choose {max} pirates.</Text>
+                            ) : (
+                                <Text as={"i"}>Please choose between {min} and {max} pirates.</Text>
+                            )}
+                        </VStack>
                         <HStack>
                             {[...Array(5)].map((_e, arenaIndex) => {
                                 return (
