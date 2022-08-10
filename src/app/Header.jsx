@@ -1,5 +1,6 @@
 import {
     Box,
+    Center,
     CircularProgress,
     CircularProgressLabel,
     Container,
@@ -233,36 +234,39 @@ function TitleHeading(props) {
     return (
         <>
             <HStack display={{ base: "none", md: "block" }}>
-                <Box
-                    as="img"
-                    src={NeopointIcon}
-                    height="1.5em"
-                    width="1.5em"
-                    display={{ base: "none", md: "inline-block" }}
-                />
-                <Heading
-                    as="h1"
-                    fontFamily="heading"
-                    fontWeight="bold"
-                    fontSize="xl"
-                    display={{ base: "none", lg: "inline-block" }}
-                >
-                    NeoFoodClub
-                </Heading>
-                <Heading
-                    as="h1"
-                    fontFamily="heading"
-                    fontWeight="bold"
-                    fontSize="xl"
-                    display={{
-                        base: "none",
-                        sm: "none",
-                        md: "inline-block",
-                        lg: "none",
-                    }}
-                >
-                    NFC
-                </Heading>
+                <Center>
+                    <Box
+                        as="img"
+                        src={NeopointIcon}
+                        height="1.5em"
+                        width="1.5em"
+                        display={{ base: "none", md: "inline-block" }}
+                        mr={2}
+                    />
+                    <Heading
+                        as="h1"
+                        fontFamily="heading"
+                        fontWeight="bold"
+                        fontSize="xl"
+                        display={{ base: "none", lg: "inline-block" }}
+                    >
+                        NeoFoodClub
+                    </Heading>
+                    <Heading
+                        as="h1"
+                        fontFamily="heading"
+                        fontWeight="bold"
+                        fontSize="xl"
+                        display={{
+                            base: "none",
+                            sm: "none",
+                            md: "inline-block",
+                            lg: "none",
+                        }}
+                    >
+                        NFC
+                    </Heading>
+                </Center>
             </HStack>
         </>
     );
