@@ -306,19 +306,12 @@ const BetFunctions = (props) => {
     }
 
     useEffect(() => {
-        // TODO: (maybe fix?) when you switch between sets, this has the side effect of updating itself again here one time
         setAllBets({ ...allBets, [currentBet]: { ...roundState.bets } });
         setAllBetAmounts({
             ...allBetAmounts,
             [currentBet]: { ...roundState.betAmounts },
         });
     }, [roundState.bets, roundState.betAmounts]);
-
-    useEffect(() => {
-        // Erase set names when selected round number changes
-        setAllNames({ 0: "Starting Set" });
-        setAllBets({ 0: { ...roundState.bets } });
-    }, [roundState.currentSelectedRound]);
 
     function addNewSet(name, bets, betAmounts, maybe_replace = false) {
         // will modify the current set if the current set is empty and maybe_replace is explicitly set to true
