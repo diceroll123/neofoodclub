@@ -23,7 +23,6 @@ import {
     WrapItem,
     Icon,
     useDisclosure,
-    HStack,
     VStack,
 } from "@chakra-ui/react";
 import { FaCopy, FaPlus, FaTrash, FaChevronDown, FaMagic, FaShapes, FaRandom } from "react-icons/fa";
@@ -152,20 +151,22 @@ const BuildSetMenu = (props) => {
                                 <Text as={"i"}>Please choose between {min} and {max} pirates.</Text>
                             )}
                         </VStack>
-                        <HStack>
+                        <Wrap justify="center">
                             {[...Array(5)].map((_e, arenaIndex) => {
                                 return (
-                                    <PirateSelect
-                                        arenaId={arenaIndex}
-                                        pirateValue={pirateIndices[arenaIndex]}
-                                        getPirateBgColor={getPirateBgColor}
-                                        onChange={(e) =>
-                                            handleChange(arenaIndex, parseInt(e.target.value))
-                                        }
-                                    />
+                                    <WrapItem key={arenaIndex}>
+                                        <PirateSelect
+                                            arenaId={arenaIndex}
+                                            pirateValue={pirateIndices[arenaIndex]}
+                                            getPirateBgColor={getPirateBgColor}
+                                            onChange={(e) =>
+                                                handleChange(arenaIndex, parseInt(e.target.value))
+                                            }
+                                        />
+                                    </WrapItem>
                                 );
                             })}
-                        </HStack>
+                        </Wrap>
                     </ModalBody>
                     <ModalFooter>
                         <Flex width="2xl">
