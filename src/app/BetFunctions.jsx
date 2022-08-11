@@ -220,7 +220,6 @@ const BuildSetMenu = (props) => {
                                 onClick={() => { handleBuildClick() }}>
                                 Build {mode} set
                             </Button>
-                            <Button variant="solid" onClick={onClose}>Cancel</Button>
                         </Flex>
                     </ModalFooter>
                 </ModalContent>
