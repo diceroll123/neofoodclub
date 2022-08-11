@@ -159,6 +159,7 @@ const BuildSetMenu = (props) => {
                                             arenaId={arenaIndex}
                                             pirateValue={pirateIndices[arenaIndex]}
                                             getPirateBgColor={getPirateBgColor}
+                                            showArenaName={true}
                                             onChange={(e) =>
                                                 handleChange(arenaIndex, parseInt(e.target.value))
                                             }

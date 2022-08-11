@@ -2,11 +2,15 @@
 import { Select } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
-import { PIRATE_NAMES } from "../constants";
+import { PIRATE_NAMES, ARENA_NAMES } from "../constants";
 import { RoundContext } from "../RoundState";
 
 const PirateSelect = (props) => {
-    let { arenaId, pirateValue, getPirateBgColor, ...rest } = props;
+    let { arenaId, pirateValue, getPirateBgColor, showArenaName = false, ...rest } = props;
+
+    // showArenaName will fill the arena name into the select option as a placeholder if set to true
+    // only used this way for the bet builder tool.
+
     const { roundState } = useContext(RoundContext);
 
     let pirates = roundState.roundData.pirates[arenaId];
@@ -19,6 +23,8 @@ const PirateSelect = (props) => {
         pirateBg = getPirateBgColor(currentOpeningOdds);
     }
 
+    let useArenaName = showArenaName && pirateValue == 0;
+
     return (
         <Select
             size="sm"
@@ -26,7 +32,8 @@ const PirateSelect = (props) => {
             backgroundColor={pirateBg}
             value={pirateValue}
             {...rest}>
-            <option value="0" />
+            <option disabled={useArenaName} hidden={useArenaName} value="0">{useArenaName ? ARENA_NAMES[arenaId] : ""}</option>
+            <option hidden={!useArenaName} value="0"></option>
             {pirates.map(
                 (pirateId, pirateIndex) => {
                     // some browsers support colored backgrounds for <option> elements, so we use that here!
