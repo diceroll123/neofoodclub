@@ -108,6 +108,34 @@ const BuildSetMenu = (props) => {
         onClose();
     }
 
+    const randomizeIndices = () => {
+        // generate a full set of random indices
+        let newIndices = [
+            generateRandomPirateIndex(),
+            generateRandomPirateIndex(),
+            generateRandomPirateIndex(),
+            generateRandomPirateIndex(),
+            generateRandomPirateIndex()
+        ];
+
+        // remove random indices as needed
+        if (max - min > 0) {
+            let indices = [0, 1, 2, 3, 4];
+            shuffleArray(indices);
+            let rand = generateRandomIntegerInRange(max - min, max + min);
+            let randomIndices = indices.slice(0, rand);
+            // set these indices to 0
+            randomIndices.forEach((index) => {
+                newIndices[index] = 0;
+            });
+        }
+
+        // this allows us to stay within the boundaries without having per-algorithm functions to do this
+
+        setPirateIndices(newIndices);
+    }
+
+
     return (
         <>
             <Menu>
@@ -174,32 +202,7 @@ const BuildSetMenu = (props) => {
                             <Button
                                 leftIcon={<Icon as={FaRandom} />}
                                 mr={3}
-                                onClick={() => {
-                                    // generate a full set of random indices
-                                    let newIndices = [
-                                        generateRandomPirateIndex(),
-                                        generateRandomPirateIndex(),
-                                        generateRandomPirateIndex(),
-                                        generateRandomPirateIndex(),
-                                        generateRandomPirateIndex()
-                                    ];
-
-                                    // remove random indices as needed
-                                    if (max - min > 0) {
-                                        let indices = [0, 1, 2, 3, 4];
-                                        shuffleArray(indices);
-                                        let rand = generateRandomIntegerInRange(max - min, max + min);
-                                        let randomIndices = indices.slice(0, rand);
-                                        // set these indices to 0
-                                        randomIndices.forEach((index) => {
-                                            newIndices[index] = 0;
-                                        });
-                                    }
-
-                                    // this allows us to stay within the boundaries without having per-algorithm functions to do this
-
-                                    setPirateIndices(newIndices);
-                                }}>
+                                onClick={randomizeIndices}>
                                 Randomize
                             </Button>
                             {
