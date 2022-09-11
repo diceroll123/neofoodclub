@@ -22,6 +22,7 @@ export function generateRandomPirateIndex() {
 
 function parseBets(betString) {
     return betString
+        .replace(/[^a-y]/g, '')
         .split("")
         .map((char) => {
             return "abcdefghijklmnopqrstuvwxy".indexOf(char);
@@ -46,6 +47,7 @@ function parseBets(betString) {
 
 function parseBetAmounts(betAmountsString) {
     return betAmountsString
+        .replace(/[^a-zA-Z]/g, '')
         .match(/.{1,3}/g)
         .map((chunk) => {
             let val = 0;
