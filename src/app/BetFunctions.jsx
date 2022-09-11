@@ -173,7 +173,7 @@ const BuildSetMenu = (props) => {
                     <ModalCloseButton />
                     <ModalBody>
                         <VStack mb={3}>
-                            {min == max ? (
+                            {min === max ? (
                                 <Text as={"i"}>Please choose {max} pirates.</Text>
                             ) : (
                                 <Text as={"i"}>Please choose between {min} and {max} pirates.</Text>
@@ -440,7 +440,7 @@ const BetFunctions = (props) => {
         let bet = 0;
         while (Object.keys(bets).length < Object.keys(roundState.bets).length) {
             const pirateBinary = topRatios[bet][0];
-            if ((pirateBinary & tenbetBinary) == tenbetBinary) {
+            if ((pirateBinary & tenbetBinary) === tenbetBinary) {
                 const index = Object.keys(bets).length + 1;
 
                 bets[index] = computeBinaryToPirates(

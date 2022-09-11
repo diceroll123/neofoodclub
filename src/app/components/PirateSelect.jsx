@@ -23,7 +23,7 @@ const PirateSelect = (props) => {
         pirateBg = getPirateBgColor(currentOpeningOdds);
     }
 
-    let useArenaName = showArenaName && pirateValue == 0;
+    let useArenaName = showArenaName && pirateValue === 0;
 
     return (
         <Select
