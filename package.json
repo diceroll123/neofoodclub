@@ -7,7 +7,7 @@
     "@chakra-ui/icons": "^2.0.6",
     "@chakra-ui/react": "^1.8.7",
     "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.6.0",
+    "@emotion/styled": "^11.10.5",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
