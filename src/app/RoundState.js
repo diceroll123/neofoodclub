@@ -25,6 +25,7 @@ const StateProvider = ({ children }) => {
 			faDetails: false,
 			customOddsMode: false,
 			oddsTimeline: false,
+			logitModel: false,
 		},
 		viewMode: initialViewMode,
 	});
