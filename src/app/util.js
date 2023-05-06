@@ -5,7 +5,8 @@ import {
     calculatePayoutTables,
     computePirateFAs,
     computePiratesBinary,
-    computeProbabilities,
+    computeLegacyProbabilities,
+    computeLogitProbabilities,
 } from "./maths";
 
 export function reducer(state, item) {
@@ -354,20 +355,23 @@ export function getOdds(roundState) {
     return odds;
 }
 
-export function getProbs(roundState) {
-    // the probabilities we will use for things.
-    // basically this just checks if the custom mode is on or not, and grabs the proper one.
-    // returns null if there are no custom probabilities
+export function getProbs(roundState, legacyProbs, logitProbs) {
+    // returns the current round probs if there are no custom probs
     if (roundState.advanced.bigBrain && roundState.advanced.customOddsMode) {
         return roundState.customProbs;
     }
-    return null;
+    if (roundState.advanced.logitModel) {
+        return logitProbs.used;
+    }
+    return legacyProbs.used;
 }
 
 export function calculateRoundData(roundState) {
     // calculates all of the round's mathy data for visualization purposes.
     let calculated = false;
-    let probabilities = {};
+    let legacyProbabilities = {};
+    let logitProbabilities = {};
+    let usedProbabilities = {};
     let pirateFAs = {};
     let arenaRatios = [];
     let betOdds = {};
@@ -389,9 +393,10 @@ export function calculateRoundData(roundState) {
     let totalEnabledBets = 0;
 
     const odds = getOdds(roundState);
-    const probs = getProbs(roundState);
     if (roundState.roundData && odds) {
-        probabilities = computeProbabilities(roundState.roundData);
+        legacyProbabilities = computeLegacyProbabilities(roundState.roundData);
+        logitProbabilities = computeLogitProbabilities(roundState.roundData);
+        usedProbabilities = getProbs(roundState, legacyProbabilities, logitProbabilities);
 
         pirateFAs = computePirateFAs(roundState.roundData);
         arenaRatios = calculateArenaRatios(odds);
@@ -413,7 +418,7 @@ export function calculateRoundData(roundState) {
                 let pirateIndex = roundState.bets[betIndex][arenaIndex];
                 if (pirateIndex > 0) {
                     let odd = odds[arenaIndex][pirateIndex];
-                    let prob = (probs || probabilities.used)[arenaIndex][pirateIndex];
+                    let prob = usedProbabilities[arenaIndex][pirateIndex];
                     betOdds[betIndex] = (betOdds[betIndex] || 1) * odd;
                     betProbabilities[betIndex] =
                         (betProbabilities[betIndex] || 1) * prob;
@@ -457,7 +462,7 @@ export function calculateRoundData(roundState) {
         // for charts
         payoutTables = calculatePayoutTables(
             roundState,
-            probs || probabilities.used,
+            usedProbabilities,
             betOdds,
             betPayoffs
         );
@@ -467,7 +472,9 @@ export function calculateRoundData(roundState) {
 
     return {
         calculated,
-        probabilities,
+        legacyProbabilities,
+        logitProbabilities,
+        usedProbabilities,
         pirateFAs,
         arenaRatios,
         betOdds,

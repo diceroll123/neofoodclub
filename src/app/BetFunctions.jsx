@@ -34,7 +34,6 @@ import {
     determineBetAmount,
     getMaxBet,
     getOdds,
-    getProbs,
     makeEmptyBetAmounts,
     makeEmptyBets,
     shuffleArray,
@@ -235,7 +234,7 @@ const BetFunctions = (props) => {
 
     const { blue, orange, red, green, yellow, gray, getPirateBgColor, ...rest } = props;
     const { roundState, setRoundState, calculations } = useContext(RoundContext);
-    const { probabilities, arenaRatios } = calculations;
+    const { usedProbabilities, arenaRatios } = calculations;
     const [currentBet, setCurrentBet] = useState("0");
 
     const [allNames, setAllNames] = useState({ 0: "Starting Set" });
@@ -259,7 +258,7 @@ const BetFunctions = (props) => {
 
         constructor() {
             this.#odds = getOdds(roundState);
-            this.#probs = getProbs(roundState) || probabilities.std;
+            this.#probs = usedProbabilities;
         }
 
         calculate(...pirates) {

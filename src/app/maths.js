@@ -1,10 +1,17 @@
-import { NEGATIVE_FAS, POSITIVE_FAS } from "./constants";
+import { NEGATIVE_FAS, POSITIVE_FAS, LOGIT_INTERCEPTS, LOGIT_PFA, LOGIT_NFA, LOGIT_IS_POS2, LOGIT_IS_POS3, LOGIT_IS_POS4 } from "./constants";
 
-export function computePirateFAs(roundData) {
+export function computePirateFAPairs(roundData) {
     // pre-populate with zeroes because really old rounds don't have this data
     // I'm not sure how, but the original neofoodclub somehow made up values to make up for this
     // I will be having none of that here.
-    let fas = [
+    let favorites = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+    ];
+    let allergies = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0],
@@ -14,27 +21,45 @@ export function computePirateFAs(roundData) {
 
     if (roundData.foods) {
         for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
-            fas[arenaIndex] = [];
+            favorites[arenaIndex] = [];
+            allergies[arenaIndex] = [];
             for (let pirateIndex = 0; pirateIndex < 4; pirateIndex++) {
+                favorites[arenaIndex][pirateIndex] = 0;
+                allergies[arenaIndex][pirateIndex] = 0;
                 for (
-                    let foodIndex = (fas[arenaIndex][pirateIndex] = 0);
+                    let foodIndex = 0;
                     foodIndex < 10;
                     foodIndex++
                 ) {
                     let foodId = roundData.foods[arenaIndex][foodIndex];
                     let pirateId = roundData.pirates[arenaIndex][pirateIndex];
-                    fas[arenaIndex][pirateIndex] +=
+                    favorites[arenaIndex][pirateIndex] +=
                         POSITIVE_FAS[pirateId][foodId];
-                    fas[arenaIndex][pirateIndex] -=
+                    allergies[arenaIndex][pirateIndex] -=
                         NEGATIVE_FAS[pirateId][foodId];
                 }
             }
         }
     }
+    
+    return [favorites, allergies]
+}
+
+export function computePirateFAs(roundData) {
+    let [favorites, allergies] = computePirateFAPairs(roundData);
+    let fas = [];
+    for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
+        fas[arenaIndex] = [];
+        for (let pirateIndex = 0; pirateIndex < 4; pirateIndex++) {
+            fas[arenaIndex][pirateIndex] =
+                favorites[arenaIndex][pirateIndex] +
+                allergies[arenaIndex][pirateIndex];
+        }
+    }
     return fas;
 }
 
-export function computeProbabilities(roundData) {
+export function computeLegacyProbabilities(roundData) {
     let returnValue = {
         min: [],
         std: [],
@@ -144,6 +169,46 @@ export function computeProbabilities(roundData) {
         for (pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
             returnValue.used[arenaIndex][pirateIndex] =
                 returnValue.used[arenaIndex][pirateIndex] / sum;
+        }
+    }
+    return returnValue;
+}
+
+export function computeLogitProbabilities(roundData) {
+    let returnValue = {
+        prob: [],
+        used: [],
+    };
+    let [favorites, allergies] = computePirateFAPairs(roundData);
+    for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
+        returnValue.prob[arenaIndex] = [1];
+        returnValue.used[arenaIndex] = [1];
+        let capabilities = [0, 0, 0, 0, 0];
+        for (let pirateIndex = 0; pirateIndex < 4; pirateIndex++) {
+            let pirateNumber = roundData.pirates[arenaIndex][pirateIndex];
+            let pirateStrength = LOGIT_INTERCEPTS[pirateNumber];
+            let favorite = favorites[arenaIndex][pirateIndex];
+            let allergy = allergies[arenaIndex][pirateIndex];
+            pirateStrength += LOGIT_PFA[pirateNumber] * favorite;
+            pirateStrength += LOGIT_NFA[pirateNumber] * allergy;
+            if (pirateIndex === 1)
+            {
+                pirateStrength += LOGIT_IS_POS2[pirateNumber];
+            }
+            if (pirateIndex === 2)
+            {
+                pirateStrength += LOGIT_IS_POS3[pirateNumber];
+            }
+            if (pirateIndex === 3)
+            {
+                pirateStrength += LOGIT_IS_POS4[pirateNumber];
+            }
+            capabilities[pirateIndex + 1] = Math.exp(pirateStrength);
+            capabilities[0] += capabilities[pirateIndex + 1];
+        }
+        for (let pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
+            returnValue.prob[arenaIndex][pirateIndex] = capabilities[pirateIndex] / capabilities[0];
+            returnValue.used[arenaIndex][pirateIndex] = returnValue.prob[arenaIndex][pirateIndex];
         }
     }
     return returnValue;

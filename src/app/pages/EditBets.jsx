@@ -22,7 +22,7 @@ import {
     POSITIVE_FAS,
 } from "../constants";
 import { computePirateBinary } from "../maths";
-import { displayAsPercent, anyBetsExist, getOdds, getProbs } from "../util";
+import { displayAsPercent, anyBetsExist, getOdds } from "../util";
 import BetExtras from "../components/BetExtras";
 import BetFunctions from "../BetFunctions";
 import BigBrainElement from "../components/BigBrainElement";
@@ -93,7 +93,7 @@ const NormalTable = (props) => {
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     const { roundState, setRoundState, calculations } =
         useContext(RoundContext);
-    const { arenaRatios, winningBetBinary, probabilities, pirateFAs } =
+    const { arenaRatios, winningBetBinary, legacyProbabilities, logitProbabilities, usedProbabilities, pirateFAs } =
         calculations;
     const amountOfBets = Object.keys(roundState.bets).length;
 
@@ -292,7 +292,7 @@ const NormalTable = (props) => {
                                 bgColor = green;
                             }
 
-                            let probs = getProbs(roundState) || probabilities.used;
+                            let probs = usedProbabilities;
                             let prob = probs[arenaId][pirateIndex + 1];
 
                             const payout = useOdds * prob - 1;
@@ -309,13 +309,13 @@ const NormalTable = (props) => {
                                         {PIRATE_NAMES[pirateId]}
                                     </StickyTd>
                                     <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(probabilities.min[arenaId][pirateIndex + 1], 1)}
+                                        {displayAsPercent(legacyProbabilities.min[arenaId][pirateIndex + 1], 1)}
                                     </BigBrainElement>
                                     <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(probabilities.max[arenaId][pirateIndex + 1], 1)}
+                                        {displayAsPercent(legacyProbabilities.max[arenaId][pirateIndex + 1], 1)}
                                     </BigBrainElement>
                                     <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(probabilities.std[arenaId][pirateIndex + 1], 1)}
+                                        {displayAsPercent(usedProbabilities[arenaId][pirateIndex + 1], 1)}
                                     </BigBrainElement>
                                     <CustomOddsElement as={Td} isNumeric>
                                         <CustomProbsInput
