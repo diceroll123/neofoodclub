@@ -50,7 +50,7 @@ const RoundInput = () => {
         ) {
             setCurrentRound(roundState.currentRound);
         }
-    }, [roundState.currentSelectedRound, roundState.currentRound]);
+    }, [roundState.currentSelectedRound, roundState.currentRound, roundNumber, currentRound]);
 
     return (
         <InputGroup size="xs">
