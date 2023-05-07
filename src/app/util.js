@@ -357,7 +357,7 @@ export function getOdds(roundState) {
 
 export function getProbs(roundState, legacyProbs, logitProbs) {
     // returns the current round probs if there are no custom probs
-    if (roundState.advanced.bigBrain && roundState.advanced.customOddsMode) {
+    if (roundState.advanced.bigBrain && roundState.advanced.customOddsMode && roundState.customProbs != null) {
         return roundState.customProbs;
     }
     if (roundState.advanced.logitModel) {

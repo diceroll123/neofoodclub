@@ -123,9 +123,16 @@ const NormalTable = (props) => {
                     <Th>Arena</Th>
                     <BigBrainElement as={Th}>Ratio</BigBrainElement>
                     <Th>Pirate</Th>
-                    <BigBrainElement as={Th}>Min Prob</BigBrainElement>
-                    <BigBrainElement as={Th}>Max Prob</BigBrainElement>
-                    <BigBrainElement as={Th}>Std Prob</BigBrainElement>
+                    {roundState.advanced.logitModel ?
+                        (
+                            <BigBrainElement as={Th}>Prob</BigBrainElement>
+                        ) : (
+                            <>
+                                <BigBrainElement as={Th}>Min Prob</BigBrainElement>
+                                <BigBrainElement as={Th}>Max Prob</BigBrainElement>
+                                <BigBrainElement as={Th}>Std Prob</BigBrainElement>
+                            </>
+                        )}
                     <CustomOddsElement as={Th}>
                         <TextTooltip
                             text="Custom Prob"
@@ -189,7 +196,7 @@ const NormalTable = (props) => {
                             </BigBrainElement>
                             <Td
                                 backgroundColor={gray}
-                                colSpan={roundState.advanced.bigBrain ? 6 : 1}
+                                colSpan={roundState.advanced.bigBrain ? (roundState.advanced.logitModel ? 4 : 6) : 1}
                             />
                             <CustomOddsElement
                                 as={Td}
@@ -309,15 +316,23 @@ const NormalTable = (props) => {
                                     <StickyTd backgroundColor={getPirateBgColor(opening)}>
                                         {PIRATE_NAMES[pirateId]}
                                     </StickyTd>
-                                    <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(legacyProbabilities.min[arenaId][pirateIndex + 1], 1)}
-                                    </BigBrainElement>
-                                    <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(legacyProbabilities.max[arenaId][pirateIndex + 1], 1)}
-                                    </BigBrainElement>
-                                    <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(usedProbabilities[arenaId][pirateIndex + 1], 1)}
-                                    </BigBrainElement>
+                                    {roundState.advanced.logitModel ? (
+                                        <BigBrainElement as={Td} isNumeric>
+                                            {displayAsPercent(logitProbabilities.prob[arenaId][pirateIndex + 1], 1)}
+                                        </BigBrainElement>
+                                    ) : (
+                                        <>
+                                            <BigBrainElement as={Td} isNumeric>
+                                                {displayAsPercent(legacyProbabilities.min[arenaId][pirateIndex + 1], 1)}
+                                            </BigBrainElement>
+                                            <BigBrainElement as={Td} isNumeric>
+                                                {displayAsPercent(legacyProbabilities.max[arenaId][pirateIndex + 1], 1)}
+                                            </BigBrainElement>
+                                            <BigBrainElement as={Td} isNumeric>
+                                                {displayAsPercent(legacyProbabilities.std[arenaId][pirateIndex + 1], 1)}
+                                            </BigBrainElement>
+                                        </>
+                                    )}
                                     <CustomOddsElement as={Td} isNumeric>
                                         <CustomProbsInput
                                             arenaIndex={arenaId}
