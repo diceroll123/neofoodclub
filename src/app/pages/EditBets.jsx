@@ -51,7 +51,8 @@ const StickyTd = (props) => {
     );
 };
 
-function PirateFA(pirateId, foodId) {
+function PirateFA(props) {
+    const { pirateId, foodId } = props;
     // returns the FA <td> element for the associated pirate/food
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
     const red = useColorModeValue("nfc.red", "nfc.redDark");
@@ -341,11 +342,8 @@ const NormalTable = (props) => {
                                             </BigBrainElement>
                                             {roundState.roundData.foods[
                                                 arenaId
-                                            ].map((foodId) => {
-                                                return PirateFA(
-                                                    pirateId,
-                                                    foodId
-                                                );
+                                            ].map((foodId, i) => {
+                                                return <PirateFA key={i} pirateId={pirateId} foodId={foodId} />;
                                             })}
                                         </>
                                     ) : (
