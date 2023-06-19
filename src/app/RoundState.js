@@ -25,6 +25,7 @@ const StateProvider = ({ children }) => {
 			faDetails: false,
 			customOddsMode: false,
 			oddsTimeline: false,
+			logitModel: false,
 		},
 		viewMode: initialViewMode,
 	});
@@ -35,15 +36,7 @@ const StateProvider = ({ children }) => {
 
 	useEffect(() => {
 		setCalculations(calculateRoundData(roundState));
-	}, [
-		roundState.roundData?.foods,
-		roundState.roundData?.winners,
-		roundState.roundData?.currentOdds,
-		roundState.bets,
-		roundState.betAmounts,
-		roundState.customProbs,
-		roundState.customOdds,
-	]);
+	}, [ roundState ]);
 
 	return (
 		<Provider value={{ roundState, setRoundState, calculations }}>

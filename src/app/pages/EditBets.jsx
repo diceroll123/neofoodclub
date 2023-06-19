@@ -22,7 +22,7 @@ import {
     POSITIVE_FAS,
 } from "../constants";
 import { computePirateBinary } from "../maths";
-import { displayAsPercent, anyBetsExist, getOdds, getProbs } from "../util";
+import { displayAsPercent, anyBetsExist, getOdds } from "../util";
 import BetExtras from "../components/BetExtras";
 import BetFunctions from "../BetFunctions";
 import BigBrainElement from "../components/BigBrainElement";
@@ -51,7 +51,8 @@ const StickyTd = (props) => {
     );
 };
 
-function PirateFA(pirateId, foodId) {
+function PirateFA(props) {
+    const { pirateId, foodId } = props;
     // returns the FA <td> element for the associated pirate/food
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
     const red = useColorModeValue("nfc.red", "nfc.redDark");
@@ -93,7 +94,7 @@ const NormalTable = (props) => {
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     const { roundState, setRoundState, calculations } =
         useContext(RoundContext);
-    const { arenaRatios, winningBetBinary, probabilities, pirateFAs } =
+    const { arenaRatios, winningBetBinary, legacyProbabilities, logitProbabilities, usedProbabilities, pirateFAs } =
         calculations;
     const amountOfBets = Object.keys(roundState.bets).length;
 
@@ -122,9 +123,16 @@ const NormalTable = (props) => {
                     <Th>Arena</Th>
                     <BigBrainElement as={Th}>Ratio</BigBrainElement>
                     <Th>Pirate</Th>
-                    <BigBrainElement as={Th}>Min Prob</BigBrainElement>
-                    <BigBrainElement as={Th}>Max Prob</BigBrainElement>
-                    <BigBrainElement as={Th}>Std Prob</BigBrainElement>
+                    {roundState.advanced.logitModel ?
+                        (
+                            <BigBrainElement as={Th}>Prob</BigBrainElement>
+                        ) : (
+                            <>
+                                <BigBrainElement as={Th}>Min Prob</BigBrainElement>
+                                <BigBrainElement as={Th}>Max Prob</BigBrainElement>
+                                <BigBrainElement as={Th}>Std Prob</BigBrainElement>
+                            </>
+                        )}
                     <CustomOddsElement as={Th}>
                         <TextTooltip
                             text="Custom Prob"
@@ -188,7 +196,7 @@ const NormalTable = (props) => {
                             </BigBrainElement>
                             <Td
                                 backgroundColor={gray}
-                                colSpan={roundState.advanced.bigBrain ? 6 : 1}
+                                colSpan={roundState.advanced.bigBrain ? (roundState.advanced.logitModel ? 4 : 6) : 1}
                             />
                             <CustomOddsElement
                                 as={Td}
@@ -292,7 +300,7 @@ const NormalTable = (props) => {
                                 bgColor = green;
                             }
 
-                            let probs = getProbs(roundState) || probabilities.used;
+                            let probs = usedProbabilities;
                             let prob = probs[arenaId][pirateIndex + 1];
 
                             const payout = useOdds * prob - 1;
@@ -308,15 +316,23 @@ const NormalTable = (props) => {
                                     <StickyTd backgroundColor={getPirateBgColor(opening)}>
                                         {PIRATE_NAMES[pirateId]}
                                     </StickyTd>
-                                    <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(probabilities.min[arenaId][pirateIndex + 1], 1)}
-                                    </BigBrainElement>
-                                    <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(probabilities.max[arenaId][pirateIndex + 1], 1)}
-                                    </BigBrainElement>
-                                    <BigBrainElement as={Td} isNumeric>
-                                        {displayAsPercent(probabilities.std[arenaId][pirateIndex + 1], 1)}
-                                    </BigBrainElement>
+                                    {roundState.advanced.logitModel ? (
+                                        <BigBrainElement as={Td} isNumeric>
+                                            {displayAsPercent(logitProbabilities.prob[arenaId][pirateIndex + 1], 1)}
+                                        </BigBrainElement>
+                                    ) : (
+                                        <>
+                                            <BigBrainElement as={Td} isNumeric>
+                                                {displayAsPercent(legacyProbabilities.min[arenaId][pirateIndex + 1], 1)}
+                                            </BigBrainElement>
+                                            <BigBrainElement as={Td} isNumeric>
+                                                {displayAsPercent(legacyProbabilities.max[arenaId][pirateIndex + 1], 1)}
+                                            </BigBrainElement>
+                                            <BigBrainElement as={Td} isNumeric>
+                                                {displayAsPercent(legacyProbabilities.std[arenaId][pirateIndex + 1], 1)}
+                                            </BigBrainElement>
+                                        </>
+                                    )}
                                     <CustomOddsElement as={Td} isNumeric>
                                         <CustomProbsInput
                                             arenaIndex={arenaId}
@@ -341,11 +357,8 @@ const NormalTable = (props) => {
                                             </BigBrainElement>
                                             {roundState.roundData.foods[
                                                 arenaId
-                                            ].map((foodId) => {
-                                                return PirateFA(
-                                                    pirateId,
-                                                    foodId
-                                                );
+                                            ].map((foodId, i) => {
+                                                return <PirateFA key={i} pirateId={pirateId} foodId={foodId} />;
                                             })}
                                         </>
                                     ) : (

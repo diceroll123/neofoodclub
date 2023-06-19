@@ -34,7 +34,6 @@ import {
     determineBetAmount,
     getMaxBet,
     getOdds,
-    getProbs,
     makeEmptyBetAmounts,
     makeEmptyBets,
     shuffleArray,
@@ -69,14 +68,10 @@ const BuildSetMenu = (props) => {
     }
 
     useEffect(() => {
-        recount();
-    }, [pirateIndices]);
-
-    const recount = () => {
         // count the amount of non-zero elements in pirateIndices
         let amount = pirateIndices.reduce((a, b) => a + (b !== 0 ? 1 : 0), 0);
         setBuildButtonEnabled(amount >= min && amount <= max);
-    }
+    }, [pirateIndices, min, max]);
 
     const handleTenBetClick = () => {
         setMode('Ten-bet');
@@ -235,7 +230,7 @@ const BetFunctions = (props) => {
 
     const { blue, orange, red, green, yellow, gray, getPirateBgColor, ...rest } = props;
     const { roundState, setRoundState, calculations } = useContext(RoundContext);
-    const { probabilities, arenaRatios } = calculations;
+    const { usedProbabilities, arenaRatios } = calculations;
     const [currentBet, setCurrentBet] = useState("0");
 
     const [allNames, setAllNames] = useState({ 0: "Starting Set" });
@@ -259,7 +254,7 @@ const BetFunctions = (props) => {
 
         constructor() {
             this.#odds = getOdds(roundState);
-            this.#probs = getProbs(roundState) || probabilities.std;
+            this.#probs = usedProbabilities;
         }
 
         calculate(...pirates) {
@@ -310,12 +305,12 @@ const BetFunctions = (props) => {
     }
 
     useEffect(() => {
-        setAllBets({ ...allBets, [currentBet]: { ...roundState.bets } });
-        setAllBetAmounts({
+        setAllBets(allBets => ({ ...allBets, [currentBet]: { ...roundState.bets } }));
+        setAllBetAmounts(allBetAmounts => ({
             ...allBetAmounts,
             [currentBet]: { ...roundState.betAmounts },
-        });
-    }, [roundState.bets, roundState.betAmounts]);
+        }));
+    }, [roundState.bets, roundState.betAmounts, currentBet]);
 
     function addNewSet(name, bets, betAmounts, maybe_replace = false) {
         // will modify the current set if the current set is empty and maybe_replace is explicitly set to true

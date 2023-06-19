@@ -39,7 +39,7 @@ function App() {
         }
 
         setRoundState(data);
-    }, [roundState.currentSelectedRound, currentRound]);
+    }, [roundState.currentSelectedRound, currentRound, setRoundState]);
 
     useEffect(() => {
         if (currentRound && roundData) {
@@ -48,7 +48,7 @@ function App() {
                 currentRound: currentRound
             });
         }
-    }, [roundData]);
+    }, [currentRound, roundData, setRoundState]);
 
     return <HomePage />;
 }

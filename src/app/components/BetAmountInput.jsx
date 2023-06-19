@@ -21,7 +21,7 @@ export default function BetAmountInput(props) {
 
     useEffect(() => {
         setTempMaxBet(roundState.betAmounts[betIndex + 1]);
-    }, [roundState.betAmounts]);
+    }, [betIndex, roundState.betAmounts]);
 
     return (
         <NumberInput
