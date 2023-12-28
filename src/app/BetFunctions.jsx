@@ -785,14 +785,13 @@ const BetFunctions = (props) => {
                                                     [currentBet]: value,
                                                 })
                                             }
-                                            onBlur={(e) => {
-                                                let name = e.target.value;
-                                                if (name === "") {
-                                                    name = "Unnamed Set";
+                                            onSubmit={(newValue) => {
+                                                if (newValue === "") {
+                                                    newValue = "Unnamed Set";
                                                 }
                                                 setAllNames({
                                                     ...allNames,
-                                                    [currentBet]: name,
+                                                    [currentBet]: newValue,
                                                 });
                                             }}
                                         >
