@@ -1,9 +1,10 @@
+import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import {
     Box,
     Button,
+    Icon,
     Radio,
     Skeleton,
-    StatArrow,
     Table,
     Tbody,
     Text,
@@ -369,18 +370,10 @@ const NormalTable = (props) => {
                                     <Td isNumeric>{opening}:1</Td>
                                     <Td isNumeric whiteSpace="nowrap">
                                         {current > opening && (
-                                            <StatArrow
-                                                mr={1}
-                                                type="increase"
-                                                style={{ stroke: "#000000" }}
-                                            />
+                                            <Icon as={TriangleUpIcon} mr={1} color={green} />
                                         )}
                                         {current < opening && (
-                                            <StatArrow
-                                                mr={1}
-                                                type="decrease"
-                                                style={{ stroke: "#000000" }}
-                                            />
+                                            <Icon as={TriangleDownIcon} mr={1} color={red} />
                                         )}
                                         <Text as={current === opening ? "" : "b"}>
                                             {current}:1
