@@ -211,7 +211,7 @@ const BuildSetMenu = (props) => {
                             }
                             <Spacer />
                             <Button
-                                disabled={!buildButtonEnabled}
+                                isDisabled={!buildButtonEnabled}
                                 variant="solid"
                                 colorScheme='blue'
                                 mr={3}
