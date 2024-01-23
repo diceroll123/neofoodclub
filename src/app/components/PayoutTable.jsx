@@ -16,7 +16,7 @@ import React, { useContext } from "react";
 
 import { PIRATE_NAMES } from "../constants";
 import { computePirateBinary } from "../maths";
-import { numberWithCommas, displayAsPercent } from "../util";
+import { displayAsPercent } from "../util";
 import BetAmountInput from "./BetAmountInput";
 import Pd from "./Pd";
 import PlaceThisBetButton from "./PlaceThisBetButton";
@@ -184,15 +184,11 @@ const PayoutTable = (props) => {
                                         />
                                     </Pd>
                                     <Td isNumeric>
-                                        {numberWithCommas(
-                                            betOdds[betIndex + 1]
-                                        )}
+                                        {betOdds[betIndex + 1].toLocaleString()}
                                         :1
                                     </Td>
                                     <Td isNumeric>
-                                        {numberWithCommas(
-                                            betPayoffs[betIndex + 1]
-                                        )}
+                                        {betPayoffs[betIndex + 1].toLocaleString()}
                                     </Td>
                                     <Td isNumeric>
                                         <TextTooltip
@@ -209,17 +205,15 @@ const PayoutTable = (props) => {
                                         {er.toFixed(3)}:1
                                     </Td>
                                     <Td isNumeric backgroundColor={neBg}>
-                                        {numberWithCommas(ne.toFixed(2))}
+                                        {ne.toFixed(2).toLocaleString()}
                                     </Td>
                                     <Td isNumeric backgroundColor={mbBg}>
-                                        {numberWithCommas(
-                                            betMaxBets[betIndex + 1]
-                                        )}
+                                        {betMaxBets[betIndex + 1].toLocaleString()}
                                     </Td>
                                     {[...Array(5)].map((e, arenaIndex) => {
                                         let pirateIndex =
                                             roundState.bets[betIndex + 1][
-                                                arenaIndex
+                                            arenaIndex
                                             ];
                                         let bgColor = "transparent";
                                         if (pirateIndex) {
@@ -242,7 +236,7 @@ const PayoutTable = (props) => {
                                                 bgColor = getPirateBgColor(
                                                     roundState.roundData
                                                         .openingOdds[
-                                                        arenaIndex
+                                                    arenaIndex
                                                     ][pirateIndex]
                                                 );
                                             }
@@ -254,10 +248,10 @@ const PayoutTable = (props) => {
                                             >
                                                 {
                                                     PIRATE_NAMES[
-                                                        roundState.roundData
-                                                            .pirates[
-                                                            arenaIndex
-                                                        ][pirateIndex - 1]
+                                                    roundState.roundData
+                                                        .pirates[
+                                                    arenaIndex
+                                                    ][pirateIndex - 1]
                                                     ]
                                                 }
                                             </Td>
@@ -277,12 +271,12 @@ const PayoutTable = (props) => {
                         <Tr>
                             <Th isNumeric>Total:</Th>
                             <Th isNumeric>
-                                {numberWithCommas(totalBetAmounts)}
+                                {totalBetAmounts.toLocaleString()}
                             </Th>
                             <Th isNumeric>
                                 {winningBetBinary > 0 && (
                                     <Text>
-                                        {numberWithCommas(totalWinningOdds)}:
+                                        {totalWinningOdds.toLocaleString()}:
                                         {totalEnabledBets}
                                     </Text>
                                 )}
@@ -290,7 +284,7 @@ const PayoutTable = (props) => {
                             <Th isNumeric>
                                 {winningBetBinary > 0 && (
                                     <Text>
-                                        {numberWithCommas(totalWinningPayoff)}
+                                        {totalWinningPayoff.toLocaleString()}
                                     </Text>
                                 )}
                             </Th>
@@ -299,9 +293,7 @@ const PayoutTable = (props) => {
                                 {totalBetExpectedRatios.toFixed(3)}
                             </Th>
                             <Th isNumeric>
-                                {numberWithCommas(
-                                    totalBetNetExpected.toFixed(2)
-                                )}
+                                {totalBetNetExpected.toFixed(2).toLocaleString()}
                             </Th>
                             <Th />
                             <Th />
@@ -315,9 +307,9 @@ const PayoutTable = (props) => {
                 </>
             ) : (
                 <Tbody>
-                    {[...Array(amountOfBets)].map(() => {
+                    {[...Array(amountOfBets)].map((_, index) => {
                         return (
-                            <Tr>
+                            <Tr key={index}>
                                 <Td colSpan={14}>
                                     <Skeleton height="30px">
                                         <Box>&nbsp;</Box>
