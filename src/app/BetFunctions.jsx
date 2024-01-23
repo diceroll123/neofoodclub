@@ -24,6 +24,12 @@ import {
     Icon,
     useDisclosure,
     VStack,
+    Card,
+    Badge,
+    Box,
+    Divider,
+    Heading,
+    Center,
 } from "@chakra-ui/react";
 import { FaCopy, FaPlus, FaTrash, FaChevronDown, FaMagic, FaShapes, FaRandom } from "react-icons/fa";
 import React, { useContext, useEffect, useState } from "react";
@@ -40,11 +46,14 @@ import {
     sortedIndices,
     generateRandomPirateIndex,
     generateRandomIntegerInRange,
+    makeBetValues,
 } from "./util";
-import { computeBinaryToPirates, computePiratesBinary } from "./maths";
+import { calculatePayoutTables, computeBinaryToPirates, computePiratesBinary } from "./maths";
 import { RoundContext } from "./RoundState";
 import PirateSelect from "./components/PirateSelect";
 import SettingsBox from "./components/SettingsBox";
+import { SHORTHAND_PIRATE_NAMES } from "./constants";
+import { current } from "immer";
 
 const cartesian = (...a) =>
     a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
@@ -676,19 +685,22 @@ const BetFunctions = (props) => {
     }
 
     return (
-        <SettingsBox bgColor={gray} mt={4} {...rest}>
+        <SettingsBox mt={4} {...rest}>
             <Stack p={4}>
                 <Wrap>
                     <WrapItem>
-                        <ButtonGroup size="sm" isAttached variant="outline">
-                            <Button
-                                leftIcon={<Icon as={FaPlus} />}
-                                aria-label=""
-                                onClick={newEmptySet}
-                            >
-                                New set
-                            </Button>
+                        <Button
+                            bgColor={gray}
+                            size="sm"
+                            variant="outline"
+                            leftIcon={<Icon as={FaPlus} />}
+                            aria-label=""
+                            onClick={newEmptySet}
+                        >
+                            New set
+                        </Button>
 
+                        <ButtonGroup size="sm" isAttached variant="outline" bgColor={gray} ml={2}>
                             <Button
                                 leftIcon={<Icon as={FaCopy} />}
                                 aria-label="Clone Current Bet Set"
@@ -708,7 +720,7 @@ const BetFunctions = (props) => {
                     </WrapItem>
 
                     <WrapItem>
-                        <ButtonGroup size="sm" isAttached variant="outline">
+                        <ButtonGroup size="sm" isAttached variant="outline" bgColor={gray}>
                             <Menu>
                                 <MenuButton
                                     as={Button}
@@ -761,47 +773,50 @@ const BetFunctions = (props) => {
                 </Wrap>
 
                 <Wrap>
-                    {Object.keys(allBets).map((e) => {
+                    {Object.keys(allBets).map((key) => {
                         return (
-                            <WrapItem key={e}>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    isActive={e === currentBet}
+                            <WrapItem key={key}>
+                                <Card
+                                    p={2}
+                                    opacity={key === currentBet ? 1 : 0.5}
                                     onClick={() => {
-                                        setCurrentBet(e);
+                                        setCurrentBet(key);
                                         setRoundState({
-                                            bets: { ...allBets[e] },
-                                            betAmounts: { ...allBetAmounts[e] },
+                                            bets: { ...allBets[key] },
+                                            betAmounts: { ...allBetAmounts[key] },
                                         });
                                     }}
                                 >
-                                    {e === currentBet ? (
-                                        <Editable
-                                            value={allNames[e]}
-                                            onChange={(value) =>
-                                                setAllNames({
-                                                    ...allNames,
-                                                    [currentBet]: value,
-                                                })
+                                    <Heading as={Editable}
+                                        px={4}
+                                        fontSize='lg'
+                                        value={allNames[key]}
+                                        onChange={(value) =>
+                                            setAllNames({
+                                                ...allNames,
+                                                [key]: value,
+                                            })
+                                        }
+                                        onSubmit={(newValue) => {
+                                            if (newValue === "") {
+                                                newValue = "Unnamed Set";
                                             }
-                                            onSubmit={(newValue) => {
-                                                if (newValue === "") {
-                                                    newValue = "Unnamed Set";
-                                                }
-                                                setAllNames({
-                                                    ...allNames,
-                                                    [currentBet]: newValue,
-                                                });
-                                            }}
-                                        >
-                                            <EditablePreview />
-                                            <EditableInput />
-                                        </Editable>
-                                    ) : (
-                                        <Text>{allNames[e]}</Text>
-                                    )}
-                                </Button>
+                                            setAllNames({
+                                                ...allNames,
+                                                [key]: newValue,
+                                            });
+                                        }}
+                                    >
+                                        <EditablePreview />
+                                        <EditableInput />
+                                    </Heading>
+                                    <Divider my={1} />
+                                    <BetBadges
+                                        bets={allBets[key]}
+                                        betAmounts={allBetAmounts[key]}
+                                    />
+
+                                </Card>
                             </WrapItem>
                         );
                     })}
@@ -810,5 +825,173 @@ const BetFunctions = (props) => {
         </SettingsBox>
     );
 };
+
+const BetBadges = (props) => {
+    const { bets, betAmounts } = props;
+    const { calculations, roundState } = useContext(RoundContext);
+    const { usedProbabilities, odds, calculated, winningBetBinary } = calculations;
+
+    if (odds === undefined) {
+        return null;
+    }
+
+    let { betOdds,
+        betPayoffs,
+        betBinaries, } = makeBetValues(bets, betAmounts, odds, usedProbabilities);
+
+    let payoutTables = {};
+
+    if (calculated) {
+        payoutTables = calculatePayoutTables(bets, usedProbabilities, betOdds, betPayoffs);
+    }
+
+    let badges = [];
+    let validBets = Object.values(betBinaries).filter((x) => x > 0);
+    let betCount = validBets.length;
+    let uniqueBetBinaries = [...new Set(validBets)];
+    let isRoundOver = roundState.roundData?.winners[0] !== 0;
+
+    // invalid badges
+    let isInvalid = false;
+    if (uniqueBetBinaries.length !== betCount) { // duplicate bets
+        badges.push(<Badge colorScheme="red" variant="subtle">❌ Contains duplicate bets</Badge>);
+        isInvalid = true;
+    }
+    Object.values(betOdds).forEach((odds, index) => { // invalid bet amounts
+        if (odds > 0) {
+            let betAmount = betAmounts[index + 1];
+            if (betAmount !== -1000 && betAmount < 50) {
+                badges.push(<Badge colorScheme="red" variant="subtle">❌ Invalid bet amounts</Badge>);
+                isInvalid = true;
+            }
+        }
+    });
+
+
+    // round-over badges
+    if (isRoundOver && roundState.roundData) {
+        // round-over badge
+        badges.push(<Badge colorScheme="red" variant="subtle">Round {roundState.roundData.round} is over</Badge>);
+
+        // units won, and np won badges
+        if (betCount > 0 && !isInvalid) {
+            let unitsWon = 0;
+            let npWon = 0;
+            Object.values(betBinaries).forEach((binary, index) => {
+                if ((winningBetBinary & binary) === binary) {
+                    unitsWon += betOdds[index + 1];
+                    npWon += Math.min(
+                        betOdds[index + 1] * betAmounts[index + 1],
+                        1_000_000
+                    );
+                }
+            });
+
+            if (unitsWon === 0) {
+                badges.push(<Badge variant="subtle">💀 Busted</Badge>);
+            } else {
+                badges.push(<Badge colorScheme="green" variant="subtle">Units won: {unitsWon.toLocaleString()}</Badge>);
+            }
+
+            if (npWon > 0) {
+                badges.push(<Badge colorScheme="green" variant="subtle">💰 NP won: {npWon.toLocaleString()}</Badge>);
+            }
+        }
+    }
+
+    // bust chance badge
+    if (betCount > 0 && roundState.roundData && !isRoundOver && !isInvalid) {
+        let bustChance = 0;
+        let bustEmoji = "";
+
+        if (payoutTables.odds !== undefined && Object.keys(payoutTables.odds).length > 1) {
+            if (payoutTables.odds[0]["value"] === 0) {
+                bustChance = payoutTables.odds[0]["probability"] * 100;
+            }
+        }
+
+        if (bustChance > 99) {
+            bustEmoji = "💀";
+        }
+
+        if (bustChance === 0) {
+            badges.push(<Badge variant="subtle">🎉 Bust-proof!</Badge>);
+        } else {
+            badges.push(<Badge variant="subtle">{bustEmoji} {Math.floor(bustChance)}% Bust</Badge>);
+        }
+    }
+
+    // guaranteed profit badge
+    if (betCount > 0 && roundState.roundData && !isRoundOver && !isInvalid) {
+        let betAmountsTotal = 0;
+        Object.values(betAmounts).forEach((amount) => {
+            if (amount !== -1000) {
+                betAmountsTotal += amount;
+            }
+        });
+        let lowestProfit = payoutTables.winnings[0].value;
+        if (betAmountsTotal < lowestProfit) {
+            badges.push(<Badge colorScheme="green" variant="subtle">💰 Guaranteed profit ({lowestProfit - betAmountsTotal}+ NP)</Badge>);
+        }
+    }
+
+    // gambit badge
+    if (betCount >= 2 && roundState.roundData && !isInvalid) {
+        let highest = Math.max(...Object.values(betBinaries));
+        let populationCount = highest.toString(2).match(/1/g).length;
+        if (populationCount === 5) {
+            let isSubset = Object.values(betBinaries).every((x) => (highest & x) === x);
+            if (isSubset) {
+                let names = [];
+                computeBinaryToPirates(highest).forEach((pirate, index) => {
+                    if (pirate > 0) {
+                        let pirateId = roundState.roundData.pirates[index][pirate - 1];
+                        names.push(SHORTHAND_PIRATE_NAMES[pirateId]);
+                    }
+                });
+
+                badges.push(<Badge colorScheme="blue" variant="subtle">Gambit: {names.join(" x ")}</Badge>);
+            }
+        }
+    }
+
+    // tenbet badge
+    if (betCount >= 10 && roundState.roundData && !isInvalid) {
+        let tenbetBinary = Object.values(betBinaries).reduce((accum, current) => accum & current);
+
+        if (tenbetBinary > 0) {
+            let names = [];
+            computeBinaryToPirates(tenbetBinary).forEach((pirate, index) => {
+                if (pirate > 0) {
+                    let pirateId = roundState.roundData.pirates[index][pirate - 1];
+                    names.push(SHORTHAND_PIRATE_NAMES[pirateId]);
+                }
+            });
+
+            badges.push(<Badge colorScheme="purple" variant="subtle">Tenbet: {names.join(" x ")}</Badge>);
+        }
+    }
+
+    // crazy badge
+    if (betCount >= 10 && roundState.roundData && !isInvalid) {
+        let isCrazy = Object.values(betBinaries).every((binary) => computeBinaryToPirates(binary).every((x) => x > 0));
+
+        if (isCrazy) {
+            badges.push(<Badge colorScheme="pink" variant="subtle">🤪 Crazy</Badge>);
+        }
+    }
+
+    return (
+        <VStack spacing={1}>
+            {badges.map((badge, index) => {
+                return (
+                    <Box key={index}>
+                        {badge}
+                    </Box>
+                );
+            })}
+        </VStack>
+    );
+}
 
 export default BetFunctions;
