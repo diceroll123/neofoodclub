@@ -45,6 +45,28 @@ export const NEGATIVE_FAS = {
 };
 
 export const ARENA_NAMES = ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"];
+export const SHORTHAND_PIRATE_NAMES = {
+    1: "Dan",
+    2: "Sproggie",
+    3: "Orvinn",
+    4: "Lucky",
+    5: "Ed",
+    6: "Peg Leg",
+    7: "Bonnie",
+    8: "Puffo",
+    9: "Stuff",
+    10: "Squire",
+    11: "Crossblades",
+    12: "Stripey",
+    13: "Ned",
+    14: "Fair",
+    15: "Goob",
+    16: "Fran",
+    17: "Fed",
+    18: "Blackbeard",
+    19: "Buck",
+    20: "Tail",
+};
 export const PIRATE_NAMES = {
     1: "Dan",
     2: "Sproggie",
