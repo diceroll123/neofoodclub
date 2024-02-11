@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 0 1 * *"
+  push:
+    paths:
+      - "automation/*"
 
 concurrency:
   # since this runs on an interval this should be fine
