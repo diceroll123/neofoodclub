@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  nfc_values:
+    image: nfc_values
+    volumes:
+      - ${PWD}:/app
