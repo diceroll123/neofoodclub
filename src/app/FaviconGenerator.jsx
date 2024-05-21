@@ -19,6 +19,7 @@ function FaviconGenerator() {
     "🥩",
     "🥧",
     "🥓",
+    "🦀",
   ];
 
   const favicon = faviconTemplate(
