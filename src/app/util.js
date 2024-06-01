@@ -170,10 +170,6 @@ export function displayAsPlusMinus(value) {
     return `${0 < value ? "+" : ""}${value}`;
 }
 
-export function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
 function calculateMaxBet(baseMaxBet, round) {
     return baseMaxBet + 2 * round;
 }
@@ -366,6 +362,64 @@ export function getProbs(roundState, legacyProbs, logitProbs) {
     return legacyProbs.used;
 }
 
+export function makeBetValues(bets, betAmounts, odds, probabilities) {
+    let betOdds = {};
+    let betPayoffs = {};
+    let betProbabilities = {};
+    let betExpectedRatios = {};
+    let betNetExpected = {};
+    let betMaxBets = {};
+    let betBinaries = {};
+
+    for (
+        let betIndex = 1;
+        betIndex <= Object.keys(bets).length;
+        betIndex++
+    ) {
+        betBinaries[betIndex] = computePiratesBinary(
+            bets[betIndex]
+        );
+        betOdds[betIndex] = 0;
+        betProbabilities[betIndex] = 0;
+
+        for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
+            let pirateIndex = bets[betIndex][arenaIndex];
+            if (pirateIndex > 0) {
+                let odd = odds[arenaIndex][pirateIndex];
+                let prob = probabilities[arenaIndex][pirateIndex];
+                betOdds[betIndex] = (betOdds[betIndex] || 1) * odd;
+                betProbabilities[betIndex] =
+                    (betProbabilities[betIndex] || 1) * prob;
+            }
+        }
+        // yes, the for-loop above had to be separate.
+        for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
+            betPayoffs[betIndex] = Math.min(
+                1_000_000,
+                betAmounts[betIndex] * betOdds[betIndex]
+            );
+            betExpectedRatios[betIndex] =
+                betOdds[betIndex] * betProbabilities[betIndex];
+            betNetExpected[betIndex] =
+                betPayoffs[betIndex] * betProbabilities[betIndex] -
+                betAmounts[betIndex];
+            betMaxBets[betIndex] = Math.floor(
+                1_000_000 / betOdds[betIndex]
+            );
+        }
+    }
+
+    return {
+        betOdds,
+        betPayoffs,
+        betProbabilities,
+        betExpectedRatios,
+        betNetExpected,
+        betMaxBets,
+        betBinaries,
+    };
+}
+
 export function calculateRoundData(roundState) {
     // calculates all of the round's mathy data for visualization purposes.
     let calculated = false;
@@ -403,43 +457,15 @@ export function calculateRoundData(roundState) {
         winningBetBinary = computePiratesBinary(roundState.roundData.winners);
 
         // keep the "cache" of bet data up to date
-        for (
-            let betIndex = 1;
-            betIndex <= Object.keys(roundState.bets).length;
-            betIndex++
-        ) {
-            betBinaries[betIndex] = computePiratesBinary(
-                roundState.bets[betIndex]
-            );
-            betOdds[betIndex] = 0;
-            betProbabilities[betIndex] = 0;
+        const values = makeBetValues(roundState.bets, roundState.betAmounts, odds, usedProbabilities);
 
-            for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
-                let pirateIndex = roundState.bets[betIndex][arenaIndex];
-                if (pirateIndex > 0) {
-                    let odd = odds[arenaIndex][pirateIndex];
-                    let prob = usedProbabilities[arenaIndex][pirateIndex];
-                    betOdds[betIndex] = (betOdds[betIndex] || 1) * odd;
-                    betProbabilities[betIndex] =
-                        (betProbabilities[betIndex] || 1) * prob;
-                }
-            }
-            // yes, the for-loop above had to be separate.
-            for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
-                betPayoffs[betIndex] = Math.min(
-                    1_000_000,
-                    roundState.betAmounts[betIndex] * betOdds[betIndex]
-                );
-                betExpectedRatios[betIndex] =
-                    betOdds[betIndex] * betProbabilities[betIndex];
-                betNetExpected[betIndex] =
-                    betPayoffs[betIndex] * betProbabilities[betIndex] -
-                    roundState.betAmounts[betIndex];
-                betMaxBets[betIndex] = Math.floor(
-                    1_000_000 / betOdds[betIndex]
-                );
-            }
-        }
+        betOdds = values.betOdds;
+        betPayoffs = values.betPayoffs;
+        betProbabilities = values.betProbabilities;
+        betExpectedRatios = values.betExpectedRatios;
+        betNetExpected = values.betNetExpected;
+        betMaxBets = values.betMaxBets;
+        betBinaries = values.betBinaries;
 
         for (let betIndex in roundState.bets) {
             let betBinary = betBinaries[betIndex];
@@ -453,7 +479,7 @@ export function calculateRoundData(roundState) {
                     totalWinningOdds += betOdds[betIndex];
                     totalWinningPayoff += Math.min(
                         betOdds[betIndex] * roundState.betAmounts[betIndex],
-                        1000000
+                        1_000_000
                     );
                 }
             }
@@ -461,7 +487,7 @@ export function calculateRoundData(roundState) {
 
         // for charts
         payoutTables = calculatePayoutTables(
-            roundState,
+            roundState.bets,
             usedProbabilities,
             betOdds,
             betPayoffs
@@ -484,6 +510,7 @@ export function calculateRoundData(roundState) {
         betNetExpected,
         betMaxBets,
         betBinaries,
+        odds,
         payoutTables,
         winningBetBinary,
         totalBetAmounts,

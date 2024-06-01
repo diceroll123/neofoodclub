@@ -18,7 +18,6 @@ import annotationPlugin from "chartjs-plugin-annotation";
 import {
     amountAbbreviation,
     displayAsPercent,
-    numberWithCommas,
 } from "../util";
 import { RoundContext } from "../RoundState";
 import Td from "./Td";
@@ -109,7 +108,7 @@ const PayoutCharts = () => {
                     callbacks: {
                         label: function (context) {
                             return [
-                                `${numberWithCommas(context.parsed.x)} ${type}`,
+                                `${(context.parsed.x).toLocaleString()} ${type}`,
                                 `${displayAsPercent(context.parsed.y, 3)}`,
                             ];
                         },
@@ -194,7 +193,7 @@ const PayoutCharts = () => {
 
             return (
                 <Tr key={key} backgroundColor={bgColor}>
-                    <Td isNumeric>{numberWithCommas(dataObj.value)}</Td>
+                    <Td isNumeric>{dataObj.value.toLocaleString()}</Td>
                     <Td isNumeric>
                         <TextTooltip
                             text={displayAsPercent(dataObj.probability, 3)}
