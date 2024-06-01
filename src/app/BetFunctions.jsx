@@ -29,7 +29,6 @@ import {
     Box,
     Divider,
     Heading,
-    Center,
 } from "@chakra-ui/react";
 import { FaCopy, FaPlus, FaTrash, FaChevronDown, FaMagic, FaShapes, FaRandom } from "react-icons/fa";
 import React, { useContext, useEffect, useState } from "react";
@@ -53,7 +52,6 @@ import { RoundContext } from "./RoundState";
 import PirateSelect from "./components/PirateSelect";
 import SettingsBox from "./components/SettingsBox";
 import { SHORTHAND_PIRATE_NAMES } from "./constants";
-import { current } from "immer";
 
 const cartesian = (...a) =>
     a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
@@ -982,7 +980,7 @@ const BetBadges = (props) => {
     }
 
     return (
-        <VStack spacing={1}>
+        <VStack spacing={1} style={{ userSelect: 'none' }}>
             {badges.map((badge, index) => {
                 return (
                     <Box key={index}>
