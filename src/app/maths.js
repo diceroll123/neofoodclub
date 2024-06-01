@@ -246,7 +246,7 @@ function tableToList(oddsTable) {
 }
 
 export function calculatePayoutTables(
-    roundState,
+    bets,
     probabilities,
     betOdds,
     betPayoffs
@@ -369,8 +369,8 @@ export function calculatePayoutTables(
     // making the ibObjs
     let ibObjOdds = {};
     let ibObjWinnings = {};
-    for (let betNum in roundState.bets) {
-        let ib = betToIb(roundState.bets[betNum]);
+    for (let betNum in bets) {
+        let ib = betToIb(bets[betNum]);
         ibObjOdds[ib] = ibObjOdds[ib] || 0;
         ibObjWinnings[ib] = ibObjWinnings[ib] || 0;
         ibObjOdds[ib] += betOdds[betNum];
