@@ -163,7 +163,7 @@ export const LOGIT_IS_POS3 = {{
 export const LOGIT_IS_POS4 = {{
     {sep.join([f"{i - 98}: {params.iloc[i]}" for i in range(99, 119)])},
 }};
-""".strip()
+""".lstrip()
 
 
 def generate_python(params) -> str:
@@ -187,7 +187,7 @@ LOGIT_IS_POS3 = [
 LOGIT_IS_POS4 = [
     {sep.join([f"{params.iloc[i]}" for i in range(99, 119)])},
 ]
-""".strip()
+""".lstrip()
 
 
 def generate_rust(params) -> str:
@@ -211,7 +211,7 @@ static LOGIT_IS_POS3: [f64; 20] = [
 static LOGIT_IS_POS4: [f64; 20] = [
     {sep.join([f"{params.iloc[i]}" for i in range(99, 119)])},
 ];
-""".strip()
+""".lstrip()
 
 
 print("Writing output files...")
