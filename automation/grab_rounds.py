@@ -1,6 +1,7 @@
-import requests
 import time
 from pathlib import Path
+
+import requests
 
 # grab the current round from the API
 current_round = int(requests.get("https://foodclub.neocities.org/next_round.txt").text)
@@ -23,5 +24,5 @@ while not Path(f"./raw_json/{previous_round}.json").exists():
     # shouldn't happen but it's a good idea to have a limit
     if previous_round < current_round - limit:
         break
-    
+
     previous_round -= 1

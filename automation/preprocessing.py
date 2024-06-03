@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 
 import pandas as pd
-
 from constants import NEGATIVE_FAS, POSITIVE_FAS
 
 # fmt: off

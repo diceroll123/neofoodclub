@@ -4,7 +4,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pylogit as pl
-
 from constants import PIRATE_NAMES
 
 df = pd.read_csv("./output/history.csv")
