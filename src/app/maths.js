@@ -1,4 +1,5 @@
-import { NEGATIVE_FAS, POSITIVE_FAS, LOGIT_INTERCEPTS, LOGIT_PFA, LOGIT_NFA, LOGIT_IS_POS2, LOGIT_IS_POS3, LOGIT_IS_POS4 } from "./constants";
+import { NEGATIVE_FAS, POSITIVE_FAS } from "./constants";
+import { LOGIT_INTERCEPTS, LOGIT_PFA, LOGIT_NFA, LOGIT_IS_POS2, LOGIT_IS_POS3, LOGIT_IS_POS4 } from "./constants_logit";
 
 export function computePirateFAPairs(roundData) {
     // pre-populate with zeroes because really old rounds don't have this data
@@ -41,7 +42,7 @@ export function computePirateFAPairs(roundData) {
             }
         }
     }
-    
+
     return [favorites, allergies]
 }
 
