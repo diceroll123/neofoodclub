@@ -788,6 +788,7 @@ const BetFunctions = (props) => {
                                             betAmounts: { ...allBetAmounts[key] },
                                         });
                                     }}
+                                    transition="opacity 0.2s ease-in-out"
                                 >
                                     <Heading as={Editable}
                                         isDisabled={key !== currentBet}
