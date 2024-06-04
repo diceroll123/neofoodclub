@@ -29,6 +29,8 @@ import {
     Box,
     Divider,
     Heading,
+    Input,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import { FaCopy, FaPlus, FaTrash, FaChevronDown, FaMagic, FaShapes, FaRandom } from "react-icons/fa";
 import React, { useContext, useEffect, useState } from "react";
@@ -239,6 +241,7 @@ const BetFunctions = (props) => {
     const { roundState, setRoundState, calculations } = useContext(RoundContext);
     const { usedProbabilities, arenaRatios } = calculations;
     const [currentBet, setCurrentBet] = useState("0");
+    const previewHover = useColorModeValue('gray.200', 'gray.600');
 
     const [allNames, setAllNames] = useState({ 0: "Starting Set" });
     const [allBets, setAllBets] = useState({ 0: { ...roundState.bets } });
@@ -777,6 +780,7 @@ const BetFunctions = (props) => {
                                 <Card
                                     p={2}
                                     opacity={key === currentBet ? 1 : 0.5}
+                                    cursor={key === currentBet ? "default" : "pointer"}
                                     onClick={() => {
                                         setCurrentBet(key);
                                         setRoundState({
@@ -786,8 +790,9 @@ const BetFunctions = (props) => {
                                     }}
                                 >
                                     <Heading as={Editable}
-                                        px={4}
-                                        fontSize='lg'
+                                        isDisabled={key !== currentBet}
+                                        size="md"
+                                        minW="100%"
                                         value={allNames[key]}
                                         onChange={(value) =>
                                             setAllNames({
@@ -805,8 +810,14 @@ const BetFunctions = (props) => {
                                             });
                                         }}
                                     >
-                                        <EditablePreview />
-                                        <EditableInput />
+                                        <EditablePreview
+                                            px={4}
+                                            py={2}
+                                            cursor={key === currentBet ? "text" : "pointer"}
+                                            _hover={{
+                                                background: key === currentBet ? previewHover : null,
+                                            }} />
+                                        <Input py={2} px={4} as={EditableInput} />
                                     </Heading>
                                     <Divider my={1} />
                                     <BetBadges
