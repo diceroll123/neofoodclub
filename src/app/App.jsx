@@ -3,7 +3,7 @@ import "firebase/database";
 import React, { useEffect, useCallback, useContext } from "react";
 import { initializeApp } from "firebase/app";
 
-import { createBetURL, parseBetUrl } from "./util";
+import { makeBetURL, parseBetUrl } from "./util";
 import HomePage from "./HomePage";
 import { RoundContext } from "./RoundState";
 import useRoundData from "./useRoundData";
@@ -59,7 +59,14 @@ function useRoundStateURLs(roundState, setRoundState) {
             return;
         }
 
-        window.history.replaceState(null, "", createBetURL(roundState, false));
+        const url = makeBetURL(
+            roundState.currentSelectedRound,
+            roundState.bets,
+            roundState.betAmounts,
+            true,
+        );
+
+        window.history.replaceState(null, "", url);
     }, [roundState]);
 
     const onHashChange = useCallback(() => {

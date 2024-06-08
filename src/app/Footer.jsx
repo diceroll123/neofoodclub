@@ -58,7 +58,7 @@ function KoFiButtion() {
 export default function Footer() {
     return (
         <>
-            <Divider pt={6} />
+            <Divider />
             <Box
                 bg={useColorModeValue('gray.50', 'gray.900')}
                 color={useColorModeValue('gray.700', 'gray.200')}>

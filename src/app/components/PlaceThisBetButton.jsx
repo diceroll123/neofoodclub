@@ -23,7 +23,7 @@ const ErrorBetButton = (props) => {
 
 const PlaceThisBetButton = (props) => {
     const { bet, betNum } = props;
-    const { roundState, calculations } = useContext(RoundContext);   
+    const { roundState, calculations } = useContext(RoundContext);
     const { betBinaries, betOdds, betPayoffs, winningBetBinary } = calculations;
     const [clicked, setClicked] = useState(false);
 
@@ -61,10 +61,10 @@ const PlaceThisBetButton = (props) => {
         );
     }
 
-    function generate_bet_link(bet, betNum) {
+    const generate_bet_link = (bet, betNum) => {
         let urlString =
             "https://www.neopets.com/pirates/process_foodclub.phtml?";
-        const pirates = roundState.roundData.pirates;
+        const { pirates } = roundState.roundData;
         for (let i = 0; i < 5; i++) {
             if (bet[i] !== 0) {
                 urlString += `winner${i + 1}=${pirates[i][bet[i] - 1]}&`;

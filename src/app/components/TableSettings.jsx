@@ -12,9 +12,10 @@ import {
 import Cookies from "universal-cookie/es6";
 import React, { useContext, useMemo, useState } from "react";
 
-import { getTableMode } from "../util";
+import { FaGlobe } from "react-icons/fa6";
+
+import { getTableMode, getUseWebDomain } from "../util";
 import ExtraBox from "./ExtraBox";
-import HorizontalScrollingBox from "./HorizontalScrollingBox";
 import { RoundContext } from "../RoundState";
 import SettingsBox from "./SettingsBox";
 
@@ -59,7 +60,7 @@ const TestTubeIcon = (props) => (
             fill="#17BF63"
             d="M29.196 13.144c-.058.379-2.627.751-5.691.343-3.063-.408-5.482-1.223-5.403-1.82.08-.597 2.627-.751 5.691-.343s5.495 1.224 5.403 1.82zM10.84 23.247c-.31.31-.813.31-1.123 0-.31-.31-.31-.813 0-1.123.31-.31.813-.31 1.123 0 .31.31.31.813 0 1.123zm3.317 2.615c-.507.507-1.328.506-1.835 0-.506-.506-.506-1.328 0-1.834.507-.507 1.328-.506 1.834 0 .507.506.508 1.327.001 1.834zm1.677-5.324c-.476.476-1.25.476-1.726 0s-.476-1.249 0-1.726c.476-.476 1.249-.477 1.725 0 .478.477.478 1.25.001 1.726zm-6.868 8.858c-.581.581-1.524.581-2.105 0-.582-.582-.581-1.524 0-2.105s1.523-.581 2.105 0c.581.581.582 1.523 0 2.105zm11.396-9.158c-.413.413-1.083.413-1.496 0-.413-.413-.412-1.083.001-1.496.414-.414 1.083-.414 1.496-.001.413.414.413 1.083-.001 1.497zm-1.207-4.288c-.27.27-.708.27-.979 0-.27-.27-.27-.708 0-.979.27-.27.708-.271.979 0 .27.271.27.709 0 .979z"
         />
-        <ellipse transform="rotate(-45.001 30.817 5.223)" fill="#CCD6DD" cx="30.817" cy="5.223" rx="1.184" ry="4.847"/>
+        <ellipse transform="rotate(-45.001 30.817 5.223)" fill="#CCD6DD" cx="30.817" cy="5.223" rx="1.184" ry="4.847" />
     </svg>
 )
 
@@ -114,11 +115,9 @@ const NormalExtras = (props) => {
     const [faDetails, setFaDetails] = useState(false);
     const [customOddsMode, setCustomOddsMode] = useState(false);
 
-    if (getTableMode() !== "normal") {
-        return null;
-    }
-
     const brainSize = bigBrain ? "2em" : "1em";
+
+    const notUsingNormal = getTableMode() !== "normal";
 
     return (
         <ExtraBox {...props}>
@@ -149,12 +148,13 @@ const NormalExtras = (props) => {
                     }
                     size="sm"
                     w="190px"
+                    isDisabled={notUsingNormal}
                 >
                     Big Brain Mode is {bigBrain === true ? "ON" : "OFF"}
                 </Button>
                 <Checkbox
                     isChecked={customOddsMode}
-                    isDisabled={!(bigBrain && roundState.roundData)}
+                    isDisabled={!(bigBrain && roundState.roundData) || notUsingNormal}
                     onChange={(e) => {
                         let checked = e.target.checked;
                         setCustomOddsMode(checked);
@@ -172,7 +172,7 @@ const NormalExtras = (props) => {
                 </Checkbox>
                 <Checkbox
                     isChecked={faDetails}
-                    isDisabled={!(roundState.roundData?.foods && bigBrain)}
+                    isDisabled={!(roundState.roundData?.foods && bigBrain) || notUsingNormal}
                     onChange={(e) => {
                         let checked = e.target.checked;
                         setFaDetails(checked);
@@ -192,58 +192,99 @@ const NormalExtras = (props) => {
     );
 };
 
-const LogitModelToggle = (props) => {
+const LogitModelToggle = () => {
     const { roundState, setRoundState } = useContext(RoundContext);
-    const testTubeSize = useMemo(() => roundState.advanced.logitModel ? "2em" : "1em", [roundState]);
+    const testTubeSize = useMemo(() => roundState.advanced.useLogitModel ? "2em" : "1em", [roundState.advanced.useLogitModel]);
+    const cookies = new Cookies();
     return (
-        <ExtraBox {...props}>
-            <Stack>
-                <Tooltip label="The experimental model uses multinomial logit to predict the probabilities and should yield better TER, especially for smaller max bets.">
-                    <Button
-                        onClick={() => {
-                            setRoundState({
-                                advanced: {
-                                    ...roundState.advanced,
-                                    logitModel: !roundState.advanced.logitModel,
-                                },
-                            });
-                        }}
-                        leftIcon={
-                            (
-                                <Icon
-                                    as={TestTubeIcon}
-                                    w={testTubeSize}
-                                    h={testTubeSize}
-                                    style={{
-                                        transition:
-                                            "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                                    }}
-                                />
-                            )
-                        }
-                        size="sm"
-                        w="220px"
-                    >
-                        Experimental Model is {roundState.advanced.logitModel === true ? "ON" : "OFF"}
-                    </Button>
-                </Tooltip>
-            </Stack>
-        </ExtraBox>
+        <Tooltip
+            label="The experimental model uses multinomial logit to predict the probabilities and should yield better TER, especially for smaller max bets."
+            openDelay={600}
+        >
+            <Button
+                onClick={() => {
+                    cookies.set("useLogitModel", !roundState.advanced.useLogitModel);
+                    setRoundState({
+                        advanced: {
+                            ...roundState.advanced,
+                            useLogitModel: !roundState.advanced.useLogitModel,
+                        },
+                    });
+                }}
+                leftIcon={
+                    (
+                        <Icon
+                            as={TestTubeIcon}
+                            w={testTubeSize}
+                            h={testTubeSize}
+                            style={{
+                                transition:
+                                    "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                            }}
+                        />
+                    )
+                }
+                size="sm"
+            >
+                Experimental Model is {roundState.advanced.useLogitModel ? "ON" : "OFF"}
+            </Button>
+        </Tooltip>
     )
+}
+
+const CopyWithDomain = () => {
+    const { setRoundState } = useContext(RoundContext);
+    const cookies = new Cookies();
+    const [useWebDomain, toggleUseWebDomain] = useState(getUseWebDomain());
+
+    let iconSize = useWebDomain ? "2em" : "1em";
+
+    return (
+        <Tooltip label={`Include domain when copying bets\n(${window.location.origin}/)`}>
+            <Button
+                size="sm"
+                leftIcon={<Icon
+                    as={FaGlobe}
+                    w={iconSize}
+                    h={iconSize}
+                    color="blue.300"
+                    style={{
+                        transition:
+                            "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    }}
+                />}
+                onClick={() => {
+                    let checked = !useWebDomain;
+                    toggleUseWebDomain(checked);
+                    cookies.set("useWebDomain", checked);
+                    setRoundState({ useWebDomain: checked });
+                }}
+            >
+                Copy domain with bets is {useWebDomain ? "ON" : "OFF"}
+            </Button>
+        </Tooltip>
+    );
 }
 
 const TableSettings = (props) => {
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     return (
         <SettingsBox bgColor={gray} {...props}>
-            <HorizontalScrollingBox>
-                <HStack p={4}>
+            <Stack p={4}>
+                <HStack>
                     <TableModes />
-                    <LogitModelToggle />
                     <NormalExtras />
                 </HStack>
-            </HorizontalScrollingBox>
-        </SettingsBox>
+
+                <ExtraBox>
+                    <Stack>
+                        <LogitModelToggle />
+                        <CopyWithDomain />
+                    </Stack>
+                </ExtraBox>
+            </Stack>
+
+        </SettingsBox >
     );
 };
 

@@ -1,8 +1,8 @@
-import { Button, Icon } from "@chakra-ui/react";
+import { Button, ButtonGroup, Icon, Heading, Stack } from "@chakra-ui/react";
 import { useContext } from "react";
 import { RoundContext } from "../RoundState";
 import { determineBetAmount, getMaxBet } from "../util";
-import { FaFillDrip } from "react-icons/fa";
+import { FaFillDrip, FaInfinity } from "react-icons/fa";
 
 const SetAllToMaxButton = (props) => {
 	const { roundState, setRoundState, calculations } =
@@ -10,14 +10,18 @@ const SetAllToMaxButton = (props) => {
 	const { ...rest } = props;
 	const { betBinaries, betOdds } = calculations;
 
-	function setAllBets(value) {
+	const setAllBets = (value, capped) => {
 		let betAmounts = { ...roundState.betAmounts };
 		for (let index in roundState.betAmounts) {
 			if (betBinaries[index] > 0) {
-				betAmounts[index] = determineBetAmount(
-					value,
-					Math.ceil(1000000 / betOdds[index])
-				);
+				if (capped) {
+					betAmounts[index] = determineBetAmount(
+						value,
+						Math.ceil(1000000 / betOdds[index])
+					);
+				} else {
+					betAmounts[index] = value;
+				}
 			} else {
 				betAmounts[index] = -1000;
 			}
@@ -26,17 +30,45 @@ const SetAllToMaxButton = (props) => {
 	}
 
 	return (
-		<Button
-			leftIcon={<Icon as={FaFillDrip} />}
-			size="sm"
-			colorScheme="green"
-			onClick={() => {
-				setAllBets(getMaxBet(roundState.currentSelectedRound));
-			}}
-			{...rest}
-		>
-			Set bet amounts to max
-		</Button>
+		<>
+			<Stack>
+				<Heading size='sm' textTransform="uppercase">Set bet amounts</Heading>
+				<ButtonGroup mt={2}>
+					<Button
+						leftIcon={<Icon as={FaFillDrip} w="1.4em" h="1.4em" />}
+						size="sm"
+						colorScheme="green"
+						onClick={() => {
+							setAllBets(getMaxBet(roundState.currentSelectedRound), true);
+						}}
+						{...rest}
+					>
+						Capped
+					</Button>
+					<Button
+						leftIcon={<Icon as={FaInfinity} w="1.4em" h="1.4em" />}
+						size="sm"
+						colorScheme="blue"
+						onClick={() => {
+							setAllBets(getMaxBet(roundState.currentSelectedRound), false);
+						}}
+						{...rest}
+					>
+						Uncapped
+					</Button>
+					<Button
+						size="sm"
+						onClick={() => {
+							setAllBets(-1000, false);
+						}}
+						colorScheme="red"
+						{...rest}
+					>
+						Clear
+					</Button>
+				</ButtonGroup>
+			</Stack>
+		</>
 	);
 };
 

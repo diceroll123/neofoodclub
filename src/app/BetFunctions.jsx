@@ -25,16 +25,21 @@ import {
     useDisclosure,
     VStack,
     Card,
+    IconButton,
     Badge,
     Box,
     Divider,
     Heading,
     Input,
     useColorModeValue,
+    useClipboard,
+    useToast,
+    Tooltip,
+    HStack,
+    Collapse
 } from "@chakra-ui/react";
-import { FaCopy, FaPlus, FaTrash, FaChevronDown, FaMagic, FaShapes, FaRandom } from "react-icons/fa";
-import React, { useContext, useEffect, useState } from "react";
-
+import { FaMarkdown, FaCode, FaClone, FaPlus, FaTrash, FaChevronDown, FaWandMagicSparkles, FaShapes, FaShuffle, FaLink, FaSackDollar } from "react-icons/fa6";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
     anyBetsExist,
     cloneArray,
@@ -48,12 +53,15 @@ import {
     generateRandomPirateIndex,
     generateRandomIntegerInRange,
     makeBetValues,
+    makeBetURL,
+    anyBetsDuplicate,
+    displayAsPercent,
 } from "./util";
 import { calculatePayoutTables, computeBinaryToPirates, computePiratesBinary } from "./maths";
 import { RoundContext } from "./RoundState";
 import PirateSelect from "./components/PirateSelect";
 import SettingsBox from "./components/SettingsBox";
-import { SHORTHAND_PIRATE_NAMES } from "./constants";
+import { PIRATE_NAMES, SHORTHAND_PIRATE_NAMES } from "./constants";
 
 const cartesian = (...a) =>
     a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
@@ -204,7 +212,7 @@ const BuildSetMenu = (props) => {
                     <ModalFooter>
                         <Flex width="2xl">
                             <Button
-                                leftIcon={<Icon as={FaRandom} />}
+                                leftIcon={<Icon as={FaShuffle} />}
                                 mr={3}
                                 onClick={randomizeIndices}>
                                 Randomize
@@ -235,13 +243,181 @@ const BuildSetMenu = (props) => {
     )
 }
 
+function createMarkdownTable(calculations, roundState, bets) {
+    // specifically meant to not be posted on Neopets, so it includes a URL.
+    if (calculations.payoutTables.odds === undefined || calculations.calculated === false || roundState.roundData === null) {
+        return null;
+    }
+
+    let totalTER = 0;
+    let betCount = 0;
+    let lines = [];
+
+    // bet table
+    lines.push(
+        `[${roundState.currentSelectedRound}](${window.location.origin
+        }${makeBetURL(
+            roundState.currentSelectedRound, bets, null, false
+        )})|Shipwreck|Lagoon|Treasure|Hidden|Harpoon|Odds`
+    );
+    lines.push(":-:|-|-|-|-|-|-:");
+
+    for (let betNum in bets) {
+        totalTER += calculations.betExpectedRatios[betNum];
+        if (calculations.betBinaries[betNum] > 0) {
+            betCount += 1;
+            let str = `${betNum}`;
+            for (let i = 0; i < 5; i++) {
+                str += "|";
+                let pirateId =
+                    roundState.roundData.pirates[i][
+                    bets[betNum][i] - 1
+                    ];
+                if (pirateId) {
+                    str += PIRATE_NAMES[pirateId];
+                }
+            }
+            lines.push(`${str}|${calculations.betOdds[betNum]}:1`);
+        }
+    }
+    lines.push("\n");
+    // stats
+    lines.push(`TER: ${totalTER.toFixed(3)}`);
+    lines.push("\n");
+    lines.push("Odds|Probability|Cumulative|Tail");
+    lines.push("--:|--:|--:|--:");
+    calculations.payoutTables.odds.forEach((item) => {
+        lines.push(
+            `${item.value}:${betCount}|${displayAsPercent(
+                item.probability,
+                3
+            )}|${displayAsPercent(item.cumulative, 3)}|${displayAsPercent(
+                item.tail,
+                3
+            )}`
+        );
+    });
+
+    return lines.join("\n");
+}
+
+function createHtmlTable(calculations, roundState, bets) {
+    // specifically meant to be posted on Neopets, so it includes the bet hash
+    if (calculations.payoutTables.odds === undefined || calculations.calculated === false || roundState.roundData === null) {
+        return null;
+    }
+
+    // bet table
+    let html =
+        "<table><thead><tr><th>Bet</th><th>Shipwreck</th><th>Lagoon</th><th>Treasure</th><th>Hidden</th><th>Harpoon</th><th>Odds</th></tr></thead><tbody>";
+
+    for (let betNum in bets) {
+        if (calculations.betBinaries[betNum] > 0) {
+            let str = `<tr><td>${betNum}</td>`;
+            for (let i = 0; i < 5; i++) {
+                str += "<td>";
+                let pirateId =
+                    roundState.roundData.pirates[i][
+                    bets[betNum][i] - 1
+                    ];
+                if (pirateId) {
+                    str += PIRATE_NAMES[pirateId];
+                }
+                str += "</td>";
+            }
+            html += str;
+            html += `<td>${calculations.betOdds[betNum]}:1</td>`;
+            html += "</tr>";
+        }
+    }
+
+    const hash = makeBetURL(roundState.currentSelectedRound, bets, null, false);
+    html += `</tbody><tfoot><tr><td colspan="7">${hash}</td></tr></tfoot></table>`;
+
+    return html;
+}
+
+const BetCopyButtons = (props) => {
+    let { bets, betAmounts, ...rest } = props;
+    const { roundState, calculations } = useContext(RoundContext);
+
+    const toast = useToast();
+    const useWebDomain = useMemo(() => roundState.useWebDomain, [roundState.useWebDomain]);
+
+    const origin = useWebDomain ? window.location.origin : "";
+
+    const urlClip = useClipboard(origin + makeBetURL(roundState.currentSelectedRound, bets, betAmounts, false));
+    const urlAmountsClip = useClipboard(origin + makeBetURL(roundState.currentSelectedRound, bets, betAmounts, true));
+
+    const markdownClip = useClipboard(createMarkdownTable(calculations, roundState, bets));
+    const htmlClip = useClipboard(createHtmlTable(calculations, roundState, bets));
+
+    let anyBetAmounts = urlAmountsClip.value.includes("&a=");
+
+    const copier = (clip, title) => {
+        clip.onCopy();
+        toast.closeAll();
+        toast({
+            title: title,
+            status: "success",
+            duration: 1300,
+            isClosable: true,
+        });
+    }
+
+    return (
+        <HStack mt={2} {...rest}>
+            <Spacer />
+            <Heading size="xs" textTransform="uppercase">Share:</Heading>
+            <ButtonGroup
+                variant="solid"
+                isAttached={anyBetAmounts}
+            >
+                <Tooltip label="Copy Bet URL" openDelay={600}>
+                    <IconButton
+                        icon={<Icon as={FaLink} w="1.5em" h="1.5em" />}
+                        onClick={() => copier(urlClip, "Bet URL copied!")}
+                    />
+                </Tooltip>
+                <Tooltip label="Copy Bet URL with bet amounts" openDelay={600}>
+                    <IconButton
+                        icon={<Icon as={FaSackDollar} w="1.5em" h="1.5em" />}
+                        hidden={!anyBetAmounts}
+                        onClick={() => copier(urlAmountsClip, "Bet URL + Amounts copied!")}
+                    />
+                </Tooltip>
+            </ButtonGroup>
+
+            <ButtonGroup
+                variant="solid"
+                isAttached
+            >
+                <Tooltip label="Copy Markdown table" openDelay={600}>
+                    <IconButton
+                        icon={<Icon as={FaMarkdown} w="1.5em" h="1.5em" />}
+                        onClick={() => copier(markdownClip, "Table Markdown copied!")}
+                    />
+                </Tooltip>
+                <Tooltip label="Copy HTML table" openDelay={600}>
+                    <IconButton
+                        icon={<Icon as={FaCode} w="1.5em" h="1.5em" />}
+                        onClick={() => copier(htmlClip, "Table HTML copied!")}
+                    />
+                </Tooltip>
+            </ButtonGroup>
+        </HStack>
+    );
+}
+
 const BetFunctions = (props) => {
 
     const { blue, orange, red, green, yellow, gray, getPirateBgColor, ...rest } = props;
     const { roundState, setRoundState, calculations } = useContext(RoundContext);
-    const { usedProbabilities, arenaRatios } = calculations;
+    const { usedProbabilities, arenaRatios, betBinaries } = calculations;
     const [currentBet, setCurrentBet] = useState("0");
     const previewHover = useColorModeValue('gray.200', 'gray.600');
+
+    const hasDuplicates = anyBetsDuplicate(betBinaries);
 
     const [allNames, setAllNames] = useState({ 0: "Starting Set" });
     const [allBets, setAllBets] = useState({ 0: { ...roundState.bets } });
@@ -322,7 +498,7 @@ const BetFunctions = (props) => {
         }));
     }, [roundState.bets, roundState.betAmounts, currentBet]);
 
-    function addNewSet(name, bets, betAmounts, maybe_replace = false) {
+    const addNewSet = (name, bets, betAmounts, maybe_replace = false) => {
         // will modify the current set if the current set is empty and maybe_replace is explicitly set to true
         const newIndex =
             maybe_replace && !anyBetsExist(roundState.bets)
@@ -342,7 +518,7 @@ const BetFunctions = (props) => {
         setCurrentBet(newIndex);
     }
 
-    function newEmptySet() {
+    const newEmptySet = () => {
         const amountOfBets = Object.keys(allBets[currentBet]).length;
         addNewSet(
             "New Set",
@@ -351,7 +527,7 @@ const BetFunctions = (props) => {
         );
     }
 
-    function cloneSet() {
+    const cloneSet = () => {
         addNewSet(
             `${allNames[currentBet]} (Clone)`,
             allBets[currentBet],
@@ -359,7 +535,7 @@ const BetFunctions = (props) => {
         );
     }
 
-    function deleteSet() {
+    const deleteSet = () => {
         const currentIndex = Object.keys(allBets).indexOf(currentBet);
         let useIndex = currentIndex - 1;
         if (useIndex < 0) {
@@ -395,7 +571,7 @@ const BetFunctions = (props) => {
         setCurrentBet(previousElement);
     }
 
-    function merSet() {
+    const merSet = () => {
         const maxBet = getMaxBet(roundState.currentSelectedRound);
 
         const maker = new BetsMaker();
@@ -424,7 +600,7 @@ const BetFunctions = (props) => {
         addNewSet(`Max TER Set (${maxBet} NP)`, newBets, newBetAmounts, true);
     }
 
-    function tenbetSet(tenbetIndices) {
+    const tenbetSet = (tenbetIndices) => {
         const maxBet = getMaxBet(roundState.currentSelectedRound);
         const tenbetBinary = computePiratesBinary(tenbetIndices);
 
@@ -462,7 +638,7 @@ const BetFunctions = (props) => {
         return { bets, betAmounts };
     }
 
-    function gambitSet() {
+    const gambitSet = () => {
         const maxBet = getMaxBet(roundState.currentSelectedRound);
 
         const maker = new BetsMaker();
@@ -486,7 +662,7 @@ const BetFunctions = (props) => {
         addNewSet(`Gambit Set (${maxBet} NP)`, bets, betAmounts, true);
     }
 
-    function bustproofSet() {
+    const bustproofSet = () => {
         const maxBet = getMaxBet(roundState.currentSelectedRound);
         const maker = new BetsMaker();
         const { betOdds } = maker.calculate(
@@ -504,7 +680,7 @@ const BetFunctions = (props) => {
         const bestArenas = sortedIndices(arenaRatios).reverse();
         const [bestArena, secondBestArena, thirdBestArena] = bestArenas;
 
-        function getBestPirates(arenaIndex) {
+        const getBestPirates = (arenaIndex) => {
             return sortedIndices(
                 roundState.roundData.currentOdds[arenaIndex]
             ).reverse();
@@ -609,7 +785,7 @@ const BetFunctions = (props) => {
         );
     }
 
-    function winningGambitSet() {
+    const winningGambitSet = () => {
         if (winningPiratesBinary === 0) {
             return;
         }
@@ -628,7 +804,7 @@ const BetFunctions = (props) => {
         );
     }
 
-    function gambitWithPirates(pirates) {
+    const gambitWithPirates = (pirates) => {
         const maxBet = getMaxBet(roundState.currentSelectedRound);
         const maker = new BetsMaker();
         const { betCaps, betOdds } = maker.calculate(
@@ -656,7 +832,7 @@ const BetFunctions = (props) => {
         return { bets, betAmounts };
     }
 
-    function randomCrazySet() {
+    const randomCrazySet = () => {
         const maxBet = getMaxBet(roundState.currentSelectedRound);
 
         const maker = new BetsMaker();
@@ -686,9 +862,9 @@ const BetFunctions = (props) => {
     }
 
     return (
-        <SettingsBox mt={4} {...rest}>
+        <SettingsBox {...rest}>
             <Stack p={4}>
-                <Wrap>
+                <Wrap >
                     <WrapItem>
                         <Button
                             bgColor={gray}
@@ -703,7 +879,7 @@ const BetFunctions = (props) => {
 
                         <ButtonGroup size="sm" isAttached variant="outline" bgColor={gray} ml={2}>
                             <Button
-                                leftIcon={<Icon as={FaCopy} />}
+                                leftIcon={<Icon as={FaClone} />}
                                 aria-label="Clone Current Bet Set"
                                 onClick={cloneSet}
                             >
@@ -725,7 +901,7 @@ const BetFunctions = (props) => {
                             <Menu>
                                 <MenuButton
                                     as={Button}
-                                    leftIcon={<Icon as={FaMagic} />}
+                                    leftIcon={<Icon as={FaWandMagicSparkles} />}
                                     rightIcon={
                                         <Icon
                                             as={FaChevronDown}
@@ -773,15 +949,21 @@ const BetFunctions = (props) => {
                     </WrapItem>
                 </Wrap>
 
-                <Wrap>
+                <Wrap mt={2}>
                     {Object.keys(allBets).map((key) => {
+                        let isCurrent = key === currentBet;
+                        let anyBets = anyBetsExist(allBets[key]);
+
                         return (
                             <WrapItem key={key}>
                                 <Card
                                     p={2}
-                                    opacity={key === currentBet ? 1 : 0.5}
-                                    cursor={key === currentBet ? "default" : "pointer"}
+                                    opacity={isCurrent ? 1 : 0.5}
+                                    cursor={isCurrent ? "default" : "pointer"}
                                     onClick={() => {
+                                        if (isCurrent) {
+                                            return;
+                                        }
                                         setCurrentBet(key);
                                         setRoundState({
                                             bets: { ...allBets[key] },
@@ -789,43 +971,61 @@ const BetFunctions = (props) => {
                                         });
                                     }}
                                     transition="opacity 0.2s ease-in-out"
+                                    boxShadow={isCurrent ? "dark-lg" : 'xl'}
+                                    minW={250}
                                 >
-                                    <Heading as={Editable}
-                                        isDisabled={key !== currentBet}
-                                        size="md"
-                                        minW="100%"
-                                        value={allNames[key]}
-                                        onChange={(value) =>
-                                            setAllNames({
-                                                ...allNames,
-                                                [key]: value,
-                                            })
-                                        }
-                                        onSubmit={(newValue) => {
-                                            if (newValue === "") {
-                                                newValue = "Unnamed Set";
+                                    <Box>
+                                        <Heading
+                                            as={Editable}
+                                            isDisabled={!isCurrent}
+                                            size="md"
+                                            minW="100%"
+                                            value={allNames[key]}
+                                            onChange={(value) =>
+                                                setAllNames({
+                                                    ...allNames,
+                                                    [key]: value,
+                                                })
                                             }
-                                            setAllNames({
-                                                ...allNames,
-                                                [key]: newValue,
-                                            });
-                                        }}
-                                    >
-                                        <EditablePreview
-                                            px={4}
-                                            py={2}
-                                            cursor={key === currentBet ? "text" : "pointer"}
-                                            _hover={{
-                                                background: key === currentBet ? previewHover : null,
-                                            }} />
-                                        <Input py={2} px={4} as={EditableInput} />
-                                    </Heading>
-                                    <Divider my={1} />
-                                    <BetBadges
-                                        bets={allBets[key]}
-                                        betAmounts={allBetAmounts[key]}
-                                    />
+                                            onSubmit={(newValue) => {
+                                                if (newValue === "") {
+                                                    newValue = "Unnamed Set";
+                                                }
+                                                setAllNames({
+                                                    ...allNames,
+                                                    [key]: newValue,
+                                                });
+                                            }}
+                                        >
+                                            <EditablePreview
+                                                px={4}
+                                                py={2}
+                                                cursor={isCurrent ? "text" : "pointer"}
+                                                _hover={{
+                                                    background: isCurrent ? previewHover : null,
+                                                }} />
+                                            <Input py={2} px={4} as={EditableInput} />
+                                        </Heading>
+                                        <Divider />
+                                        <BetBadges
+                                            pt={1}
+                                            bets={allBets[key]}
+                                            betAmounts={allBetAmounts[key]}
+                                        />
 
+                                        <Collapse
+                                            in={isCurrent && anyBets && !hasDuplicates}
+                                            animateOpacity
+                                        >
+                                            <Box mt={2}>
+                                                <Divider />
+                                                <BetCopyButtons
+                                                    bets={allBets[key]}
+                                                    betAmounts={allBetAmounts[key]}
+                                                />
+                                            </Box>
+                                        </Collapse>
+                                    </Box>
                                 </Card>
                             </WrapItem>
                         );
@@ -837,7 +1037,7 @@ const BetFunctions = (props) => {
 };
 
 const BetBadges = (props) => {
-    const { bets, betAmounts } = props;
+    const { bets, betAmounts, ...rest } = props;
     const { calculations, roundState } = useContext(RoundContext);
     const { usedProbabilities, odds, calculated, winningBetBinary } = calculations;
 
@@ -914,10 +1114,8 @@ const BetBadges = (props) => {
         let bustChance = 0;
         let bustEmoji = "";
 
-        if (payoutTables.odds !== undefined && Object.keys(payoutTables.odds).length > 1) {
-            if (payoutTables.odds[0]["value"] === 0) {
-                bustChance = payoutTables.odds[0]["probability"] * 100;
-            }
+        if (payoutTables.odds !== undefined && Object.keys(payoutTables.odds).length > 1 && payoutTables.odds[0]["value"] === 0) {
+            bustChance = payoutTables.odds[0]["probability"] * 100;
         }
 
         if (bustChance > 99) {
@@ -992,7 +1190,7 @@ const BetBadges = (props) => {
     }
 
     return (
-        <VStack spacing={1} style={{ userSelect: 'none' }}>
+        <VStack spacing={1} style={{ userSelect: 'none' }} {...rest}>
             {badges.map((badge, index) => {
                 return (
                     <Box key={index}>

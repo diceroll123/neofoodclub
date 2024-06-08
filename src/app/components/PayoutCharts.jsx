@@ -3,6 +3,7 @@ import Chart from 'chart.js/auto';
 
 import {
     HStack,
+    Card,
     Table,
     Tbody,
     Th,
@@ -11,6 +12,7 @@ import {
     Skeleton,
     useColorMode,
     useColorModeValue,
+    Box,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import annotationPlugin from "chartjs-plugin-annotation";
@@ -30,7 +32,6 @@ Chart.register(annotationPlugin);
 const PayoutCharts = () => {
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
     const red = useColorModeValue("nfc.red", "nfc.redDark");
-    const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     const { roundState, calculations } = useContext(RoundContext);
     const {
         payoutTables,
@@ -41,7 +42,7 @@ const PayoutCharts = () => {
     } = calculations;
     const { colorMode } = useColorMode();
 
-    function makeChart(title, data) {
+    const makeChart = (title, data) => {
         let points = [];
 
         for (const dataObj in data) {
@@ -170,24 +171,20 @@ const PayoutCharts = () => {
         );
     }
 
-    function makeTable(title, data) {
+    const makeTable = (title, data) => {
         data = data || {};
         let tableRows = Object.keys(data).map((key) => {
             const dataObj = data[key];
 
             let bgColor = "transparent";
 
-            if (winningBetBinary > 0) {
-                if (
-                    (title === "Odds" && totalWinningOdds === dataObj.value) ||
-                    (title === "Winnings" &&
-                        totalWinningPayoff === dataObj.value)
-                ) {
-                    if (dataObj.value === 0) {
-                        bgColor = red;
-                    } else {
-                        bgColor = green;
-                    }
+            if (winningBetBinary > 0 && ((title === "Odds" && totalWinningOdds === dataObj.value) ||
+                (title === "Winnings" &&
+                    totalWinningPayoff === dataObj.value))) {
+                if (dataObj.value === 0) {
+                    bgColor = red;
+                } else {
+                    bgColor = green;
                 }
             }
 
@@ -217,35 +214,36 @@ const PayoutCharts = () => {
         });
 
         return (
-            <Skeleton
-                isLoaded={roundState.roundData && calculations.calculated}
-            >
-                <Table
-                    size="sm"
-                    width="auto"
-                    backgroundColor={gray}
-                    borderTopLeftRadius="0.5rem"
-                    borderTopRightRadius="0.5rem"
-                >
-                    <Thead>
-                        <Tr>
-                            <Th>{title}</Th>
-                            <Th>Probability</Th>
-                            <Th>Cumulative</Th>
-                            <Th>Tail</Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {tableRows}
-                        {makeChart(title, data)}
-                    </Tbody>
-                </Table>
-            </Skeleton>
+            <Box>
+                <Card p={1} boxShadow='2xl'>
+                    <Skeleton
+                        isLoaded={roundState.roundData && calculations.calculated}
+                    >
+                        <Table
+                            size="sm"
+                            width="auto"
+                        >
+                            <Thead>
+                                <Tr>
+                                    <Th>{title}</Th>
+                                    <Th>Probability</Th>
+                                    <Th>Cumulative</Th>
+                                    <Th>Tail</Th>
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {tableRows}
+                                {makeChart(title, data)}
+                            </Tbody>
+                        </Table>
+                    </Skeleton>
+                </Card>
+            </Box>
         );
     }
 
     return (
-        <HStack mx={4}>
+        <HStack px={4} pb={4}>
             {makeTable("Odds", payoutTables.odds)}
             {makeTable("Winnings", payoutTables.winnings)}
         </HStack>

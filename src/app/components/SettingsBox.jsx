@@ -9,10 +9,7 @@ const SettingsBox = (props) => {
         <Flex
             align="center"
             justify="space-between"
-            mx={4}
-            mb={4}
             backgroundColor={background}
-            borderWidth="1px"
             {...rest}
         >
             {children}

@@ -203,10 +203,24 @@ export function getTableMode() {
     return mode;
 }
 
+export function getUseWebDomain() {
+    const cookies = new Cookies();
+    return cookies.get("useWebDomain");
+}
+
+export function getUseLogitModel() {
+    const cookies = new Cookies();
+    return cookies.get("useLogitModel");
+}
+
 export function anyBetsExist(betsObject) {
     return Object.values(betsObject).some((pirates) =>
         pirates.some((index) => index > 0)
     );
+}
+
+export function anyBetAmountsExist(betAmountsObject) {
+    return Object.values(betAmountsObject).some((amount) => amount >= 50);
 }
 
 export function anyBetsDuplicate(betsObject) {
@@ -216,36 +230,34 @@ export function anyBetsDuplicate(betsObject) {
     return values.length !== [...new Set(values)].length;
 }
 
-export function createBetURL(roundState, ignoreBetAmounts) {
+export function makeBetURL(roundNumber, bets, betAmounts, includeBetAmounts) {
     // for this function:
     // bets will only be added if any bets are valid
-    // bet amounts will only be added if ignoreBetAmounts is false AND valid bet amounts are found
+    // bet amounts will only be added if includeBetAmounts is true AND valid bet amounts are found
 
     // that aside, this only returns the hash, shaped like so:
     // "/#round=7018"
     // "/#round=7018&b=gmkhmgklhkfmlfmbkkhkgkacm"
     // "/#round=7018&b=gmkhmgklhkfmlfmbkkhkgkacm&a=CEbCEbCEbCEbCEbCEbCEbCEbCEbCEb"
 
-    ignoreBetAmounts = ignoreBetAmounts ?? true;
+    includeBetAmounts = includeBetAmounts ?? false;
 
-    let betURL = `/#round=${roundState.currentSelectedRound}`;
-    let addBets = anyBetsExist(roundState.bets);
+    let betURL = `/#round=${roundNumber}`;
+    let addBets = anyBetsExist(bets);
 
     if (addBets === false) {
         return betURL;
     }
 
-    betURL += "&b=" + makeBetUrl(roundState.bets);
+    betURL += "&b=" + makeBetUrl(bets);
 
-    if (ignoreBetAmounts) {
+    if (!includeBetAmounts) {
         return betURL;
     }
 
-    let addBetAmounts = Object.values(roundState.betAmounts).some(
-        (value) => value >= 50
-    );
+    let addBetAmounts = anyBetAmountsExist(betAmounts);
     if (addBetAmounts) {
-        return betURL + "&a=" + makeBetAmountsUrl(roundState.betAmounts);
+        return betURL + "&a=" + makeBetAmountsUrl(betAmounts);
     }
     return betURL;
 }
@@ -356,7 +368,7 @@ export function getProbs(roundState, legacyProbs, logitProbs) {
     if (roundState.advanced.bigBrain && roundState.advanced.customOddsMode && roundState.customProbs != null) {
         return roundState.customProbs;
     }
-    if (roundState.advanced.logitModel) {
+    if (roundState.advanced.useLogitModel) {
         return logitProbs.used;
     }
     return legacyProbs.used;

@@ -50,9 +50,8 @@ const PayoutTable = (props) => {
     } = calculations;
     const amountOfBets = Object.keys(roundState.bets).length;
 
-    function swapBets(index, newIndex) {
-        let bets = roundState.bets;
-        let betAmounts = roundState.betAmounts;
+    const swapBets = (index, newIndex) => {
+        let {bets, betAmounts} = roundState;
         [bets[index], bets[newIndex]] = [bets[newIndex], bets[index]];
         [betAmounts[index], betAmounts[newIndex]] = [
             betAmounts[newIndex],
@@ -61,7 +60,7 @@ const PayoutTable = (props) => {
         setRoundState({ bets: { ...bets }, betAmounts: { ...betAmounts } });
     }
 
-    function getMaxBetColor(betNum) {
+    const getMaxBetColor = (betNum) => {
         let betAmount = roundState.betAmounts[betNum];
         let div = 1_000_000 / betOdds[betNum];
         if (betAmount > Math.ceil(div)) {
@@ -135,45 +134,48 @@ const PayoutTable = (props) => {
                             return (
                                 <Tr key={betIndex}>
                                     <Pd backgroundColor={betNumBgColor}>
-                                        <HStack>
+                                        <HStack px={2} gap={1}>
                                             <Spacer />
                                             <Text>{betIndex + 1}</Text>
 
                                             {roundState.viewMode === false && (
-                                                <HStack spacing="1px">
-                                                    <IconButton
-                                                        size="xs"
-                                                        height="20px"
-                                                        icon={<ArrowUpIcon />}
-                                                        onClick={() =>
-                                                            swapBets(
-                                                                betIndex + 1,
-                                                                betIndex
-                                                            )
-                                                        }
-                                                        isDisabled={
-                                                            betIndex === 0
-                                                        }
-                                                    />
-                                                    <IconButton
-                                                        size="xs"
-                                                        height="20px"
-                                                        icon={<ArrowDownIcon />}
-                                                        onClick={() =>
-                                                            swapBets(
-                                                                betIndex + 1,
-                                                                betIndex + 2
-                                                            )
-                                                        }
-                                                        isDisabled={
-                                                            betIndex ===
-                                                            amountOfBets - 1
-                                                        }
-                                                    />
-                                                </HStack>
+                                                <>
+                                                    <Spacer />
+                                                    <HStack spacing="1px">
+                                                        <IconButton
+                                                            size="xs"
+                                                            height="20px"
+                                                            icon={<ArrowUpIcon />}
+                                                            onClick={() =>
+                                                                swapBets(
+                                                                    betIndex + 1,
+                                                                    betIndex
+                                                                )
+                                                            }
+                                                            isDisabled={
+                                                                betIndex === 0
+                                                            }
+                                                        />
+                                                        <IconButton
+                                                            size="xs"
+                                                            height="20px"
+                                                            icon={<ArrowDownIcon />}
+                                                            onClick={() =>
+                                                                swapBets(
+                                                                    betIndex + 1,
+                                                                    betIndex + 2
+                                                                )
+                                                            }
+                                                            isDisabled={
+                                                                betIndex ===
+                                                                amountOfBets - 1
+                                                            }
+                                                        />
+                                                    </HStack>
+                                                </>
                                             )}
-
                                             <Spacer />
+
                                         </HStack>
                                     </Pd>
                                     <Pd>

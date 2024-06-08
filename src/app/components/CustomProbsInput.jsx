@@ -21,7 +21,7 @@ export default function CustomProbsInput(props) {
 
     // we multiply by 100 to make it visibly a percentage
 
-    function changeProbs(probValue) {
+    const changeProbs = (probValue) => {
         setProb(probValue);
 
         const customProbs = produce(
