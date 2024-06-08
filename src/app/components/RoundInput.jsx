@@ -23,7 +23,7 @@ const RoundInput = () => {
     const [currentRound, setCurrentRound] = useState(0);
     const [hasFocus, setHasFocus] = useState(false);
 
-    function changeCurrentSelectedRound(value) {
+    const changeCurrentSelectedRound = (value) => {
         if (value === roundState.currentSelectedRound) {
             return;
         }

@@ -11,6 +11,8 @@ import {
     Th,
     Thead,
     Tr,
+    Collapse,
+    ScaleFade,
     useColorModeValue,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
@@ -24,24 +26,24 @@ import {
 } from "../constants";
 import { computePirateBinary } from "../maths";
 import { displayAsPercent, anyBetsExist, getOdds } from "../util";
-import BetExtras from "../components/BetExtras";
+import BetAmountsSettings from "./BetAmountsSettings";
 import BetFunctions from "../BetFunctions";
-import BigBrainElement from "../components/BigBrainElement";
-import ClearBetsButton from "../components/ClearBetsButton";
-import CopyPayouts from "../components/CopyPayouts";
-import CustomOddsElement from "../components/CustomOddsElement";
-import CustomOddsInput from "../components/CustomOddsInput";
-import CustomProbsInput from "../components/CustomProbsInput";
-import FaDetailsElement from "../components/FaDetailsElement";
-import HorizontalScrollingBox from "../components/HorizontalScrollingBox";
-import PayoutCharts from "../components/PayoutCharts";
-import PayoutTable from "../components/PayoutTable";
-import PirateSelect from "../components/PirateSelect";
-import Pd from "../components/Pd";
+import BigBrainElement from "./BigBrainElement";
+import ClearBetsButton from "./ClearBetsButton";
+import CustomOddsElement from "./CustomOddsElement";
+import CustomOddsInput from "./CustomOddsInput";
+import CustomProbsInput from "./CustomProbsInput";
+import FaDetailsElement from "./FaDetailsElement";
+import HorizontalScrollingBox from "./HorizontalScrollingBox";
+import PayoutCharts from "./PayoutCharts";
+import PayoutTable from "./PayoutTable";
+import PirateSelect from "./PirateSelect";
+import Pd from "./Pd";
 import { RoundContext } from "../RoundState";
-import Td from "../components/Td";
-import TextTooltip from "../components/TextTooltip";
-import TableSettings from "../components/TableSettings";
+import Td from "./Td";
+import TextTooltip from "./TextTooltip";
+import TableSettings from "./TableSettings";
+import { FaEdit } from "react-icons/fa";
 
 const StickyTd = (props) => {
     const { children, ...rest } = props;
@@ -100,14 +102,14 @@ const NormalTable = (props) => {
     const amountOfBets = Object.keys(roundState.bets).length;
 
 
-    function changeBet(betIndex, arenaIndex, pirateIndex) {
+    const changeBet = (betIndex, arenaIndex, pirateIndex) => {
         // change a single pirate in a single arena
         let newBets = roundState.bets;
         newBets[betIndex][arenaIndex] = pirateIndex;
         setRoundState({ bets: { ...newBets } }); // hacky way to force an object to update useEffect
     }
 
-    function changeBetLine(arenaIndex, pirateValue) {
+    const changeBetLine = (arenaIndex, pirateValue) => {
         // change the entire row to pirateValue
         // for the 10-bet button
         let newBets = roundState.bets;
@@ -124,7 +126,7 @@ const NormalTable = (props) => {
                     <Th>Arena</Th>
                     <BigBrainElement as={Th}>Ratio</BigBrainElement>
                     <Th>Pirate</Th>
-                    {roundState.advanced.logitModel ?
+                    {roundState.advanced.useLogitModel ?
                         (
                             <BigBrainElement as={Th}>Prob</BigBrainElement>
                         ) : (
@@ -197,7 +199,7 @@ const NormalTable = (props) => {
                             </BigBrainElement>
                             <Td
                                 backgroundColor={gray}
-                                colSpan={roundState.advanced.bigBrain ? (roundState.advanced.logitModel ? 4 : 6) : 1}
+                                colSpan={roundState.advanced.bigBrain ? (roundState.advanced.useLogitModel ? 4 : 6) : 1}
                             />
                             <CustomOddsElement
                                 as={Td}
@@ -317,7 +319,7 @@ const NormalTable = (props) => {
                                     <StickyTd backgroundColor={getPirateBgColor(opening)}>
                                         {PIRATE_NAMES[pirateId]}
                                     </StickyTd>
-                                    {roundState.advanced.logitModel ? (
+                                    {roundState.advanced.useLogitModel ? (
                                         <BigBrainElement as={Td} isNumeric>
                                             {displayAsPercent(logitProbabilities.prob[arenaId][pirateIndex + 1], 1)}
                                         </BigBrainElement>
@@ -439,7 +441,7 @@ const DropDownTable = (props) => {
     const red = useColorModeValue("nfc.red", "nfc.redDark");
     const orange = useColorModeValue("nfc.orange", "nfc.orangeDark");
 
-    function getPirateBgColor(odds) {
+    const getPirateBgColor = (odds) => {
         if ([3, 4, 5].includes(odds)) return blue;
         if ([6, 7, 8, 9].includes(odds)) return orange;
         if ([10, 11, 12, 13].includes(odds)) return red;
@@ -447,7 +449,7 @@ const DropDownTable = (props) => {
         return green;
     }
 
-    function changeBet(betIndex, arenaIndex, pirateIndex) {
+    const changeBet = (betIndex, arenaIndex, pirateIndex) => {
         // change a single pirate in a single arena
         let newBets = roundState.bets;
         newBets[betIndex][arenaIndex] = pirateIndex;
@@ -580,38 +582,58 @@ const PirateTable = (props) => {
 export default function EditBets(props) {
     const { blue, orange, green, red, yellow, gray, getPirateBgColor } = props;
 
-    const { roundState } = useContext(RoundContext);
+    const { roundState, setRoundState } = useContext(RoundContext);
 
     const anyBets = anyBetsExist(roundState.bets);
 
     return (
         <>
-            <TableSettings />
+            <Collapse in={roundState.viewMode}>
+                <Box
+                    bgColor={blue}
+                    p={4}
+                >
+                    <Button
+                        leftIcon={<Icon as={FaEdit} />}
+                        variant="ghost"
+                        onClick={() => {
+                            setRoundState({ viewMode: false });
+                        }}
+                    >
+                        Edit these bets
+                    </Button>
+                </Box>
+            </Collapse>
 
-            <HorizontalScrollingBox>
-                <PirateTable
-                    m={4}
+            <Collapse in={!roundState.viewMode}>
+                <TableSettings />
+
+                <HorizontalScrollingBox>
+                    <PirateTable
+                        m={4}
+                        red={red}
+                        green={green}
+                        getPirateBgColor={getPirateBgColor}
+                    />
+                </HorizontalScrollingBox>
+
+                <BetFunctions
+                    blue={blue}
+                    orange={orange}
                     red={red}
                     green={green}
+                    yellow={yellow}
+                    gray={gray}
                     getPirateBgColor={getPirateBgColor}
                 />
-            </HorizontalScrollingBox>
 
-            <BetFunctions
-                blue={blue}
-                orange={orange}
-                red={red}
-                green={green}
-                yellow={yellow}
-                gray={gray}
-                getPirateBgColor={getPirateBgColor}
-            />
+            </Collapse>
 
             {anyBets && (
                 <>
-                    <BetExtras />
+                    <BetAmountsSettings boxShadow="md" />
 
-                    <HorizontalScrollingBox>
+                    <HorizontalScrollingBox py={4}>
                         <PayoutTable
                             blue={blue}
                             orange={orange}
@@ -622,9 +644,7 @@ export default function EditBets(props) {
                         />
                     </HorizontalScrollingBox>
 
-                    <CopyPayouts />
-
-                    <HorizontalScrollingBox>
+                    <HorizontalScrollingBox py={4}>
                         <PayoutCharts />
                     </HorizontalScrollingBox>
                 </>

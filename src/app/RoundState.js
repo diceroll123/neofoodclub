@@ -1,5 +1,5 @@
 import { createContext, useReducer, useState, useEffect } from "react";
-import { getTableMode, reducer, parseBetUrl, calculateRoundData } from "./util";
+import { getTableMode, reducer, parseBetUrl, calculateRoundData, getUseWebDomain, getUseLogitModel } from "./util";
 
 const RoundContext = createContext(null);
 const { Provider } = RoundContext;
@@ -25,9 +25,10 @@ const StateProvider = ({ children }) => {
 			faDetails: false,
 			customOddsMode: false,
 			oddsTimeline: false,
-			logitModel: false,
+			useLogitModel: getUseLogitModel(),
 		},
 		viewMode: initialViewMode,
+		useWebDomain: getUseWebDomain(),
 	});
 
 	const [calculations, setCalculations] = useState(

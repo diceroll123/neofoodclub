@@ -10,7 +10,7 @@ const ClearBetsButton = () => {
     const { roundState, setRoundState } = useContext(RoundContext);
     const amountOfBets = Object.keys(roundState.bets).length;
 
-    function clearBets() {
+    const clearBets = () => {
         setRoundState({
             bets: { ...makeEmptyBets(amountOfBets) },
             betAmounts: { ...makeEmptyBetAmounts(amountOfBets) },

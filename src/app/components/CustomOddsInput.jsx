@@ -23,7 +23,7 @@ export default function CustomOddsInput(props) {
         original[arenaIndex][pirateIndex]
     );
 
-    function changeOdds(oddsValue) {
+    const changeOdds = (oddsValue) => {
         setOdds(oddsValue);
 
         const customOdds = produce(roundState.customOdds || roundState.roundData.currentOdds, (draftCustomOdds) => {
@@ -32,7 +32,7 @@ export default function CustomOddsInput(props) {
         setRoundState({ customOdds });
     }
 
-    function verify(value) {
+    const verify = (value) => {
         // returns false if it needs to be reverted, true if the value is clean
         // the rules are simple.
         // it needs to be a valid number between 2 and 13 inclusive.
@@ -60,7 +60,7 @@ export default function CustomOddsInput(props) {
                 if (verify(value) === false) {
                     changeOdds(
                         roundState.roundData.currentOdds[arenaIndex][
-                            pirateIndex
+                        pirateIndex
                         ]
                     );
                 }
