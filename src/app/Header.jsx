@@ -272,6 +272,7 @@ function HeaderContent() {
 
     useEffect(() => {
         if (!roundState.roundData) {
+            setIsGlowing(false);
             return;
         }
 
@@ -279,21 +280,26 @@ function HeaderContent() {
         const winners = roundState.roundData?.winners;
 
         if (!winners) {
+            setIsGlowing(false);
             return;
         }
 
         if (winners.some((winner) => winner > 0)) {
+            setIsGlowing(false);
             return;
         }
 
         if (!timestamp) {
+            setIsGlowing(false);
             return;
         }
         if (timestamp === roundState.roundData.start) {
+            setIsGlowing(false);
             return;
         }
 
         if (timestamp === currentTimestamp) {
+            setIsGlowing(false);
             return;
         }
 
