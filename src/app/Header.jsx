@@ -65,6 +65,7 @@ function CurrentRoundProgress() {
     if (winners !== undefined && winners.some((winner) => winner > 0)) {
         return null;
     }
+
     return (
         <>
             {roundPercentOver === 100 ? (
