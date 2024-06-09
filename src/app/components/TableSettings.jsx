@@ -19,6 +19,7 @@ import { getTableMode, getUseWebDomain } from "../util";
 import ExtraBox from "./ExtraBox";
 import { RoundContext } from "../RoundState";
 import SettingsBox from "./SettingsBox";
+import HorizontalScrollingBox from "./HorizontalScrollingBox";
 
 // the element that has table settings such as big brain mode, and the table modes
 
@@ -286,23 +287,25 @@ const ColorModeButton = () => {
 const TableSettings = (props) => {
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     return (
-        <SettingsBox bgColor={gray} {...props}>
-            <Stack p={4}>
-                <HStack>
-                    <TableModes />
-                    <NormalExtras />
-                </HStack>
+        <HorizontalScrollingBox bgColor={gray}>
+            <SettingsBox {...props}>
+                <Stack p={4}>
+                    <HStack>
+                        <TableModes />
+                        <NormalExtras />
+                    </HStack>
 
-                <ExtraBox>
-                    <Stack>
-                        <LogitModelToggle />
-                        <CopyWithDomain />
-                        <ColorModeButton />
-                    </Stack>
-                </ExtraBox>
-            </Stack>
+                    <ExtraBox>
+                        <Stack>
+                            <LogitModelToggle />
+                            <CopyWithDomain />
+                            <ColorModeButton />
+                        </Stack>
+                    </ExtraBox>
+                </Stack>
 
-        </SettingsBox >
+            </SettingsBox >
+        </HorizontalScrollingBox>
     );
 };
 
