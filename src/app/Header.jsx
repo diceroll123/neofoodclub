@@ -44,7 +44,7 @@ function PreviousRoundInfo() {
     const { roundState } = useContext(RoundContext);
 
     return (
-        <Text as={Box} fontSize="xs">
+        <Text as={Box} fontSize="xs" display={{ sm: "none", md: "block" }}>
             <VStack>
                 <>Round {roundState.currentSelectedRound} ended</>
                 <Moment
@@ -135,7 +135,7 @@ function RoundInfo() {
         }
     }
 
-    return <Box>{element}</Box>;
+    return <Box display={{ base: "none", sm: "block" }}>{element}</Box>;
 }
 
 function MaxBetInput() {
@@ -270,14 +270,16 @@ function HeaderContent() {
                 <Box
                     p={2}
                     h="4.5rem"
+                    maxW="lg"
                     borderWidth="1px"
                     borderRadius="md"
                 >
-                    <HStack spacing={2} h="100%">
+                    <HStack spacing={3} h="100%">
                         <VStack spacing={1} maxW={"140px"}>
                             <RoundInput />
                             <MaxBetInput />
                         </VStack>
+
                         <RoundInfo />
                     </HStack>
                 </Box>
