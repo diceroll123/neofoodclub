@@ -8,11 +8,12 @@ import {
     Checkbox,
     useColorModeValue,
     Tooltip,
+    useColorMode,
 } from "@chakra-ui/react";
 import Cookies from "universal-cookie/es6";
 import React, { useContext, useMemo, useState } from "react";
 
-import { FaGlobe } from "react-icons/fa6";
+import { FaGlobe, FaMoon, FaSun } from "react-icons/fa6";
 
 import { getTableMode, getUseWebDomain } from "../util";
 import ExtraBox from "./ExtraBox";
@@ -266,6 +267,22 @@ const CopyWithDomain = () => {
     );
 }
 
+const ColorModeButton = () => {
+
+    const { colorMode, toggleColorMode } = useColorMode();
+    const label = colorMode === "light" ? "Dark mode" : "Light mode";
+    const SwitchIcon = useColorModeValue(FaMoon, FaSun);
+
+    return (
+        <Button
+            aria-label={`Switch to ${label}`}
+            onClick={toggleColorMode}
+            leftIcon={<SwitchIcon />}
+            size="sm"
+        >{label} is OFF</Button>
+    );
+}
+
 const TableSettings = (props) => {
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     return (
@@ -280,6 +297,7 @@ const TableSettings = (props) => {
                     <Stack>
                         <LogitModelToggle />
                         <CopyWithDomain />
+                        <ColorModeButton />
                     </Stack>
                 </ExtraBox>
             </Stack>

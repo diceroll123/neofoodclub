@@ -7,7 +7,6 @@ import {
     Divider,
     Heading,
     HStack,
-    IconButton,
     InputGroup,
     InputLeftAddon,
     NumberDecrementStepper,
@@ -17,15 +16,13 @@ import {
     NumberInputStepper,
     Skeleton,
     SkeletonText,
+    Spacer,
     Stack,
     Text,
-    Tooltip,
-    useColorMode,
     useColorModeValue,
     useToast,
     VStack,
 } from "@chakra-ui/react";
-import { FaMoon, FaSun } from "react-icons/fa";
 import { useViewportScroll } from "framer-motion";
 import Cookies from "universal-cookie/es6";
 import Moment from "react-moment";
@@ -42,23 +39,6 @@ import { RoundContext } from "./RoundState";
 import RoundInput from "./components/RoundInput";
 
 moment.relativeTimeThreshold("ss", 0);
-
-function ColorModeButton() {
-    const { colorMode, toggleColorMode } = useColorMode();
-    const label = colorMode === "light" ? "Dark mode" : "Light mode";
-    const SwitchIcon = useColorModeValue(FaMoon, FaSun);
-
-    return (
-        <Tooltip label={label}>
-            <IconButton
-                aria-label={`Switch to ${label}`}
-                onClick={toggleColorMode}
-                fontSize="lg"
-                icon={<SwitchIcon />}
-            />
-        </Tooltip>
-    );
-}
 
 function PreviousRoundInfo() {
     const { roundState } = useContext(RoundContext);
@@ -285,6 +265,7 @@ function HeaderContent() {
                 align={"center"}
             >
                 <TitleHeading />
+                <Spacer />
 
                 <Box
                     p={2}
@@ -302,7 +283,7 @@ function HeaderContent() {
                         <RoundInfo />
                     </HStack>
                 </Box>
-                <ColorModeButton />
+                <Spacer />
             </Stack>
         </>
     );
