@@ -263,6 +263,12 @@ export function makeBetURL(roundNumber, bets, betAmounts, includeBetAmounts) {
 }
 
 export function calculateRoundOverPercentage(roundState) {
+    let roundStart = roundState?.roundData?.start;
+
+    if (roundStart === undefined) {
+        return 0;
+    }
+
     let now = moment();
     let start = moment(roundState.roundData.start);
     let end = moment(roundState.roundData.start).add(1, "day");
