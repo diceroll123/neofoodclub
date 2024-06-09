@@ -56,21 +56,12 @@ function PreviousRoundInfo() {
     );
 }
 
-function CurrentRoundInfo() {
+function CurrentRoundProgress() {
     const { roundState } = useContext(RoundContext);
     const roundPercentOver = calculateRoundOverPercentage(roundState);
 
-    const timestamp = moment(roundState.roundData.timestamp);
-
-    let element = "span";
-
-    if (moment().diff(timestamp) > 3e5) {
-        // highlight the current last update if it hasn't been updated in 30+s
-        element = "mark";
-    }
-
     return (
-        <HStack>
+        <>
             {roundPercentOver === 100 ? (
                 <CircularProgress size="38px" isIndeterminate capIsRound />
             ) : (
@@ -84,36 +75,52 @@ function CurrentRoundInfo() {
                     </CircularProgressLabel>
                 </CircularProgress>
             )}
-            <Box textAlign="left">
-                <Text fontSize="xs" as={element}>
-                    Last Update:{" "}
-                    <Moment
-                        date={roundState.roundData.timestamp}
-                        fromNow
-                        withTitle
-                        titleFormat="LLL"
-                        interval={1}
-                    />
-                </Text>
-                {roundState.roundData.lastChange &&
-                    roundState.roundData.start !==
-                    roundState.roundData.lastChange && (
-                        <>
-                            <Divider my={1} />
-                            <Text fontSize="xs">
-                                Last Change:{" "}
-                                <Moment
-                                    date={roundState.roundData.lastChange}
-                                    fromNow
-                                    withTitle
-                                    titleFormat="LLL"
-                                    interval={1}
-                                />
-                            </Text>
-                        </>
-                    )}
-            </Box>
-        </HStack>
+        </>
+    )
+}
+
+function CurrentRoundInfo() {
+    const { roundState } = useContext(RoundContext);
+
+    const timestamp = moment(roundState.roundData.timestamp);
+
+    let element = "span";
+
+    if (moment().diff(timestamp) > 3e5) {
+        // highlight the current last update if it hasn't been updated in 30+s
+        element = "mark";
+    }
+
+    return (
+        <Box textAlign="left">
+            <Text fontSize="xs" as={element}>
+                Last Update:{" "}
+                <Moment
+                    date={roundState.roundData.timestamp}
+                    fromNow
+                    withTitle
+                    titleFormat="LLL"
+                    interval={1}
+                />
+            </Text>
+            {roundState.roundData.lastChange &&
+                roundState.roundData.start !==
+                roundState.roundData.lastChange && (
+                    <>
+                        <Divider my={1} />
+                        <Text fontSize="xs">
+                            Last Change:{" "}
+                            <Moment
+                                date={roundState.roundData.lastChange}
+                                fromNow
+                                withTitle
+                                titleFormat="LLL"
+                                interval={1}
+                            />
+                        </Text>
+                    </>
+                )}
+        </Box>
     );
 }
 
@@ -279,7 +286,7 @@ function HeaderContent() {
                             <RoundInput />
                             <MaxBetInput />
                         </VStack>
-
+                        <CurrentRoundProgress />
                         <RoundInfo />
                     </HStack>
                 </Box>
