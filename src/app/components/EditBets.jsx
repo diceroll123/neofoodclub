@@ -12,7 +12,6 @@ import {
     Thead,
     Tr,
     Collapse,
-    ScaleFade,
     useColorModeValue,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
