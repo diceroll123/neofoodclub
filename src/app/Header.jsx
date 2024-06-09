@@ -266,6 +266,45 @@ function TitleHeading(props) {
 }
 
 function HeaderContent() {
+    const { roundState } = useContext(RoundContext);
+    const [isGlowing, setIsGlowing] = useState(false);
+    const [currentTimestamp, setCurrentTimestamp] = useState("");
+
+    useEffect(() => {
+        if (!roundState.roundData) {
+            return;
+        }
+
+        const timestamp = roundState.roundData?.timestamp;
+        const winners = roundState.roundData?.winners;
+
+        if (!winners) {
+            return;
+        }
+
+        if (winners.some((winner) => winner > 0)) {
+            return;
+        }
+
+        if (!timestamp) {
+            return;
+        }
+        if (timestamp === roundState.roundData.start) {
+            return;
+        }
+
+        if (timestamp === currentTimestamp) {
+            return;
+        }
+
+        setCurrentTimestamp(timestamp);
+        setIsGlowing(true);
+        const timeout = setTimeout(() => {
+            setIsGlowing(false);
+        }, 4000);
+        return () => clearTimeout(timeout);
+    }, [roundState]);
+
     return (
         <>
             <Stack
@@ -286,6 +325,8 @@ function HeaderContent() {
                     maxW="lg"
                     borderWidth="1px"
                     borderRadius="md"
+                    boxShadow={isGlowing ? "outline" : undefined}
+                    transition="box-shadow 4s"
                 >
                     <HStack spacing={3} h="100%">
                         <VStack spacing={1} maxW={"140px"}>
