@@ -270,8 +270,8 @@ export function calculateRoundOverPercentage(roundState) {
     }
 
     let now = moment();
-    let start = moment(roundState.roundData.start);
-    let end = moment(roundState.roundData.start).add(1, "day");
+    let start = moment(roundStart);
+    let end = moment(roundStart).add(1, "day");
     let totalMillisInRange = end.valueOf() - start.valueOf();
     let elapsedMillis = now.valueOf() - start.valueOf();
     return Math.max(
