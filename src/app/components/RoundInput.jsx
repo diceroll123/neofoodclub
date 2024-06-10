@@ -20,7 +20,6 @@ const RoundInput = () => {
     const [roundNumber, setRoundNumber] = useState(
         roundState.currentSelectedRound || 0
     );
-    const [currentRound, setCurrentRound] = useState(0);
     const [hasFocus, setHasFocus] = useState(false);
 
     const changeCurrentSelectedRound = (value) => {
@@ -39,24 +38,23 @@ const RoundInput = () => {
     }
 
     useEffect(() => {
-        const currentSelected = roundState.currentSelectedRound;
-        if (currentSelected !== null && currentSelected !== roundNumber) {
-            setRoundNumber(currentSelected);
+        const currentSelectedRoundNumber = roundState.currentSelectedRound || 0;
+        if (currentSelectedRoundNumber === roundNumber) {
+            return;
         }
 
-        if (
-            currentRound !== roundState.currentRound &&
-            roundState.currentRound > 0
-        ) {
-            setCurrentRound(roundState.currentRound);
+        if (currentSelectedRoundNumber === 0) {
+            return;
         }
-    }, [roundState.currentSelectedRound, roundState.currentRound, roundNumber, currentRound]);
+
+        setRoundNumber(roundState.currentSelectedRound);
+    }, [roundState.currentSelectedRound]);
+
 
     return (
         <InputGroup size="xs">
             <InputLeftAddon children="Round" />
             <NumberInput
-                isDisabled={roundNumber === 0}
                 value={roundNumber}
                 min={1}
                 allowMouseWheel
