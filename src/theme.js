@@ -22,7 +22,7 @@ const colors = {
         orangeDark: "#F0923E",
 
         yellow: "#FAF089",
-        yellowDark: "#EFCF50",
+        yellowDark: "#FFC300",
     },
 }
 
