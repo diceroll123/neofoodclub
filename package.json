@@ -15,7 +15,7 @@
     "chartjs-plugin-annotation": "^3.0.1",
     "firebase": "^10.12.2",
     "framer-motion": "11.2.10",
-    "immer": "^9.0.15",
+    "immer": "^10.1.1",
     "moment": "^2.30.1",
     "moment-duration-format": "^2.3.2",
     "moment-timezone": "^0.5.45",
