@@ -10,7 +10,7 @@ import {
     Tooltip,
     useColorMode,
 } from "@chakra-ui/react";
-import Cookies from "universal-cookie/es6";
+import Cookies from "universal-cookie";
 import React, { useContext, useMemo, useState } from "react";
 
 import { FaGlobe, FaMoon, FaSun } from "react-icons/fa6";

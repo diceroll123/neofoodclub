@@ -24,7 +24,7 @@ import {
     VStack,
 } from "@chakra-ui/react";
 import { useViewportScroll } from "framer-motion";
-import Cookies from "universal-cookie/es6";
+import Cookies from "universal-cookie";
 import Moment from "react-moment";
 import React, { useContext, useEffect, useState } from "react";
 import moment from "moment";

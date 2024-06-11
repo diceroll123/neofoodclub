@@ -1,4 +1,4 @@
-import Cookies from "universal-cookie/es6";
+import Cookies from "universal-cookie";
 import moment from "moment";
 import {
     calculateArenaRatios,
