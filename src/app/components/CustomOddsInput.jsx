@@ -6,7 +6,7 @@ import {
     NumberInputStepper,
 } from "@chakra-ui/react";
 import { useState, useContext } from "react";
-import produce from "immer";
+import { produce } from "immer";
 
 import { RoundContext } from "../RoundState";
 import { getOdds } from "../util";
