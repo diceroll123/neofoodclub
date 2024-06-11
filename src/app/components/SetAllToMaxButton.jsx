@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Icon, Heading, Stack } from "@chakra-ui/react";
+import { Button, ButtonGroup, Icon, Heading, Stack, Tooltip } from "@chakra-ui/react";
 import { useContext } from "react";
 import { RoundContext } from "../RoundState";
 import { determineBetAmount, getMaxBet } from "../util";
@@ -34,28 +34,38 @@ const SetAllToMaxButton = (props) => {
 			<Stack>
 				<Heading size='sm' textTransform="uppercase">Set bet amounts</Heading>
 				<ButtonGroup mt={2}>
-					<Button
-						leftIcon={<Icon as={FaFillDrip} w="1.4em" h="1.4em" />}
-						size="sm"
-						colorScheme="green"
-						onClick={() => {
-							setAllBets(getMaxBet(roundState.currentSelectedRound), true);
-						}}
-						{...rest}
+					<Tooltip
+						label="Sets all bet amounts to whichever is lower: your max bet amount, or the value in the MAXBET column below + 1. This prevents you from betting more than necessary to earn 1M NP from the bet, given the current odds."
+						openDelay="600"
 					>
-						Capped
-					</Button>
-					<Button
-						leftIcon={<Icon as={FaInfinity} w="1.4em" h="1.4em" />}
-						size="sm"
-						colorScheme="blue"
-						onClick={() => {
-							setAllBets(getMaxBet(roundState.currentSelectedRound), false);
-						}}
-						{...rest}
+						<Button
+							leftIcon={<Icon as={FaFillDrip} w="1.4em" h="1.4em" />}
+							size="sm"
+							colorScheme="green"
+							onClick={() => {
+								setAllBets(getMaxBet(roundState.currentSelectedRound), true);
+							}}
+							{...rest}
+						>
+							Capped
+						</Button>
+					</Tooltip>
+					<Tooltip
+						label="Sets all bet amounts your max bet, regardless of overflow with the MAXBET column below. This is generally used by people who would like to maximize profits in the event of odds changing."
+						openDelay="600"
 					>
-						Uncapped
-					</Button>
+						<Button
+							leftIcon={<Icon as={FaInfinity} w="1.4em" h="1.4em" />}
+							size="sm"
+							colorScheme="blue"
+							onClick={() => {
+								setAllBets(getMaxBet(roundState.currentSelectedRound), false);
+							}}
+							{...rest}
+						>
+							Uncapped
+						</Button>
+					</Tooltip>
 					<Button
 						size="sm"
 						onClick={() => {
