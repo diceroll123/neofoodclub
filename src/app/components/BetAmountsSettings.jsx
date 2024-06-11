@@ -2,7 +2,7 @@ import {
     useColorModeValue,
 } from "@chakra-ui/react";
 import SettingsBox from "./SettingsBox";
-import SetAllToMaxButton from "./SetAllToMaxButton";
+import BetAmountsButtons from "./BetAmountsButtons";
 
 // these are the "Set all to max" + copy url buttons
 
@@ -12,7 +12,7 @@ const BetAmountsSettings = (props) => {
 
     return (
         <SettingsBox bgColor={gray} p={4} {...rest}>
-            <SetAllToMaxButton />
+            <BetAmountsButtons />
         </SettingsBox>
     );
 };

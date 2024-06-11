@@ -4,7 +4,7 @@ import { RoundContext } from "../RoundState";
 import { determineBetAmount, getMaxBet } from "../util";
 import { FaFillDrip, FaInfinity } from "react-icons/fa";
 
-const SetAllToMaxButton = (props) => {
+const BetAmountsButtons = (props) => {
 	const { roundState, setRoundState, calculations } =
 		useContext(RoundContext);
 	const { ...rest } = props;
@@ -82,4 +82,4 @@ const SetAllToMaxButton = (props) => {
 	);
 };
 
-export default SetAllToMaxButton;
+export default BetAmountsButtons;
