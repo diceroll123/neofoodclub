@@ -296,11 +296,8 @@ const NormalTable = (props) => {
                             const useCustom = roundState.advanced.bigBrain && roundState.advanced.customOddsMode;
                             const useOdds = useCustom ? custom : current;
 
-                            let bgColor = "transparent";
                             let pirateBin = computePirateBinary(arenaId, pirateIndex + 1);
-                            if ((winningBetBinary & pirateBin) === pirateBin) {
-                                bgColor = green;
-                            }
+                            let pirateWon = (winningBetBinary & pirateBin) === pirateBin;
 
                             let probs = usedProbabilities;
                             let prob = probs[arenaId][pirateIndex + 1];
@@ -314,7 +311,7 @@ const NormalTable = (props) => {
                             }
 
                             return (
-                                <Tr key={pirateId} backgroundColor={bgColor}>
+                                <Tr key={pirateId} backgroundColor={pirateWon ? green : null}>
                                     <StickyTd backgroundColor={getPirateBgColor(opening)}>
                                         {PIRATE_NAMES[pirateId]}
                                     </StickyTd>
@@ -499,18 +496,12 @@ const DropDownTable = (props) => {
                                                 let opening = roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
                                                 let current = roundState.roundData.currentOdds[arenaId][pirateIndex + 1];
 
-                                                let pirateBg = getPirateBgColor(opening);
-                                                let trBg = "transparent";
                                                 let pirateBin = computePirateBinary(arenaId, pirateIndex + 1);
-
-                                                if ((winningBetBinary & pirateBin) === pirateBin) {
-                                                    trBg = green;
-                                                    pirateBg = green;
-                                                }
+                                                let pirateWon = (winningBetBinary & pirateBin) === pirateBin;
 
                                                 return (
-                                                    <Tr key={pirateId} backgroundColor={trBg}>
-                                                        <Pd whiteSpace="nowrap" backgroundColor={pirateBg}>
+                                                    <Tr key={pirateId} backgroundColor={pirateWon ? green : null}>
+                                                        <Pd whiteSpace="nowrap" backgroundColor={pirateWon ? green : getPirateBgColor(opening)}>
                                                             {PIRATE_NAMES[pirateId]}
                                                         </Pd>
                                                         <Pd isNumeric>
