@@ -432,7 +432,7 @@ const DropDownTable = (props) => {
     let { ...rest } = props;
     const { roundState, setRoundState, calculations } =
         useContext(RoundContext);
-    const { winningBetBinary } = calculations;
+    const { winningBetBinary, arenaRatios } = calculations;
     const amountOfBets = Object.keys(roundState.bets).length;
 
     const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
@@ -459,8 +459,8 @@ const DropDownTable = (props) => {
         <Table size="sm" width="auto" {...rest}>
             <Thead>
                 <Tr>
-                    {ARENA_NAMES.map((arenaName, _arenaId) => {
-                        return <Th>{arenaName}</Th>;
+                    {ARENA_NAMES.map((arenaName, arenaId) => {
+                        return <Th>{arenaName} ({displayAsPercent(arenaRatios[arenaId], 1)})</Th>;
                     })}
                     <Th>
                         <ClearBetsButton />
