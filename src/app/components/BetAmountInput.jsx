@@ -23,6 +23,22 @@ export default function BetAmountInput(props) {
         setTempMaxBet(roundState.betAmounts[betIndex + 1]);
     }, [betIndex, roundState.betAmounts]);
 
+    useEffect(() => {
+
+        let value = parseInt(tempMaxBet);
+
+        const timeoutId = setTimeout(() => {
+            let betAmounts = { ...roundState.betAmounts };
+            betAmounts[betIndex + 1] = value;
+            setRoundState({ betAmounts });
+        }, 200);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
+
+    }, [tempMaxBet]);
+
     return (
         <NumberInput
             {...rest}
@@ -39,11 +55,9 @@ export default function BetAmountInput(props) {
                     value = -1000;
                 }
 
-                setTempMaxBet(value);
+                value = Math.min(value, 500000);
 
-                let betAmounts = { ...roundState.betAmounts };
-                betAmounts[betIndex + 1] = value;
-                setRoundState({ betAmounts });
+                setTempMaxBet(value);
             }}
             onFocus={(e) => e.target.select()}
             size="sm"
