@@ -4,7 +4,7 @@ import { getTableMode, reducer, parseBetUrl, calculateRoundData, getUseWebDomain
 const RoundContext = createContext(null);
 const { Provider } = RoundContext;
 
-const initialState = parseBetUrl();
+const initialState = parseBetUrl(window.location.hash.slice(1));
 
 const initialViewMode =
 	Object.values(initialState.bets).filter((x) => x.some((val) => val > 0))
@@ -37,7 +37,7 @@ const StateProvider = ({ children }) => {
 
 	useEffect(() => {
 		setCalculations(calculateRoundData(roundState));
-	}, [ roundState ]);
+	}, [roundState]);
 
 	return (
 		<Provider value={{ roundState, setRoundState, calculations }}>

@@ -67,8 +67,8 @@ function parseBetAmounts(betAmountsString) {
         }, {});
 }
 
-export function parseBetUrl() {
-    const urlParams = new URLSearchParams(window.location.hash.slice(1));
+export function parseBetUrl(url) {
+    const urlParams = new URLSearchParams(url);
 
     let bets = {};
     let betAmounts = {};
@@ -239,8 +239,6 @@ export function makeBetURL(roundNumber, bets, betAmounts, includeBetAmounts) {
     // "/#round=7018"
     // "/#round=7018&b=gmkhmgklhkfmlfmbkkhkgkacm"
     // "/#round=7018&b=gmkhmgklhkfmlfmbkkhkgkacm&a=CEbCEbCEbCEbCEbCEbCEbCEbCEbCEb"
-
-    includeBetAmounts = includeBetAmounts ?? false;
 
     let betURL = `/#round=${roundNumber}`;
     let addBets = anyBetsExist(bets);
