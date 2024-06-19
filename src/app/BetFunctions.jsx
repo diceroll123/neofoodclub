@@ -988,12 +988,9 @@ const BetFunctions = (props) => {
                                                 })
                                             }
                                             onSubmit={(newValue) => {
-                                                if (newValue === "") {
-                                                    newValue = "Unnamed Set";
-                                                }
                                                 setAllNames({
                                                     ...allNames,
-                                                    [key]: newValue,
+                                                    [key]: newValue || "Unnamed Set",
                                                 });
                                             }}
                                         >
