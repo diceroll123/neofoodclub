@@ -46,11 +46,6 @@ export default function BetAmountInput(props) {
             onChange={(value) => setTempMaxBet(value)}
             onBlur={(e) => {
                 let value = parseInt(e.target.value);
-                if (value === tempMaxBet) {
-                    // don't save over it if it's the same
-                    return;
-                }
-
                 if (isNaN(value) || value < 50) {
                     value = -1000;
                 }
