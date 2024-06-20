@@ -28,7 +28,10 @@ import TextTooltip from "./TextTooltip";
 
 const PayoutTable = (props) => {
     const { blue, orange, green, red, yellow, getPirateBgColor, ...rest } = props;
-    const { roundState, setRoundState, calculations } =
+    const { roundState, calculations,
+        currentBet,
+        allBets, setAllBets,
+        allBetAmounts, setAllBetAmounts } =
         useContext(RoundContext);
 
     const {
@@ -48,20 +51,23 @@ const PayoutTable = (props) => {
         totalWinningOdds,
         totalEnabledBets,
     } = calculations;
-    const amountOfBets = Object.keys(roundState.bets).length;
+    const amountOfBets = Object.keys(allBets[currentBet]).length;
 
     const swapBets = (index, newIndex) => {
-        let {bets, betAmounts} = roundState;
+        let bets = allBets[currentBet];
+        let betAmounts = allBetAmounts[currentBet];
         [bets[index], bets[newIndex]] = [bets[newIndex], bets[index]];
         [betAmounts[index], betAmounts[newIndex]] = [
             betAmounts[newIndex],
             betAmounts[index],
         ];
-        setRoundState({ bets: { ...bets }, betAmounts: { ...betAmounts } });
+        setAllBets({ ...allBets, [currentBet]: bets });
+        setAllBetAmounts({ ...allBetAmounts, [currentBet]: betAmounts });
+
     }
 
     const getMaxBetColor = (betNum) => {
-        let betAmount = roundState.betAmounts[betNum];
+        let betAmount = allBetAmounts[currentBet][betNum];
         let div = 1_000_000 / betOdds[betNum];
         if (betAmount > Math.ceil(div)) {
             return orange;
@@ -115,7 +121,7 @@ const PayoutTable = (props) => {
                             let ne = betNetExpected[betIndex + 1];
                             let neBg = ne - 1 < 0 ? red : "transparent";
 
-                            let betAmount = roundState.betAmounts[betIndex + 1];
+                            let betAmount = allBetAmounts[currentBet][betIndex + 1];
                             let baBg =
                                 betAmount < 50
                                     ? red
@@ -214,7 +220,7 @@ const PayoutTable = (props) => {
                                     </Td>
                                     {[...Array(5)].map((e, arenaIndex) => {
                                         let pirateIndex =
-                                            roundState.bets[betIndex + 1][
+                                            allBets[currentBet][betIndex + 1][
                                             arenaIndex
                                             ];
                                         let bgColor = "transparent";
@@ -261,7 +267,7 @@ const PayoutTable = (props) => {
                                     })}
                                     <Td>
                                         <PlaceThisBetButton
-                                            bet={roundState.bets[betIndex + 1]}
+                                            bet={allBets[currentBet][betIndex + 1]}
                                             betNum={betIndex + 1}
                                         />
                                     </Td>

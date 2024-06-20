@@ -7,14 +7,15 @@ import { RoundContext } from "../RoundState";
 // this is the "Clear" button on top of the bet table
 
 const ClearBetsButton = () => {
-    const { roundState, setRoundState } = useContext(RoundContext);
-    const amountOfBets = Object.keys(roundState.bets).length;
+    const { currentBet,
+        allBets, setAllBets,
+        allBetAmounts, setAllBetAmounts
+    } = useContext(RoundContext);
+    const amountOfBets = Object.keys(allBets[currentBet]).length;
 
     const clearBets = () => {
-        setRoundState({
-            bets: { ...makeEmptyBets(amountOfBets) },
-            betAmounts: { ...makeEmptyBetAmounts(amountOfBets) },
-        });
+        setAllBets({ ...allBets, [currentBet]: makeEmptyBets(amountOfBets) });
+        setAllBetAmounts({ ...allBetAmounts, [currentBet]: makeEmptyBetAmounts(amountOfBets) });
     }
 
     return (

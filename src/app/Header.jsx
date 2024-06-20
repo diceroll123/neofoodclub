@@ -309,7 +309,7 @@ function HeaderContent() {
             setIsGlowing(false);
         }, 4000);
         return () => clearTimeout(timeout);
-    }, [roundState]);
+    }, [roundState, currentTimestamp]);
 
     return (
         <>

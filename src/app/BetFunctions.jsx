@@ -39,7 +39,7 @@ import {
     Collapse
 } from "@chakra-ui/react";
 import { FaMarkdown, FaCode, FaClone, FaPlus, FaTrash, FaChevronDown, FaWandMagicSparkles, FaShapes, FaShuffle, FaLink, FaSackDollar } from "react-icons/fa6";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import {
     anyBetsExist,
     cloneArray,
@@ -67,8 +67,8 @@ const cartesian = (...a) =>
     a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
 
 const BuildSetMenu = (props) => {
-    const { addNewSet, gambitWithPirates, getPirateBgColor, tenbetSet } = props;
-    const { roundState } = useContext(RoundContext);
+    const { gambitWithPirates, getPirateBgColor, tenbetSet } = props;
+    const { roundState, addNewSet } = useContext(RoundContext);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [mode, setMode] = React.useState(''); // currently can only be "Ten-bet" or "Gambit"
     const [pirateIndices, setPirateIndices] = React.useState([0, 0, 0, 0, 0]); // indices of the pirates to be included in the set
@@ -338,8 +338,11 @@ function createHtmlTable(calculations, roundState, bets) {
 }
 
 const BetCopyButtons = (props) => {
-    let { bets, betAmounts, ...rest } = props;
-    const { roundState, calculations } = useContext(RoundContext);
+    let { index, ...rest } = props;
+    const { roundState, calculations, allBets, allBetAmounts } = useContext(RoundContext);
+
+    const bets = allBets[index];
+    const betAmounts = allBetAmounts[index];
 
     const toast = useToast();
     const useWebDomain = useMemo(() => roundState.useWebDomain, [roundState.useWebDomain]);
@@ -412,21 +415,17 @@ const BetCopyButtons = (props) => {
 const BetFunctions = (props) => {
 
     const { blue, orange, red, green, yellow, gray, getPirateBgColor, ...rest } = props;
-    const { roundState, setRoundState, calculations } = useContext(RoundContext);
+    const { roundState, calculations,
+        addNewSet,
+        currentBet, setCurrentBet,
+        allNames, setAllNames,
+        allBets, setAllBets,
+        allBetAmounts, setAllBetAmounts,
+    } = useContext(RoundContext);
     const { usedProbabilities, arenaRatios, betBinaries } = calculations;
-    const [currentBet, setCurrentBet] = useState("0");
     const previewHover = useColorModeValue('gray.200', 'gray.600');
 
     const hasDuplicates = anyBetsDuplicate(betBinaries);
-
-    const [allNames, setAllNames] = useState({ 0: "Starting Set" });
-    const [allBets, setAllBets] = useState({ 0: { ...roundState.bets } });
-    const [allBetAmounts, setAllBetAmounts] = useState({
-        0: { ...roundState.betAmounts },
-    });
-
-    const getNewIndex = () =>
-        (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
 
     const winningPiratesBinary = computePiratesBinary(
         roundState.roundData?.winners || [0, 0, 0, 0, 0]
@@ -490,34 +489,6 @@ const BetFunctions = (props) => {
         }
     }
 
-    useEffect(() => {
-        setAllBets(allBets => ({ ...allBets, [currentBet]: { ...roundState.bets } }));
-        setAllBetAmounts(allBetAmounts => ({
-            ...allBetAmounts,
-            [currentBet]: { ...roundState.betAmounts },
-        }));
-    }, [roundState.bets, roundState.betAmounts, currentBet]);
-
-    const addNewSet = (name, bets, betAmounts, maybe_replace = false) => {
-        // will modify the current set if the current set is empty and maybe_replace is explicitly set to true
-        const newIndex =
-            maybe_replace && !anyBetsExist(roundState.bets)
-                ? currentBet
-                : getNewIndex();
-
-        const clonedBets = cloneArray(bets);
-        const clonedBetAmounts = cloneArray(betAmounts);
-
-        setAllNames({ ...allNames, [newIndex]: name });
-        setAllBets({ ...allBets, [newIndex]: clonedBets });
-        setAllBetAmounts({ ...allBetAmounts, [newIndex]: clonedBetAmounts });
-        setRoundState({
-            bets: { ...clonedBets },
-            betAmounts: { ...clonedBetAmounts },
-        });
-        setCurrentBet(newIndex);
-    }
-
     const newEmptySet = () => {
         const amountOfBets = Object.keys(allBets[currentBet]).length;
         addNewSet(
@@ -564,10 +535,6 @@ const BetFunctions = (props) => {
         setAllBets({ ...allBetsCopy });
         setAllBetAmounts({ ...allBetAmountsCopy });
         setAllNames({ ...allNamesCopy });
-        setRoundState({
-            bets: { ...allBetsCopy[previousElement] },
-            betAmounts: { ...allBetAmountsCopy[previousElement] },
-        });
         setCurrentBet(previousElement);
     }
 
@@ -588,7 +555,7 @@ const BetFunctions = (props) => {
 
         let newBets = {};
         let newBetAmounts = {};
-        for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
+        for (let bet = 0; bet < Object.keys(allBets[currentBet]).length; bet++) {
             const pirateBinary = topRatios[bet][0];
             newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
             newBetAmounts[bet + 1] = determineBetAmount(
@@ -619,7 +586,7 @@ const BetFunctions = (props) => {
         let bets = {};
         let betAmounts = {};
         let bet = 0;
-        while (Object.keys(bets).length < Object.keys(roundState.bets).length) {
+        while (Object.keys(bets).length < Object.keys(allBets[currentBet]).length) {
             const pirateBinary = topRatios[bet][0];
             if ((pirateBinary & tenbetBinary) === tenbetBinary) {
                 const index = Object.keys(bets).length + 1;
@@ -820,7 +787,7 @@ const BetFunctions = (props) => {
 
         let bets = {};
         let betAmounts = {};
-        for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
+        for (let bet = 0; bet < Object.keys(allBets[currentBet]).length; bet++) {
             const pirateBinary = topRatios[bet][0];
             bets[bet + 1] = computeBinaryToPirates(pirateBinary);
             betAmounts[bet + 1] = determineBetAmount(
@@ -849,7 +816,7 @@ const BetFunctions = (props) => {
 
         let newBets = {};
         let newBetAmounts = {};
-        for (let bet = 0; bet < Object.keys(roundState.bets).length; bet++) {
+        for (let bet = 0; bet < Object.keys(allBets[currentBet]).length; bet++) {
             const pirateBinary = allFullBets[bet];
             newBets[bet + 1] = computeBinaryToPirates(pirateBinary);
             newBetAmounts[bet + 1] = determineBetAmount(
@@ -939,7 +906,6 @@ const BetFunctions = (props) => {
                             </Menu>
 
                             <BuildSetMenu
-                                addNewSet={addNewSet}
                                 gambitWithPirates={gambitWithPirates}
                                 getPirateBgColor={getPirateBgColor}
                                 tenbetSet={tenbetSet}
@@ -965,10 +931,6 @@ const BetFunctions = (props) => {
                                             return;
                                         }
                                         setCurrentBet(key);
-                                        setRoundState({
-                                            bets: { ...allBets[key] },
-                                            betAmounts: { ...allBetAmounts[key] },
-                                        });
                                     }}
                                     transition="opacity 0.2s ease-in-out"
                                     boxShadow={isCurrent ? "dark-lg" : 'xl'}
@@ -1006,8 +968,7 @@ const BetFunctions = (props) => {
                                         <Divider />
                                         <BetBadges
                                             pt={1}
-                                            bets={allBets[key]}
-                                            betAmounts={allBetAmounts[key]}
+                                            index={key}
                                         />
 
                                         <Collapse
@@ -1016,10 +977,7 @@ const BetFunctions = (props) => {
                                         >
                                             <Box mt={2}>
                                                 <Divider />
-                                                <BetCopyButtons
-                                                    bets={allBets[key]}
-                                                    betAmounts={allBetAmounts[key]}
-                                                />
+                                                <BetCopyButtons index={key} />
                                             </Box>
                                         </Collapse>
                                     </Box>
@@ -1034,13 +992,16 @@ const BetFunctions = (props) => {
 };
 
 const BetBadges = (props) => {
-    const { bets, betAmounts, ...rest } = props;
-    const { calculations, roundState } = useContext(RoundContext);
+    const { index, ...rest } = props;
+    const { calculations, roundState, allBets, allBetAmounts } = useContext(RoundContext);
     const { usedProbabilities, odds, calculated, winningBetBinary } = calculations;
 
     if (odds === undefined) {
         return null;
     }
+
+    let bets = allBets[index];
+    let betAmounts = allBetAmounts[index];
 
     let { betOdds,
         betPayoffs,
@@ -1065,7 +1026,7 @@ const BetBadges = (props) => {
         isInvalid = true;
     }
     Object.values(betOdds).forEach((odds, index) => { // invalid bet amounts
-        if (odds > 0) {
+        if (odds > 0 && betAmounts) {
             let betAmount = betAmounts[index + 1];
             if (betAmount !== -1000 && betAmount < 50) {
                 badges.push(<Badge colorScheme="red" variant="subtle">❌ Invalid bet amounts</Badge>);
@@ -1085,7 +1046,7 @@ const BetBadges = (props) => {
             let unitsWon = 0;
             let npWon = 0;
             Object.values(betBinaries).forEach((binary, index) => {
-                if ((winningBetBinary & binary) === binary) {
+                if (betAmounts && (winningBetBinary & binary) === binary) {
                     unitsWon += betOdds[index + 1];
                     npWon += Math.min(
                         betOdds[index + 1] * betAmounts[index + 1],
@@ -1127,7 +1088,7 @@ const BetBadges = (props) => {
     }
 
     // guaranteed profit badge
-    if (betCount > 0 && roundState.roundData && !isRoundOver && !isInvalid) {
+    if (betCount > 0 && roundState.roundData && !isRoundOver && !isInvalid && betAmounts) {
         let betAmountsTotal = 0;
         Object.values(betAmounts).forEach((amount) => {
             if (amount !== -1000) {

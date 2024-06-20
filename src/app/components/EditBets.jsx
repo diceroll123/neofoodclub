@@ -94,28 +94,31 @@ function PirateFA(props) {
 const NormalTable = (props) => {
     const { red, green, getPirateBgColor } = props;
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
-    const { roundState, setRoundState, calculations } =
+    const { roundState, calculations,
+        currentBet,
+        allBets, setAllBets,
+    } =
         useContext(RoundContext);
     const { arenaRatios, winningBetBinary, legacyProbabilities, logitProbabilities, usedProbabilities, pirateFAs } =
         calculations;
-    const amountOfBets = Object.keys(roundState.bets).length;
+    const amountOfBets = Object.keys(allBets[currentBet]).length;
 
 
     const changeBet = (betIndex, arenaIndex, pirateIndex) => {
         // change a single pirate in a single arena
-        let newBets = roundState.bets;
+        let newBets = allBets[currentBet];
         newBets[betIndex][arenaIndex] = pirateIndex;
-        setRoundState({ bets: { ...newBets } }); // hacky way to force an object to update useEffect
+        setAllBets({ ...allBets, [currentBet]: newBets });
     }
 
     const changeBetLine = (arenaIndex, pirateValue) => {
         // change the entire row to pirateValue
         // for the 10-bet button
-        let newBets = roundState.bets;
+        let newBets = allBets[currentBet];
         for (let x = 1; x <= amountOfBets; x++) {
             newBets[x][arenaIndex] = pirateValue;
         }
-        setRoundState({ bets: { ...newBets } }); // hacky way to force an object to update useEffect
+        setAllBets({ ...allBets, [currentBet]: newBets });
     }
 
     return (
@@ -244,7 +247,7 @@ const NormalTable = (props) => {
                                                             changeBet(betNum + 1, arenaId, 0)
                                                         }
                                                         isChecked={
-                                                            roundState.bets[betNum + 1][arenaId] === 0
+                                                            allBets[currentBet][betNum + 1][arenaId] === 0
                                                         }
                                                     />
                                                 </Td>
@@ -395,7 +398,7 @@ const NormalTable = (props) => {
                                                             changeBet(betNum + 1, arenaId, pirateIndex + 1)
                                                         }
                                                         isChecked={
-                                                            roundState.bets[betNum + 1][arenaId] === pirateIndex + 1
+                                                            allBets[currentBet][betNum + 1][arenaId] === pirateIndex + 1
                                                         }
                                                     />
                                                 </Td>
@@ -427,10 +430,13 @@ const NormalTable = (props) => {
 
 const DropDownTable = (props) => {
     let { ...rest } = props;
-    const { roundState, setRoundState, calculations } =
+    const { roundState, calculations,
+        currentBet,
+        allBets, setAllBets
+    } =
         useContext(RoundContext);
     const { winningBetBinary, arenaRatios } = calculations;
-    const amountOfBets = Object.keys(roundState.bets).length;
+    const amountOfBets = Object.keys(allBets[currentBet]).length;
 
     const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
@@ -447,9 +453,9 @@ const DropDownTable = (props) => {
 
     const changeBet = (betIndex, arenaIndex, pirateIndex) => {
         // change a single pirate in a single arena
-        let newBets = roundState.bets;
+        let newBets = allBets[currentBet];
         newBets[betIndex][arenaIndex] = pirateIndex;
-        setRoundState({ bets: { ...newBets } }); // hacky way to force an object to update useEffect
+        setAllBets({ ...allBets, [currentBet]: newBets });
     }
 
     return (
@@ -537,7 +543,7 @@ const DropDownTable = (props) => {
                                         </Pd>
                                     );
                                 }
-                                let pirateIndex = roundState.bets[betNum + 1][arenaId];
+                                let pirateIndex = allBets[currentBet][betNum + 1][arenaId];
 
                                 return (
                                     <Pd key={arenaId}>
@@ -572,9 +578,11 @@ const PirateTable = (props) => {
 export default function EditBets(props) {
     const { blue, orange, green, red, yellow, gray, getPirateBgColor } = props;
 
-    const { roundState, setRoundState } = useContext(RoundContext);
+    const { roundState, setRoundState,
+        currentBet,
+        allBets, } = useContext(RoundContext);
 
-    const anyBets = anyBetsExist(roundState.bets);
+    const anyBets = anyBetsExist(allBets[currentBet]);
 
     return (
         <>

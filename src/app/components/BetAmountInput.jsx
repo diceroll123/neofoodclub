@@ -12,32 +12,38 @@ import { RoundContext } from "../RoundState";
 // this is the number input element next to bets
 
 export default function BetAmountInput(props) {
-    const { roundState, setRoundState } = useContext(RoundContext);
+    const {
+        currentBet,
+        allBetAmounts, setAllBetAmounts
+    } = useContext(RoundContext);
     const { betIndex, ...rest } = props;
 
     const [tempMaxBet, setTempMaxBet] = useState(
-        roundState.betAmounts[betIndex + 1]
+        allBetAmounts[currentBet][betIndex + 1]
     );
 
     useEffect(() => {
-        setTempMaxBet(roundState.betAmounts[betIndex + 1]);
-    }, [betIndex, roundState.betAmounts]);
+        setTempMaxBet(allBetAmounts[currentBet][betIndex + 1]);
+    }, [betIndex, allBetAmounts, currentBet]);
 
     useEffect(() => {
-
         let value = parseInt(tempMaxBet);
 
+        if (value === allBetAmounts[currentBet][betIndex + 1]) {
+            return;
+        }
+
         const timeoutId = setTimeout(() => {
-            let betAmounts = { ...roundState.betAmounts };
-            betAmounts[betIndex + 1] = value;
-            setRoundState({ betAmounts });
+            let newBetAmounts = { ...allBetAmounts[currentBet] };
+            newBetAmounts[betIndex + 1] = value;
+            setAllBetAmounts({ ...allBetAmounts, [currentBet]: newBetAmounts });
         }, 200);
 
         return () => {
             clearTimeout(timeoutId);
         };
 
-    }, [tempMaxBet]);
+    }, [tempMaxBet, allBetAmounts, currentBet, betIndex, setAllBetAmounts]);
 
     return (
         <NumberInput

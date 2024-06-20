@@ -242,7 +242,7 @@ const CopyWithDomain = () => {
     let iconSize = useWebDomain ? "2em" : "1em";
 
     return (
-        <Tooltip label={`Include domain when copying bets\n(${window.location.origin}/)`}>
+        <Tooltip label={`Include domain when copying bets\n(${window.location.origin}/)`} openDelay="600">
             <Button
                 size="sm"
                 leftIcon={<Icon

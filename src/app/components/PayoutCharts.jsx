@@ -32,7 +32,7 @@ Chart.register(annotationPlugin);
 const PayoutCharts = () => {
     const green = useColorModeValue("nfc.green", "nfc.greenDark");
     const red = useColorModeValue("nfc.red", "nfc.redDark");
-    const { roundState, calculations } = useContext(RoundContext);
+    const { roundState, calculations, currentBet, allBetAmounts } = useContext(RoundContext);
     const {
         payoutTables,
         betBinaries,
@@ -73,7 +73,7 @@ const PayoutCharts = () => {
             breakEven = validBets.length;
             doubleProfit = 2 * breakEven;
         } else if (title === "Winnings") {
-            let totalBetAmount = Object.values(roundState.betAmounts).reduce(
+            let totalBetAmount = Object.values(allBetAmounts[currentBet]).reduce(
                 (a, b) => a + b
             );
             breakEven = totalBetAmount;

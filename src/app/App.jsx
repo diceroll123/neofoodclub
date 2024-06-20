@@ -24,7 +24,7 @@ const firebase = initializeApp(config);
 function App() {
     const { roundState, setRoundState } = useContext(RoundContext);
 
-    useRoundStateURLs(roundState, setRoundState);
+    useRoundStateURLs();
 
     const [currentRound, roundData] = useRoundData(
         firebase,
@@ -53,7 +53,9 @@ function App() {
     return <HomePage />;
 }
 
-function useRoundStateURLs(roundState, setRoundState) {
+function useRoundStateURLs() {
+    const { roundState, setRoundState, currentBet, allBetAmounts, allBets } = useContext(RoundContext);
+
     useEffect(() => {
         if (roundState.currentSelectedRound === null) {
             return;
@@ -61,23 +63,21 @@ function useRoundStateURLs(roundState, setRoundState) {
 
         const url = makeBetURL(
             roundState.currentSelectedRound,
-            roundState.bets,
-            roundState.betAmounts,
+            allBets[currentBet],
+            allBetAmounts[currentBet],
             true,
         );
 
         window.history.replaceState(null, "", url);
-    }, [roundState]);
+    }, [roundState, currentBet, allBets, allBetAmounts]);
 
     const onHashChange = useCallback(() => {
-        const data = parseBetUrl();
+        const data = parseBetUrl(window.location.hash.slice(1));
         if (isNaN(parseInt(data.round))) {
             data.round = roundState.currentRound.toString();
         }
         setRoundState({
             currentSelectedRound: data.round,
-            bets: data.bets,
-            betAmounts: data.betAmounts,
             customOdds: null,
             customProbs: null,
             viewMode: false,

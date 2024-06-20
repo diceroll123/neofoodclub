@@ -48,7 +48,7 @@ const RoundInput = () => {
         }
 
         setRoundNumber(roundState.currentSelectedRound);
-    }, [roundState.currentSelectedRound]);
+    }, [roundState.currentSelectedRound, roundNumber]);
 
 
     return (

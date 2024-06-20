@@ -5,14 +5,17 @@ import { determineBetAmount, getMaxBet } from "../util";
 import { FaFillDrip, FaInfinity } from "react-icons/fa";
 
 const BetAmountsButtons = (props) => {
-	const { roundState, setRoundState, calculations } =
+	const { roundState, calculations,
+		currentBet,
+		allBetAmounts, setAllBetAmounts
+	} =
 		useContext(RoundContext);
 	const { ...rest } = props;
 	const { betBinaries, betOdds } = calculations;
 
-	const setAllBets = (value, capped) => {
-		let betAmounts = { ...roundState.betAmounts };
-		for (let index in roundState.betAmounts) {
+	const setBetAmounts = (value, capped) => {
+		let betAmounts = { ...allBetAmounts[currentBet] };
+		for (let index in allBetAmounts[currentBet]) {
 			if (betBinaries[index] > 0) {
 				if (capped) {
 					betAmounts[index] = determineBetAmount(
@@ -26,7 +29,7 @@ const BetAmountsButtons = (props) => {
 				betAmounts[index] = -1000;
 			}
 		}
-		setRoundState({ betAmounts });
+		setAllBetAmounts({ ...allBetAmounts, [currentBet]: betAmounts });
 	}
 
 	return (
@@ -37,13 +40,14 @@ const BetAmountsButtons = (props) => {
 					<Tooltip
 						label="Sets all bet amounts to whichever is lower: your max bet amount, or the value in the MAXBET column below + 1. This prevents you from betting more than necessary to earn 1M NP from the bet, given the current odds."
 						openDelay="600"
+						placement="top"
 					>
 						<Button
 							leftIcon={<Icon as={FaFillDrip} w="1.4em" h="1.4em" />}
 							size="sm"
 							colorScheme="green"
 							onClick={() => {
-								setAllBets(getMaxBet(roundState.currentSelectedRound), true);
+								setBetAmounts(getMaxBet(roundState.currentSelectedRound), true);
 							}}
 							{...rest}
 						>
@@ -53,13 +57,14 @@ const BetAmountsButtons = (props) => {
 					<Tooltip
 						label="Sets all bet amounts your max bet, regardless of overflow with the MAXBET column below. This is generally used by people who would like to maximize profits in the event of odds changing."
 						openDelay="600"
+						placement="top"
 					>
 						<Button
 							leftIcon={<Icon as={FaInfinity} w="1.4em" h="1.4em" />}
 							size="sm"
 							colorScheme="blue"
 							onClick={() => {
-								setAllBets(getMaxBet(roundState.currentSelectedRound), false);
+								setBetAmounts(getMaxBet(roundState.currentSelectedRound), false);
 							}}
 							{...rest}
 						>
@@ -69,7 +74,7 @@ const BetAmountsButtons = (props) => {
 					<Button
 						size="sm"
 						onClick={() => {
-							setAllBets(-1000, false);
+							setBetAmounts(-1000, false);
 						}}
 						colorScheme="red"
 						{...rest}

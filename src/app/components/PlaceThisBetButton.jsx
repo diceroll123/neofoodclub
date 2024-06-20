@@ -23,13 +23,13 @@ const ErrorBetButton = (props) => {
 
 const PlaceThisBetButton = (props) => {
     const { bet, betNum } = props;
-    const { roundState, calculations } = useContext(RoundContext);
+    const { roundState, calculations, currentBet, allBetAmounts, allBets } = useContext(RoundContext);
     const { betBinaries, betOdds, betPayoffs, winningBetBinary } = calculations;
     const [clicked, setClicked] = useState(false);
 
     useEffect(() => {
         setClicked(false);
-    }, [roundState.bets]);
+    }, [allBets, allBetAmounts]);
 
     if (
         winningBetBinary > 0 ||
@@ -42,7 +42,7 @@ const PlaceThisBetButton = (props) => {
         );
     }
 
-    if (roundState.betAmounts[betNum] < 50) {
+    if (allBetAmounts[currentBet][betNum] < 50) {
         return (
             <ErrorBetButton>
                 Invalid bet amount!
@@ -75,7 +75,7 @@ const PlaceThisBetButton = (props) => {
                 urlString += `matches[]=${i + 1}&`;
             }
         }
-        urlString += `bet_amount=${roundState.betAmounts[betNum]}&`;
+        urlString += `bet_amount=${allBetAmounts[currentBet][betNum]}&`;
         urlString += `total_odds=${betOdds[betNum]}&`;
         urlString += `winnings=${betPayoffs[betNum]}&`;
         urlString += "type=bet";

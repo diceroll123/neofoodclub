@@ -220,7 +220,7 @@ export function anyBetsExist(betsObject) {
 }
 
 export function anyBetAmountsExist(betAmountsObject) {
-    return Object.values(betAmountsObject).some((amount) => amount >= 50);
+    return Object.values(betAmountsObject || {}).some((amount) => amount >= 50);
 }
 
 export function anyBetsDuplicate(betsObject) {
@@ -409,20 +409,13 @@ export function makeBetValues(bets, betAmounts, odds, probabilities) {
             }
         }
         // yes, the for-loop above had to be separate.
-        for (let arenaIndex = 0; arenaIndex < 5; arenaIndex++) {
-            betPayoffs[betIndex] = Math.min(
-                1_000_000,
-                betAmounts[betIndex] * betOdds[betIndex]
-            );
-            betExpectedRatios[betIndex] =
-                betOdds[betIndex] * betProbabilities[betIndex];
-            betNetExpected[betIndex] =
-                betPayoffs[betIndex] * betProbabilities[betIndex] -
-                betAmounts[betIndex];
-            betMaxBets[betIndex] = Math.floor(
-                1_000_000 / betOdds[betIndex]
-            );
-        }
+        const amount = (betAmounts || {})[betIndex] || -1000;
+        const theseOdds = betOdds[betIndex];
+        const prob = betProbabilities[betIndex];
+        betPayoffs[betIndex] = Math.min(1_000_000, amount * theseOdds);
+        betExpectedRatios[betIndex] = theseOdds * prob;
+        betNetExpected[betIndex] = betPayoffs[betIndex] * prob - amount;
+        betMaxBets[betIndex] = Math.floor(1_000_000 / theseOdds);
     }
 
     return {
@@ -436,7 +429,7 @@ export function makeBetValues(bets, betAmounts, odds, probabilities) {
     };
 }
 
-export function calculateRoundData(roundState) {
+export function calculateRoundData(roundState, bets, betAmounts) {
     // calculates all of the round's mathy data for visualization purposes.
     let calculated = false;
     let legacyProbabilities = {};
@@ -463,7 +456,7 @@ export function calculateRoundData(roundState) {
     let totalEnabledBets = 0;
 
     const odds = getOdds(roundState);
-    if (roundState.roundData && odds) {
+    if (roundState.roundData && odds && bets && betAmounts) {
         legacyProbabilities = computeLegacyProbabilities(roundState.roundData);
         logitProbabilities = computeLogitProbabilities(roundState.roundData);
         usedProbabilities = getProbs(roundState, legacyProbabilities, logitProbabilities);
@@ -473,7 +466,7 @@ export function calculateRoundData(roundState) {
         winningBetBinary = computePiratesBinary(roundState.roundData.winners);
 
         // keep the "cache" of bet data up to date
-        const values = makeBetValues(roundState.bets, roundState.betAmounts, odds, usedProbabilities);
+        const values = makeBetValues(bets, betAmounts, odds, usedProbabilities);
 
         betOdds = values.betOdds;
         betPayoffs = values.betPayoffs;
@@ -483,18 +476,18 @@ export function calculateRoundData(roundState) {
         betMaxBets = values.betMaxBets;
         betBinaries = values.betBinaries;
 
-        for (let betIndex in roundState.bets) {
+        for (let betIndex in bets) {
             let betBinary = betBinaries[betIndex];
             if (betBinary > 0) {
                 totalEnabledBets += 1;
-                totalBetAmounts += roundState.betAmounts[betIndex];
+                totalBetAmounts += betAmounts[betIndex];
                 totalBetExpectedRatios += betExpectedRatios[betIndex];
                 totalBetNetExpected += betNetExpected[betIndex];
                 if ((winningBetBinary & betBinary) === betBinary) {
                     // bet won
                     totalWinningOdds += betOdds[betIndex];
                     totalWinningPayoff += Math.min(
-                        betOdds[betIndex] * roundState.betAmounts[betIndex],
+                        betOdds[betIndex] * betAmounts[betIndex],
                         1_000_000
                     );
                 }
@@ -503,7 +496,7 @@ export function calculateRoundData(roundState) {
 
         // for charts
         payoutTables = calculatePayoutTables(
-            roundState.bets,
+            bets,
             usedProbabilities,
             betOdds,
             betPayoffs
