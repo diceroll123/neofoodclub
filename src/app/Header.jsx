@@ -133,19 +133,12 @@ function CurrentRoundInfo() {
 function RoundInfo() {
     const { roundState } = useContext(RoundContext);
 
-    const oldRound =
-        parseInt(roundState.currentSelectedRound) !== roundState.currentRound;
+    let element = null;
 
-    const skeletonWidth = oldRound ? "129px" : "190px";
-
-    let element = <SkeletonText noOfLines={3} minWidth={skeletonWidth} />;
-
-    if (roundState.roundData) {
-        if (roundState.roundData.winners[0] > 0) {
-            element = <PreviousRoundInfo />;
-        } else {
-            element = <CurrentRoundInfo />;
-        }
+    if (roundState?.roundData?.winners[0] > 0) {
+        element = <PreviousRoundInfo />;
+    } else if (roundState?.roundData?.timestamp) {
+        element = <CurrentRoundInfo />;
     }
 
     return <Box display={{ base: "none", sm: "block" }}>{element}</Box>;
@@ -269,6 +262,7 @@ function HeaderContent() {
     const { roundState } = useContext(RoundContext);
     const [isGlowing, setIsGlowing] = useState(false);
     const [currentTimestamp, setCurrentTimestamp] = useState("");
+    const [winnersExist, setWinnersExist] = useState(false);
 
     useEffect(() => {
         if (!roundState.roundData) {
@@ -278,6 +272,8 @@ function HeaderContent() {
 
         const timestamp = roundState.roundData?.timestamp;
         const winners = roundState.roundData?.winners;
+
+        setWinnersExist(winners.some((winner) => winner > 0));
 
         if (!winners) {
             setIsGlowing(false);
@@ -339,8 +335,12 @@ function HeaderContent() {
                             <RoundInput />
                             <MaxBetInput />
                         </VStack>
-                        <CurrentRoundProgress />
-                        <RoundInfo />
+                        <SkeletonText minW={"130"} isLoaded={roundState?.roundData}>
+                            <HStack>
+                                <CurrentRoundProgress hidden={winnersExist} />
+                                <RoundInfo />
+                            </HStack>
+                        </SkeletonText>
                     </HStack>
                 </Box>
                 <Spacer />
