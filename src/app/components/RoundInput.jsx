@@ -40,6 +40,10 @@ const RoundInput = () => {
 
     useEffect(() => {
 
+        if (roundNumber === "") {
+            return;
+        }
+
         const timeoutId = setTimeout(() => {
             changeCurrentSelectedRound(roundNumber);
         }, 400);
