@@ -13,7 +13,6 @@ const DropZone = ({ children }) => {
 
     useEffect(() => {
         const handleDrop = (e) => {
-            e.preventDefault();
             const url = e.dataTransfer.getData('text/uri-list');
 
             const parsed = parseBetUrl(url.split("#")[1]);
@@ -21,6 +20,8 @@ const DropZone = ({ children }) => {
             if (!anyBetsExist(parsed.bets)) {
                 return;
             }
+
+            e.preventDefault();
 
             const dropped = e.dataTransfer.getData('text/html');
             let name = removeHtmlTags(dropped || "").trim();
