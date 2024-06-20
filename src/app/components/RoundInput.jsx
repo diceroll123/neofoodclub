@@ -26,14 +26,16 @@ const RoundInput = () => {
             return;
         }
 
-        if (value > 0) {
-            setRoundState({
-                currentSelectedRound: value,
-                roundData: null,
-                customOdds: null,
-                customProbs: null,
-            });
+        if (value < 1) {
+            value = roundState.currentRound;
         }
+
+        setRoundState({
+            currentSelectedRound: value,
+            roundData: null,
+            customOdds: null,
+            customProbs: null,
+        });
     }
 
     useEffect(() => {
@@ -46,7 +48,11 @@ const RoundInput = () => {
             clearTimeout(timeoutId);
         };
 
-    }, [roundState.currentSelectedRound, roundNumber]);
+    }, [roundNumber]);
+
+    useEffect(() => {
+        setRoundNumber(roundState.currentSelectedRound || 0);
+    }, [roundState.currentSelectedRound]);
 
 
     return (
