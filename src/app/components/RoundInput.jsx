@@ -21,23 +21,6 @@ const RoundInput = () => {
     );
     const [hasFocus, setHasFocus] = useState(false);
 
-    const changeCurrentSelectedRound = (value) => {
-        if (value === roundState.currentSelectedRound) {
-            return;
-        }
-
-        if (value < 1) {
-            value = roundState.currentRound;
-        }
-
-        setRoundState({
-            currentSelectedRound: value,
-            roundData: null,
-            customOdds: null,
-            customProbs: null,
-        });
-    }
-
     useEffect(() => {
 
         if (roundNumber === "") {
@@ -45,19 +28,32 @@ const RoundInput = () => {
         }
 
         const timeoutId = setTimeout(() => {
-            changeCurrentSelectedRound(roundNumber);
+            if (roundNumber === roundState.currentSelectedRound) {
+                return;
+            }
+
+            let value = roundNumber;
+            if (roundNumber < 1) {
+                value = roundState.currentRound;
+            }
+
+            setRoundState({
+                currentSelectedRound: value,
+                roundData: null,
+                customOdds: null,
+                customProbs: null,
+            });
         }, 400);
 
         return () => {
             clearTimeout(timeoutId);
         };
 
-    }, [roundNumber]);
+    }, [roundNumber, roundState.currentSelectedRound, roundState.currentRound, setRoundState]);
 
     useEffect(() => {
         setRoundNumber(roundState.currentSelectedRound || 0);
     }, [roundState.currentSelectedRound]);
-
 
     return (
         <InputGroup size="xs">
