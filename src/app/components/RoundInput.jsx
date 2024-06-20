@@ -16,7 +16,6 @@ import { RoundContext } from "../RoundState";
 const RoundInput = () => {
     const { roundState, setRoundState } = useContext(RoundContext);
 
-    const [timeoutId, setTimeoutId] = useState(null);
     const [roundNumber, setRoundNumber] = useState(
         roundState.currentSelectedRound || 0
     );
@@ -38,16 +37,15 @@ const RoundInput = () => {
     }
 
     useEffect(() => {
-        const currentSelectedRoundNumber = roundState.currentSelectedRound || 0;
-        if (currentSelectedRoundNumber === roundNumber) {
-            return;
-        }
 
-        if (currentSelectedRoundNumber === 0) {
-            return;
-        }
+        const timeoutId = setTimeout(() => {
+            changeCurrentSelectedRound(roundNumber);
+        }, 400);
 
-        setRoundNumber(roundState.currentSelectedRound);
+        return () => {
+            clearTimeout(timeoutId);
+        };
+
     }, [roundState.currentSelectedRound, roundNumber]);
 
 
@@ -70,24 +68,11 @@ const RoundInput = () => {
                     }
 
                     setRoundNumber(value);
-
-                    // debounce number input to 400ms
-                    if (timeoutId && typeof timeoutId === "number") {
-                        clearTimeout(timeoutId);
-                    }
-
-                    setTimeoutId(
-                        setTimeout(() => {
-                            setTimeoutId(null);
-                            changeCurrentSelectedRound(value);
-                        }, 400)
-                    );
                 }}
                 onBlur={(e) => {
                     setHasFocus(false);
                     if (e.target.value === "") {
                         setRoundNumber(roundState.currentRound);
-                        changeCurrentSelectedRound(roundState.currentRound);
                     }
                 }}
             >
