@@ -13,14 +13,14 @@ const rootElement = document.getElementById("root");
 const root = ReactDOMClient.createRoot(rootElement);
 
 root.render(
-    <React.StrictMode>
-        <FaviconGenerator />
-        <StateProvider>
-            <ChakraProvider theme={theme}>
-                <App />
-            </ChakraProvider>
-        </StateProvider>
-    </React.StrictMode>
+  <React.StrictMode>
+    <FaviconGenerator />
+    <StateProvider>
+      <ChakraProvider theme={theme}>
+        <App />
+      </ChakraProvider>
+    </StateProvider>
+  </React.StrictMode>
 );
 
 serviceWorkerRegistration.register();
