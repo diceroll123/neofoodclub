@@ -23,7 +23,7 @@ import {
     useToast,
     VStack,
 } from "@chakra-ui/react";
-import { useViewportScroll } from "framer-motion";
+import { useScroll } from "framer-motion";
 import Cookies from "universal-cookie";
 import Moment from "react-moment";
 import React, { useContext, useEffect, useState } from "react";
@@ -349,9 +349,9 @@ function Header(props) {
     );
     const [y, setY] = useState(0);
 
-    const { scrollY } = useViewportScroll();
+    const { scrollY } = useScroll();
     useEffect(() => {
-        return scrollY.onChange(() => setY(scrollY.get()));
+        scrollY.on("change", () => setY(scrollY.get()));
     }, [scrollY]);
 
     return (
