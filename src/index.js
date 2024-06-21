@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import * as ReactDOMClient from "react-dom/client";
 import "./index.css";
 import App from "./app/App";
 import FaviconGenerator from "./app/FaviconGenerator";
@@ -9,7 +9,10 @@ import { StateProvider } from "./app/RoundState";
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from "./theme";
 
-ReactDOM.render(
+const rootElement = document.getElementById("root");
+const root = ReactDOMClient.createRoot(rootElement);
+
+root.render(
     <React.StrictMode>
         <FaviconGenerator />
         <StateProvider>
@@ -17,8 +20,7 @@ ReactDOM.render(
                 <App />
             </ChakraProvider>
         </StateProvider>
-    </React.StrictMode>,
-    document.getElementById("root")
+    </React.StrictMode>
 );
 
 serviceWorkerRegistration.register();
