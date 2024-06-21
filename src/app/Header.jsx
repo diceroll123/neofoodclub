@@ -195,7 +195,7 @@ function MaxBetInput() {
                         toast({
                             title: `Max Bet Saved!`,
                             status: "success",
-                            duration: 1200,
+                            duration: 2000,
                             isClosable: true,
                         });
                     }}

@@ -363,7 +363,7 @@ const BetCopyButtons = (props) => {
         toast({
             title: title,
             status: "success",
-            duration: 1300,
+            duration: 2000,
             isClosable: true,
         });
     }
