@@ -164,7 +164,7 @@ export function displayAsPercent(value, decimals) {
 }
 
 export function displayAsPlusMinus(value) {
-  return `${0 < value ? "+" : ""}${value}`;
+  return `${value > 0 ? "+" : ""}${value}`;
 }
 
 function calculateMaxBet(baseMaxBet, round) {

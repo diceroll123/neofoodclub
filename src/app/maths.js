@@ -163,8 +163,7 @@ export function computeLegacyProbabilities(roundData) {
     }
 
     for (pirateIndex = 1; pirateIndex <= 4; pirateIndex++) {
-      returnValue.used[arenaIndex][pirateIndex] =
-        returnValue.used[arenaIndex][pirateIndex] / sum;
+      returnValue.used[arenaIndex][pirateIndex] /= sum;
     }
   }
   return returnValue;
@@ -271,7 +270,7 @@ export function calculatePayoutTables(
     let ib = 0;
     for (let i = 0; i < 5; i++) {
       // this adds pirates meant by bet[i] to the pirates accepted by ib.
-      ib = ib | (convrtPirIb[bet[i]] & arIb[i]);
+      ib |= convrtPirIb[bet[i]] & arIb[i];
     }
     return ib;
   }
