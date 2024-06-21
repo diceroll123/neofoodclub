@@ -1,12 +1,14 @@
 import React, { useEffect, useContext } from 'react';
 import { RoundContext } from "./RoundState";
 import { anyBetsExist, parseBetUrl } from './util';
+import { useToast } from '@chakra-ui/react';
 
 function removeHtmlTags(str) {
     return str.replace(/<\/?[^>]+(>|$)/g, "");
 }
 
 const DropZone = ({ children }) => {
+    const toast = useToast();
     const {
         addNewSet, allBets
     } = useContext(RoundContext);
@@ -31,6 +33,11 @@ const DropZone = ({ children }) => {
             }
 
             addNewSet(name, parsed.bets, parsed.betAmounts, true);
+            toast({
+                title: `Dropped bet imported!`,
+                duration: 2000,
+                isClosable: true,
+            });
         };
 
         const handleDragOver = (e) => {
@@ -44,7 +51,7 @@ const DropZone = ({ children }) => {
             document.removeEventListener('drop', handleDrop);
             document.removeEventListener('dragover', handleDragOver);
         };
-    }, [addNewSet, allBets]);
+    }, [addNewSet, allBets, toast]);
 
     return (
         <>
