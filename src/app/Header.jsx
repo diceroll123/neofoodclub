@@ -271,16 +271,13 @@ function HeaderContent() {
         }
 
         const timestamp = roundState.roundData?.timestamp;
-        const winners = roundState.roundData?.winners;
+        const winners = roundState.roundData?.winners || {};
 
-        setWinnersExist(winners.some((winner) => winner > 0));
+        const anyWinners = winners.some((winner) => winner > 0);
 
-        if (!winners) {
-            setIsGlowing(false);
-            return;
-        }
+        setWinnersExist(anyWinners);
 
-        if (winners.some((winner) => winner > 0)) {
+        if (anyWinners) {
             setIsGlowing(false);
             return;
         }
@@ -289,12 +286,8 @@ function HeaderContent() {
             setIsGlowing(false);
             return;
         }
-        if (timestamp === roundState.roundData.start) {
-            setIsGlowing(false);
-            return;
-        }
 
-        if (timestamp === currentTimestamp) {
+        if (timestamp === roundState.roundData.start) {
             setIsGlowing(false);
             return;
         }
