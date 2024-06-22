@@ -5,7 +5,7 @@ import {
   NumberInputField,
   NumberInputStepper,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { produce } from "immer";
 
 import { RoundContext } from "../RoundState";
@@ -19,31 +19,41 @@ export default function CustomProbsInput(props) {
 
   // we multiply by 100 to make it visibly a percentage
 
-  const changeProbs = (probValue) => {
-    setProb(probValue);
-
-    const customProbs = produce(used, (draftCustomProbs) => {
-      draftCustomProbs[arenaIndex][pirateIndex] = probValue / 100;
-    });
-    setRoundState({ customProbs });
+  const verify = (value) => {
+    return !isNaN(parseFloat(value));
   };
+
+  useEffect(() => {
+    if (!verify(prob)) {
+      return;
+    }
+
+    if (prob === used[arenaIndex][pirateIndex] * 100) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      const customProbs = produce(used, (draftCustomProbs) => {
+        draftCustomProbs[arenaIndex][pirateIndex] = prob / 100;
+      });
+      setRoundState({ customProbs });
+    }, 400);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [prob, arenaIndex, pirateIndex, used, setRoundState]);
 
   return (
     <NumberInput
       {...rest}
       value={prob}
       onChange={(value) => {
-        const cleanValue = parseFloat(value);
-
-        if (isNaN(cleanValue) || value.charAt(value.length - 1) === ".") {
-          setProb(value);
-        } else {
-          changeProbs(cleanValue);
-        }
+        setProb(value);
       }}
       onBlur={(e) => {
         if (e.target.value === "") {
-          changeProbs(used[arenaIndex][pirateIndex] * 100);
+          setProb(used[arenaIndex][pirateIndex] * 100);
         }
       }}
       onFocus={(e) => e.target.select()}

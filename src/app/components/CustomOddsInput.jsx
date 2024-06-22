@@ -5,7 +5,7 @@ import {
   NumberInputField,
   NumberInputStepper,
 } from "@chakra-ui/react";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { produce } from "immer";
 
 import { RoundContext } from "../RoundState";
@@ -21,17 +21,37 @@ export default function CustomOddsInput(props) {
 
   const [odds, setOdds] = useState(original[arenaIndex][pirateIndex]);
 
-  const changeOdds = (oddsValue) => {
-    setOdds(oddsValue);
+  useEffect(() => {
+    if (!verify(odds)) {
+      return;
+    }
 
-    const customOdds = produce(
-      roundState.customOdds || roundState.roundData.currentOdds,
-      (draftCustomOdds) => {
-        draftCustomOdds[arenaIndex][pirateIndex] = oddsValue;
+    const timeoutId = setTimeout(() => {
+      if (odds === original[arenaIndex][pirateIndex]) {
+        return;
       }
-    );
-    setRoundState({ customOdds });
-  };
+
+      const customOdds = produce(
+        roundState.customOdds || roundState.roundData.currentOdds,
+        (draftCustomOdds) => {
+          draftCustomOdds[arenaIndex][pirateIndex] = odds;
+        }
+      );
+      setRoundState({ customOdds });
+    }, 400);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [
+    odds,
+    arenaIndex,
+    pirateIndex,
+    original,
+    roundState.customOdds,
+    setRoundState,
+    roundState.roundData.currentOdds,
+  ]);
 
   const verify = (value) => {
     // returns false if it needs to be reverted, true if the value is clean
@@ -50,16 +70,10 @@ export default function CustomOddsInput(props) {
       value={odds}
       onChange={(value) => {
         setOdds(value);
-
-        if (verify(value)) {
-          changeOdds(value);
-        }
       }}
       onBlur={(e) => {
-        let value = e.target.value;
-
-        if (verify(value) === false) {
-          changeOdds(roundState.roundData.currentOdds[arenaIndex][pirateIndex]);
+        if (!verify(e.target.value)) {
+          setOdds(original[arenaIndex][pirateIndex]);
         }
       }}
       onFocus={(e) => e.target.select()}
