@@ -33,22 +33,32 @@ function App() {
 
   // If we don't have a selected round yet, initialize it to the current round ID, once it loads in.
   useEffect(() => {
-    let data = { currentRound: parseInt(currentRound) };
     if (roundState.currentSelectedRound === null && currentRound) {
+      let data = { currentRound: parseInt(currentRound) };
       data = { ...data, currentSelectedRound: parseInt(currentRound) };
+      setRoundState(data);
     }
-
-    setRoundState(data);
   }, [roundState.currentSelectedRound, currentRound, setRoundState]);
 
   useEffect(() => {
-    if (currentRound && roundData) {
+    if (
+      currentRound &&
+      roundData &&
+      (currentRound !== roundState.currentRound ||
+        roundData !== roundState.roundData)
+    ) {
       setRoundState({
         roundData: roundData,
         currentRound: currentRound,
       });
     }
-  }, [currentRound, roundData, setRoundState]);
+  }, [
+    currentRound,
+    roundData,
+    setRoundState,
+    roundState.currentRound,
+    roundState.roundData,
+  ]);
 
   return <HomePage />;
 }
