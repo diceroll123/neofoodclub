@@ -84,15 +84,16 @@ function useRoundStateURLs() {
     if (isNaN(parseInt(data.round))) {
       data.round = roundState.currentRound.toString();
     }
+
+    const isSameRound =
+      parseInt(data.round) === parseInt(roundState.currentSelectedRound);
+
     setRoundState({
       currentSelectedRound: data.round,
-      customOdds: null,
-      customProbs: null,
+      customOdds: isSameRound ? roundState.customOdds : null,
+      customProbs: isSameRound ? roundState.customProbs : null,
       viewMode: false,
-      roundData:
-        parseInt(data.round) === parseInt(roundState.currentSelectedRound)
-          ? roundState.roundData
-          : null,
+      roundData: isSameRound ? roundState.roundData : null,
     });
 
     if (data.bets !== allBets[currentBet]) {
@@ -105,6 +106,8 @@ function useRoundStateURLs() {
     roundState.currentRound,
     roundState.currentSelectedRound,
     roundState.roundData,
+    roundState.customOdds,
+    roundState.customProbs,
     setRoundState,
     allBets,
     allBetAmounts,
