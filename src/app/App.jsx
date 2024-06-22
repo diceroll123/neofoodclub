@@ -54,8 +54,15 @@ function App() {
 }
 
 function useRoundStateURLs() {
-  const { roundState, setRoundState, currentBet, allBetAmounts, allBets } =
-    useContext(RoundContext);
+  const {
+    roundState,
+    setRoundState,
+    currentBet,
+    allBetAmounts,
+    allBets,
+    setAllBetAmounts,
+    setAllBets,
+  } = useContext(RoundContext);
 
   useEffect(() => {
     if (roundState.currentSelectedRound === null) {
@@ -87,11 +94,23 @@ function useRoundStateURLs() {
           ? roundState.roundData
           : null,
     });
+
+    if (data.bets !== allBets[currentBet]) {
+      setAllBets({ ...allBets, [currentBet]: data.bets });
+    }
+    if (data.betAmounts !== allBetAmounts[currentBet]) {
+      setAllBetAmounts({ ...allBetAmounts, [currentBet]: data.betAmounts });
+    }
   }, [
     roundState.currentRound,
     roundState.currentSelectedRound,
     roundState.roundData,
     setRoundState,
+    allBets,
+    allBetAmounts,
+    setAllBets,
+    setAllBetAmounts,
+    currentBet,
   ]);
 
   useEffect(() => {
