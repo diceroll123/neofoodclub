@@ -9,7 +9,7 @@ function removeHtmlTags(str) {
 
 const DropZone = ({ children }) => {
   const toast = useToast();
-  const { addNewSet, allBets } = useContext(RoundContext);
+  const { addNewSet } = useContext(RoundContext);
 
   useEffect(() => {
     const handleDrop = (e) => {
@@ -49,7 +49,7 @@ const DropZone = ({ children }) => {
       document.removeEventListener("drop", handleDrop);
       document.removeEventListener("dragover", handleDragOver);
     };
-  }, [addNewSet, allBets, toast]);
+  }, [addNewSet, toast]);
 
   return <>{children}</>;
 };
