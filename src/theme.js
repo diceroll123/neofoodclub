@@ -26,6 +26,6 @@ const colors = {
   },
 };
 
-const theme = extendTheme({ config }, { colors });
+const theme = extendTheme(config, { colors });
 
 export default theme;
