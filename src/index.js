@@ -15,11 +15,11 @@ const root = ReactDOMClient.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <FaviconGenerator />
-    <StateProvider>
-      <ChakraProvider theme={theme}>
+    <ChakraProvider theme={theme}>
+      <StateProvider>
         <App />
-      </ChakraProvider>
-    </StateProvider>
+      </StateProvider>
+    </ChakraProvider>
   </React.StrictMode>
 );
 
