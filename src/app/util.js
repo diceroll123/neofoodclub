@@ -157,6 +157,9 @@ function makeBetAmountsUrl(betAmounts) {
 }
 
 export function displayAsPercent(value, decimals) {
+  if (value === undefined) {
+    return "0%";
+  }
   if (decimals === undefined) {
     return `${100 * value}%`;
   }
