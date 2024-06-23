@@ -31,23 +31,12 @@ function App() {
     roundState.currentSelectedRound
   );
 
-  // If we don't have a selected round yet, initialize it to the current round ID, once it loads in.
-  useEffect(() => {
-    if (roundState.currentSelectedRound === null && currentRound) {
-      let data = {
-        currentRound: parseInt(currentRound),
-        currentSelectedRound: parseInt(currentRound),
-      };
-      setRoundState(data);
-    }
-  }, [roundState.currentSelectedRound, currentRound, setRoundState]);
-
   useEffect(() => {
     setRoundState({
       currentRound: currentRound,
       roundData: roundData,
     });
-  }, [roundData, setRoundState, currentRound]);
+  }, [currentRound, setRoundState, roundData]);
 
   return <HomePage />;
 }
@@ -90,14 +79,13 @@ function useRoundStateURLs() {
     const isSameRound =
       parseInt(data.round) === parseInt(roundState.currentSelectedRound);
 
-    setRoundState((prevState) => ({
-      ...prevState,
+    setRoundState({
       currentSelectedRound: data.round,
-      customOdds: isSameRound ? prevState.customOdds : null,
-      customProbs: isSameRound ? prevState.customProbs : null,
+      customOdds: isSameRound ? roundState.customOdds : null,
+      customProbs: isSameRound ? roundState.customProbs : null,
       viewMode: false,
-      roundData: isSameRound ? prevState.roundData : null,
-    }));
+      roundData: isSameRound ? roundState.roundData : null,
+    });
 
     if (data.bets !== allBets[currentBet]) {
       setAllBets((prevBets) => ({ ...prevBets, [currentBet]: data.bets }));

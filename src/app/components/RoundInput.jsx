@@ -27,13 +27,16 @@ const RoundInput = () => {
     }
 
     const timeoutId = setTimeout(() => {
-      if (roundNumber === roundState.currentSelectedRound) {
-        return;
-      }
-
       let value = roundNumber;
       if (roundNumber < 1) {
         value = roundState.currentRound;
+      }
+
+      const isSameRound =
+        parseInt(value) === parseInt(roundState.currentSelectedRound);
+
+      if (isSameRound) {
+        return;
       }
 
       setRoundState({
