@@ -887,7 +887,13 @@ const BetFunctions = (props) => {
           </WrapItem>
 
           <WrapItem>
-            <ButtonGroup size="sm" isAttached variant="outline" bgColor={gray}>
+            <ButtonGroup
+              size="sm"
+              isAttached
+              variant="outline"
+              bgColor={gray}
+              isDisabled={!roundState.roundData}
+            >
               <Menu>
                 <MenuButton
                   as={Button}
