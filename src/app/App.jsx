@@ -1,6 +1,6 @@
 import "firebase/database";
 
-import React, { useEffect, useCallback, useContext } from "react";
+import React, { useEffect, useCallback, useContext, useMemo } from "react";
 import { initializeApp } from "firebase/app";
 
 import { makeBetURL, parseBetUrl } from "./util";
@@ -63,20 +63,23 @@ function useRoundStateURLs() {
     setAllBets,
   } = useContext(RoundContext);
 
-  useEffect(() => {
+  const url = useMemo(() => {
     if (roundState.currentSelectedRound === null) {
-      return;
+      return "";
     }
-
-    const url = makeBetURL(
+    return makeBetURL(
       roundState.currentSelectedRound,
       allBets[currentBet],
       allBetAmounts[currentBet],
       true
     );
+  }, [roundState.currentSelectedRound, allBets, allBetAmounts, currentBet]);
 
-    window.history.replaceState(null, "", url);
-  }, [roundState, currentBet, allBets, allBetAmounts]);
+  useEffect(() => {
+    if (url) {
+      window.history.replaceState(null, "", url);
+    }
+  }, [url]);
 
   const onHashChange = useCallback(() => {
     const data = parseBetUrl(window.location.hash.slice(1));
@@ -87,26 +90,26 @@ function useRoundStateURLs() {
     const isSameRound =
       parseInt(data.round) === parseInt(roundState.currentSelectedRound);
 
-    setRoundState({
+    setRoundState((prevState) => ({
+      ...prevState,
       currentSelectedRound: data.round,
-      customOdds: isSameRound ? roundState.customOdds : null,
-      customProbs: isSameRound ? roundState.customProbs : null,
+      customOdds: isSameRound ? prevState.customOdds : null,
+      customProbs: isSameRound ? prevState.customProbs : null,
       viewMode: false,
-      roundData: isSameRound ? roundState.roundData : null,
-    });
+      roundData: isSameRound ? prevState.roundData : null,
+    }));
 
     if (data.bets !== allBets[currentBet]) {
-      setAllBets({ ...allBets, [currentBet]: data.bets });
+      setAllBets((prevBets) => ({ ...prevBets, [currentBet]: data.bets }));
     }
     if (data.betAmounts !== allBetAmounts[currentBet]) {
-      setAllBetAmounts({ ...allBetAmounts, [currentBet]: data.betAmounts });
+      setAllBetAmounts((prevAmounts) => ({
+        ...prevAmounts,
+        [currentBet]: data.betAmounts,
+      }));
     }
   }, [
-    roundState.currentRound,
-    roundState.currentSelectedRound,
-    roundState.roundData,
-    roundState.customOdds,
-    roundState.customProbs,
+    roundState,
     setRoundState,
     allBets,
     allBetAmounts,
