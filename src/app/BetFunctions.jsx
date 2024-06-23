@@ -440,6 +440,46 @@ const BetCopyButtons = (props) => {
   );
 };
 
+const calculateBets = (roundState, usedProbabilities, ...pirates) => {
+  const maxBet = getMaxBet(roundState.currentSelectedRound);
+  let betCaps = {};
+  let betOdds = {};
+  let pirateCombos = {};
+
+  const odds = getOdds(roundState);
+  const probs = usedProbabilities;
+
+  for (let p of cartesian(...pirates)) {
+    const [a, b, c, d, e] = p;
+    const betBinary = computePiratesBinary(p);
+
+    if (betBinary === 0) {
+      // empty bet, SKIP!
+      continue;
+    }
+
+    const totalOdds =
+      odds[0][a] * odds[1][b] * odds[2][c] * odds[3][d] * odds[4][e];
+    const winChance =
+      probs[0][a] * probs[1][b] * probs[2][c] * probs[3][d] * probs[4][e];
+    const betCap = Math.ceil(1_000_000 / totalOdds);
+    const winnings = Math.min(maxBet * totalOdds, 1_000_000);
+
+    betCaps[betBinary] = betCap;
+    betOdds[betBinary] = totalOdds;
+    if (maxBet >= 50) {
+      // Net expected
+      const maxCap = Math.min(betCap, maxBet);
+      pirateCombos[betBinary] = ((winChance * winnings) / maxCap - 1) * maxCap;
+    } else {
+      // Expected return
+      pirateCombos[betBinary] = totalOdds * winChance;
+    }
+  }
+
+  return { betCaps, betOdds, pirateCombos };
+};
+
 const BetFunctions = (props) => {
   const { blue, orange, red, green, yellow, gray, getPirateBgColor, ...rest } =
     props;
@@ -466,62 +506,6 @@ const BetFunctions = (props) => {
   );
 
   const positiveArenas = arenaRatios.filter((x) => x > 0).length;
-
-  class BetsMaker {
-    #odds;
-    #probs;
-
-    constructor() {
-      this.#odds = getOdds(roundState);
-      this.#probs = usedProbabilities;
-    }
-
-    calculate(...pirates) {
-      const maxBet = getMaxBet(roundState.currentSelectedRound);
-      let betCaps = {};
-      let betOdds = {};
-      let pirateCombos = {};
-
-      for (let p of cartesian(...pirates)) {
-        const [a, b, c, d, e] = p;
-        const betBinary = computePiratesBinary(p);
-
-        if (betBinary === 0) {
-          // empty bet, SKIP!
-          continue;
-        }
-
-        const totalOdds =
-          this.#odds[0][a] *
-          this.#odds[1][b] *
-          this.#odds[2][c] *
-          this.#odds[3][d] *
-          this.#odds[4][e];
-        const winChance =
-          this.#probs[0][a] *
-          this.#probs[1][b] *
-          this.#probs[2][c] *
-          this.#probs[3][d] *
-          this.#probs[4][e];
-        const betCap = Math.ceil(1_000_000 / totalOdds);
-        const winnings = Math.min(maxBet * totalOdds, 1_000_000);
-
-        betCaps[betBinary] = betCap;
-        betOdds[betBinary] = totalOdds;
-        if (maxBet >= 50) {
-          // Net expected
-          const maxCap = Math.min(betCap, maxBet);
-          pirateCombos[betBinary] =
-            ((winChance * winnings) / maxCap - 1) * maxCap;
-        } else {
-          // Expected return
-          pirateCombos[betBinary] = totalOdds * winChance;
-        }
-      }
-
-      return { betCaps, betOdds, pirateCombos };
-    }
-  }
 
   const newEmptySet = () => {
     const amountOfBets = Object.keys(allBets[currentBet]).length;
@@ -575,8 +559,9 @@ const BetFunctions = (props) => {
   const merSet = () => {
     const maxBet = getMaxBet(roundState.currentSelectedRound);
 
-    const maker = new BetsMaker();
-    const { betCaps, pirateCombos } = maker.calculate(
+    const { betCaps, pirateCombos } = calculateBets(
+      roundState,
+      usedProbabilities,
       [0, 1, 2, 3, 4],
       [0, 1, 2, 3, 4],
       [0, 1, 2, 3, 4],
@@ -605,8 +590,9 @@ const BetFunctions = (props) => {
     const maxBet = getMaxBet(roundState.currentSelectedRound);
     const tenbetBinary = computePiratesBinary(tenbetIndices);
 
-    const maker = new BetsMaker();
-    const { betCaps, pirateCombos } = maker.calculate(
+    const { betCaps, pirateCombos } = calculateBets(
+      roundState,
+      usedProbabilities,
       [0, 1, 2, 3, 4],
       [0, 1, 2, 3, 4],
       [0, 1, 2, 3, 4],
@@ -637,8 +623,9 @@ const BetFunctions = (props) => {
   const gambitSet = () => {
     const maxBet = getMaxBet(roundState.currentSelectedRound);
 
-    const maker = new BetsMaker();
-    const { pirateCombos } = maker.calculate(
+    const { pirateCombos } = calculateBets(
+      roundState,
+      usedProbabilities,
       [1, 2, 3, 4],
       [1, 2, 3, 4],
       [1, 2, 3, 4],
@@ -660,8 +647,9 @@ const BetFunctions = (props) => {
 
   const bustproofSet = () => {
     const maxBet = getMaxBet(roundState.currentSelectedRound);
-    const maker = new BetsMaker();
-    const { betOdds } = maker.calculate(
+    const { betOdds } = calculateBets(
+      roundState,
+      usedProbabilities,
       [0, 1, 2, 3, 4],
       [0, 1, 2, 3, 4],
       [0, 1, 2, 3, 4],
@@ -793,8 +781,9 @@ const BetFunctions = (props) => {
 
   const gambitWithPirates = (pirates) => {
     const maxBet = getMaxBet(roundState.currentSelectedRound);
-    const maker = new BetsMaker();
-    const { betCaps, betOdds } = maker.calculate(
+    const { betCaps, betOdds } = calculateBets(
+      roundState,
+      usedProbabilities,
       [0, pirates[0]],
       [0, pirates[1]],
       [0, pirates[2]],
@@ -819,8 +808,9 @@ const BetFunctions = (props) => {
   const randomCrazySet = () => {
     const maxBet = getMaxBet(roundState.currentSelectedRound);
 
-    const maker = new BetsMaker();
-    const { betCaps, betOdds } = maker.calculate(
+    const { betCaps, betOdds } = calculateBets(
+      roundState,
+      usedProbabilities,
       [1, 2, 3, 4],
       [1, 2, 3, 4],
       [1, 2, 3, 4],
