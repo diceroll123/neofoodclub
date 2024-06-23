@@ -26,7 +26,7 @@ import {
 import { useScroll } from "framer-motion";
 import Cookies from "universal-cookie";
 import Moment from "react-moment";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useMemo } from "react";
 import moment from "moment";
 import NeopointIcon from "./images/np-icon.svg";
 
@@ -259,6 +259,11 @@ function HeaderContent() {
   const [currentTimestamp, setCurrentTimestamp] = useState("");
   const [winnersExist, setWinnersExist] = useState(false);
 
+  const anyWinners = useMemo(() => {
+    const winners = roundState.roundData?.winners || [];
+    return winners.some((winner) => winner > 0);
+  }, [roundState.roundData?.winners]);
+
   useEffect(() => {
     if (!roundState.roundData) {
       setIsGlowing(false);
@@ -266,9 +271,6 @@ function HeaderContent() {
     }
 
     const timestamp = roundState.roundData?.timestamp;
-    const winners = roundState.roundData?.winners || {};
-
-    const anyWinners = winners.some((winner) => winner > 0);
 
     setWinnersExist(anyWinners);
 
@@ -293,7 +295,7 @@ function HeaderContent() {
       setIsGlowing(false);
     }, 4000);
     return () => clearTimeout(timeout);
-  }, [roundState, currentTimestamp]);
+  }, [roundState, currentTimestamp, anyWinners]);
 
   return (
     <>
