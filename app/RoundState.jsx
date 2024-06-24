@@ -11,16 +11,15 @@ import {
 } from "./util";
 import DropZone from "./DropZone";
 
-const RoundContext = createContext(null);
-const { Provider } = RoundContext;
-
-const initialState = parseBetUrl(window.location.hash.slice(1));
-
-const initialViewMode =
-  Object.values(initialState.bets).filter((x) => x.some((val) => val > 0))
-    .length > 0;
+const RoundContext = createContext();
 
 const StateProvider = ({ children }) => {
+  const initialState = parseBetUrl(global?.window?.location.hash.slice(1));
+
+  const initialViewMode =
+    Object.values(initialState.bets).filter((x) => x.some((val) => val > 0))
+      .length > 0;
+
   const [roundState, setRoundState] = useReducer(reducer, {
     roundData: null,
     currentRound: null,
@@ -79,7 +78,7 @@ const StateProvider = ({ children }) => {
   };
 
   return (
-    <Provider
+    <RoundContext.Provider
       value={{
         roundState,
         setRoundState,
@@ -96,7 +95,7 @@ const StateProvider = ({ children }) => {
       }}
     >
       <DropZone>{children}</DropZone>
-    </Provider>
+    </RoundContext.Provider>
   );
 };
 

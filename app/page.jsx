@@ -1,3 +1,5 @@
+"use client";
+
 import "firebase/database";
 
 import React, { useEffect, useCallback, useContext, useMemo } from "react";
@@ -5,8 +7,13 @@ import { initializeApp } from "firebase/app";
 
 import { makeBetURL, parseBetUrl } from "./util";
 import HomePage from "./HomePage";
-import { RoundContext } from "./RoundState";
 import useRoundData from "./useRoundData";
+import { ChakraProvider } from "@chakra-ui/react";
+import theme from "./theme";
+import FaviconGenerator from "./FaviconGenerator";
+import Head from "next/head";
+
+import { RoundContext, StateProvider } from "./RoundState";
 
 const config = {
   apiKey: "AIzaSyA1AJzRRbOTh7iVZi4DfK9lBuSJnfTTbr4",
@@ -21,7 +28,23 @@ const config = {
 
 const firebase = initializeApp(config);
 
-function App() {
+export default function App() {
+  return (
+    <>
+      <Head>
+        <link rel="icon" />
+      </Head>
+      <FaviconGenerator />
+      <ChakraProvider theme={theme}>
+        <StateProvider>
+          <Home />
+        </StateProvider>
+      </ChakraProvider>
+    </>
+  );
+}
+
+function Home() {
   const { roundState, setRoundState } = useContext(RoundContext);
 
   useRoundStateURLs();
@@ -111,5 +134,3 @@ function useRoundStateURLs() {
     return () => window.removeEventListener("hashchange", onHashChange);
   }, [onHashChange]);
 }
-
-export default App;

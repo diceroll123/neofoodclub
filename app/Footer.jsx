@@ -12,13 +12,13 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import * as React from "react";
-import NeopointIcon from "./images/np-icon.svg";
+import NeopointIcon from "../public/images/np-icon.svg";
 import { VercelCredit } from "./components/VercelCredit";
 
 function Logo() {
   return (
     <Stack direction="row">
-      <Box as="img" src={NeopointIcon} height="1.5em" width="1.5em" />
+      <Box as="img" src={NeopointIcon.src} height="1.5em" width="1.5em" />
       <Heading as="h1" fontFamily="heading" fontWeight="bold" fontSize="xl">
         NeoFoodClub
       </Heading>

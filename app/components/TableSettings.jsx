@@ -253,7 +253,7 @@ const CopyWithDomain = () => {
 
   return (
     <Tooltip
-      label={`Include domain when copying bets\n(${window.location.origin}/)`}
+      label={`Include domain when copying bets\n(${global?.window?.location.origin}/)`}
       openDelay="600"
     >
       <Button

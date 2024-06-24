@@ -28,7 +28,7 @@ import Cookies from "universal-cookie";
 import Moment from "react-moment";
 import React, { useContext, useEffect, useState, useMemo } from "react";
 import moment from "moment";
-import NeopointIcon from "./images/np-icon.svg";
+import NeopointIcon from "../public/images/np-icon.svg";
 
 import {
   calculateBaseMaxBet,
@@ -211,14 +211,14 @@ function MaxBetInput() {
   );
 }
 
-function TitleHeading(props) {
+function TitleHeading() {
   return (
     <>
       <HStack display={{ base: "none", md: "block" }}>
         <Center>
           <Box
             as="img"
-            src={NeopointIcon}
+            src={NeopointIcon.src}
             height="1.5em"
             width="1.5em"
             display={{ base: "none", md: "inline-block" }}
