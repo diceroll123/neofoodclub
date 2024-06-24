@@ -32,7 +32,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "eslintConfig": {
     "extends": [
@@ -53,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^14.2.4",
     "eslint-plugin-react-hooks": "^4.6.2"
   }
 }
