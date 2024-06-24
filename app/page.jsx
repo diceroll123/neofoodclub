@@ -29,6 +29,12 @@ const config = {
 const firebase = initializeApp(config);
 
 export default function App() {
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js");
+    }
+  }, []);
+
   return (
     <>
       <Head>
