@@ -9,6 +9,7 @@ cp ./output/javascript.js ../src/app/constants_logit.js
 
 # stage the changes
 git add ./output/
+git add ./raw_json/
 git add ../src/app/constants_logit.js
 
 # commit the changes
