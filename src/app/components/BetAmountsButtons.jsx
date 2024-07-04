@@ -41,6 +41,26 @@ const BetAmountsButtons = (props) => {
     setAllBetAmounts({ ...allBetAmounts, [currentBet]: betAmounts });
   };
 
+  const updateBetAmounts = (amount) => {
+    // amount should be either -2 or 2
+    let betAmounts = { ...allBetAmounts[currentBet] };
+    for (let index in allBetAmounts[currentBet]) {
+      if (betBinaries[index] > 0) {
+        betAmounts[index] += amount;
+      }
+
+      if (betAmounts[index] < 50) {
+        betAmounts[index] = -1000;
+      }
+
+      betAmounts[index] = Math.min(betAmounts[index], 500000);
+    }
+    setAllBetAmounts({ ...allBetAmounts, [currentBet]: betAmounts });
+  };
+
+  const increment = () => updateBetAmounts(2);
+  const decrement = () => updateBetAmounts(-2);
+
   return (
     <>
       <Stack>
@@ -95,6 +115,24 @@ const BetAmountsButtons = (props) => {
           >
             Clear
           </Button>
+
+          <ButtonGroup size="sm" colorScheme="purple">
+            <Tooltip
+              label="Increment all bet amounts by 2"
+              openDelay="600"
+              placement="top"
+            >
+              <Button onClick={increment}>+2</Button>
+            </Tooltip>
+
+            <Tooltip
+              label="Decrement all bet amounts by 2"
+              openDelay="600"
+              placement="top"
+            >
+              <Button onClick={decrement}>-2</Button>
+            </Tooltip>
+          </ButtonGroup>
         </ButtonGroup>
       </Stack>
     </>
