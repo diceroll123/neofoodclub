@@ -27,3 +27,4 @@ yarn-error.log*
 public/rounds/
 
 __pycache__/
+.env
