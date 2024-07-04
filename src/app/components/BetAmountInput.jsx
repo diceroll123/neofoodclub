@@ -27,7 +27,7 @@ export default function BetAmountInput(props) {
   useEffect(() => {
     let value = parseInt(tempMaxBet);
 
-    if (value === allBetAmounts[currentBet][betIndex + 1]) {
+    if (value === allBetAmounts[currentBet][betIndex + 1] || isNaN(value)) {
       return;
     }
 
