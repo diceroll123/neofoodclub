@@ -1044,20 +1044,23 @@ const BetBadges = (props) => {
     );
     isInvalid = true;
   }
-  Object.values(betOdds).forEach((odds, index) => {
-    // invalid bet amounts
+
+  const invalidBetAmounts = Object.values(betOdds).filter((odds, index) => {
     if (odds > 0 && betAmounts) {
       let betAmount = betAmounts[index + 1];
-      if (betAmount !== -1000 && betAmount < 50) {
-        badges.push(
-          <Badge colorScheme="red" variant="subtle">
-            ❌ Invalid bet amounts
-          </Badge>
-        );
-        isInvalid = true;
-      }
+      return betAmount !== -1000 && betAmount < 50;
     }
+    return false;
   });
+
+  if (invalidBetAmounts.length > 0) {
+    badges.push(
+      <Badge colorScheme="red" variant="subtle">
+        ❌ Invalid bet amounts
+      </Badge>
+    );
+    isInvalid = true;
+  }
 
   // round-over badges
   if (isRoundOver && roundState.roundData) {
@@ -1103,7 +1106,7 @@ const BetBadges = (props) => {
   }
 
   // bust chance badge
-  if (betCount > 0 && roundState.roundData && !isRoundOver && !isInvalid) {
+  if (betCount > 0 && roundState.roundData && !isRoundOver) {
     let bustChance = 0;
     let bustEmoji = "";
 
@@ -1155,7 +1158,7 @@ const BetBadges = (props) => {
   }
 
   // gambit badge
-  if (betCount >= 2 && roundState.roundData && !isInvalid) {
+  if (betCount >= 2 && roundState.roundData) {
     let highest = Math.max(...Object.values(betBinaries));
     let populationCount = highest.toString(2).match(/1/g).length;
     if (populationCount === 5) {
@@ -1181,7 +1184,7 @@ const BetBadges = (props) => {
   }
 
   // tenbet badge
-  if (betCount >= 10 && roundState.roundData && !isInvalid) {
+  if (betCount >= 10 && roundState.roundData) {
     let tenbetBinary = Object.values(betBinaries).reduce(
       (accum, current) => accum & current
     );
@@ -1204,7 +1207,7 @@ const BetBadges = (props) => {
   }
 
   // crazy badge
-  if (betCount >= 10 && roundState.roundData && !isInvalid) {
+  if (betCount >= 10 && roundState.roundData) {
     let isCrazy = Object.values(betBinaries).every((binary) =>
       computeBinaryToPirates(binary).every((x) => x > 0)
     );
