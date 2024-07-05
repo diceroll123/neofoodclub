@@ -17,6 +17,8 @@ module.exports = async (req, res) => {
     const data = await s3.getObject(params).promise();
     const jsonData = JSON.parse(data.Body.toString("utf-8"));
 
+    res.setHeader("Cache-Control", "public, max-age=15");
+
     res.status(200).json(jsonData);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch data" });
