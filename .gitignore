@@ -28,3 +28,4 @@ public/rounds/
 
 __pycache__/
 .env
+.vercel
