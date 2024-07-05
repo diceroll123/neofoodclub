@@ -9,6 +9,10 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: "Round parameter is required" });
   }
 
+  if (!/^\d+$/.test(round)) {
+    return res.status(400).json({ error: "Round parameter must be a number" });
+  }
+
   try {
     const params = {
       Bucket: BUCKET_NAME,
