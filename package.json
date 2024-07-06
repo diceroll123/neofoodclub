@@ -14,7 +14,6 @@
     "aws-sdk": "^2.1654.0",
     "chart.js": "^4.4.3",
     "chartjs-plugin-annotation": "^3.0.1",
-    "firebase": "^10.12.2",
     "framer-motion": "11.2.11",
     "immer": "^10.1.1",
     "moment": "^2.30.1",

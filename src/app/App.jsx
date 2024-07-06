@@ -1,25 +1,9 @@
-import "firebase/database";
-
 import React, { useEffect, useCallback, useContext, useMemo } from "react";
-import { initializeApp } from "firebase/app";
 
 import { makeBetURL, parseBetUrl } from "./util";
 import HomePage from "./HomePage";
 import { RoundContext } from "./RoundState";
 import useRoundData from "./useRoundData";
-
-const config = {
-  apiKey: "AIzaSyA1AJzRRbOTh7iVZi4DfK9lBuSJnfTTbr4",
-  authDomain: "neofoodclub.firebaseapp.com",
-  databaseURL: "https://neofoodclub-default-rtdb.firebaseio.com",
-  projectId: "neofoodclub",
-  storageBucket: "neofoodclub.appspot.com",
-  messagingSenderId: "1085231429788",
-  appId: "1:1085231429788:web:6a5ce4dbe8a5021e64d559",
-  measurementId: "G-TPEBSBBBTR",
-};
-
-const firebase = initializeApp(config);
 
 function App() {
   const { roundState, setRoundState } = useContext(RoundContext);
@@ -27,7 +11,6 @@ function App() {
   useRoundStateURLs();
 
   const [currentRound, roundData] = useRoundData(
-    firebase,
     roundState.currentSelectedRound
   );
 
