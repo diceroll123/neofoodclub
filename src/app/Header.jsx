@@ -289,8 +289,11 @@ function HeaderContent() {
       return;
     }
 
+    if (currentTimestamp !== timestamp) {
+      setIsGlowing(true);
+    }
+
     setCurrentTimestamp(timestamp);
-    setIsGlowing(true);
     const timeout = setTimeout(() => {
       setIsGlowing(false);
     }, 4000);
