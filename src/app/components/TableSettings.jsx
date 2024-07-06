@@ -1,4 +1,6 @@
 import {
+  Box,
+  Badge,
   HStack,
   RadioGroup,
   Stack,
@@ -197,7 +199,12 @@ const NormalExtras = (props) => {
         >
           FA Details
         </Checkbox>
-        <Checkbox isDisabled>Odds Timeline</Checkbox>
+        <Box>
+          <Checkbox isDisabled>Odds Timeline</Checkbox>
+          <Badge ml={2} colorScheme="blue">
+            SOON!
+          </Badge>
+        </Box>
       </Stack>
     </ExtraBox>
   );
