@@ -10,7 +10,9 @@ export default function useRoundData(currentSelectedRound) {
   // When the page first loads, if there's no round selected yet, get the current round number
   useEffect(() => {
     const fetchCurrentRound = async () => {
-      const currentRoundResponse = await fetch("/api/fetch-current-round");
+      const currentRoundResponse = await fetch(
+        `https://neofoodclub.b-cdn.net/current_round.txt`
+      );
       const currentRoundData = await currentRoundResponse.text();
       if (/\d+/.test(currentRoundData)) {
         setCurrentRound(parseInt(currentRoundData));
@@ -33,7 +35,7 @@ export default function useRoundData(currentSelectedRound) {
       }
       try {
         const response = await fetch(
-          `/api/fetch-round/?round=${currentSelectedRound}`
+          `https://neofoodclub.b-cdn.net/rounds/${currentSelectedRound}.json`
         );
         const data = await response.json();
         if (!response.ok) {
