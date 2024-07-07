@@ -913,7 +913,7 @@ export default function EditBets(props) {
         <Box bgColor={blue} p={4}>
           <Button
             leftIcon={<Icon as={FaEdit} />}
-            variant="ghost"
+            colorScheme="blackAlpha"
             onClick={() => {
               setRoundState({ viewMode: false });
             }}
