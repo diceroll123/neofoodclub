@@ -1,6 +1,4 @@
 import {
-  Box,
-  Badge,
   HStack,
   RadioGroup,
   Stack,
@@ -125,6 +123,7 @@ const NormalExtras = (props) => {
   const [bigBrain, setBigBrain] = useState(true);
   const [faDetails, setFaDetails] = useState(false);
   const [customOddsMode, setCustomOddsMode] = useState(false);
+  const [oddsTimeline, setOddsTimeline] = useState(false);
 
   const brainSize = bigBrain ? "2em" : "1em";
 
@@ -199,12 +198,24 @@ const NormalExtras = (props) => {
         >
           FA Details
         </Checkbox>
-        <Box>
-          <Checkbox isDisabled>Odds Timeline</Checkbox>
-          <Badge ml={2} colorScheme="blue">
-            SOON!
-          </Badge>
-        </Box>
+        <Checkbox
+          isChecked={oddsTimeline}
+          isDisabled={
+            !(roundState.roundData?.foods && bigBrain) || notUsingNormal
+          }
+          onChange={(e) => {
+            let checked = e.target.checked;
+            setOddsTimeline(checked);
+            setRoundState({
+              advanced: {
+                ...roundState.advanced,
+                oddsTimeline: checked,
+              },
+            });
+          }}
+        >
+          Odds Timeline
+        </Checkbox>
       </Stack>
     </ExtraBox>
   );
