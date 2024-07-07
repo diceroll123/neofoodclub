@@ -79,7 +79,7 @@ export default function useRoundData(currentSelectedRound) {
       clearInterval(interval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [toast, currentSelectedRound, setRoundData]);
+  }, [toast, currentSelectedRound, currentRound, setRoundData]);
 
   return [currentRound, roundData];
 }
