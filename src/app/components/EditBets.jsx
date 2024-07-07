@@ -413,6 +413,8 @@ const NormalTable = (props) => {
     setAllBets({ ...allBets, [currentBet]: newBets });
   };
 
+  const amountOfChanges = (roundState?.roundData?.changes || []).length;
+
   return (
     <Table size="sm" width="auto">
       <Thead>
@@ -453,7 +455,8 @@ const NormalTable = (props) => {
           </CustomOddsElement>
           {roundState.advanced.oddsTimeline ? (
             <BigBrainElement as={Th} w="300px">
-              Odds Timeline
+              Odds Timeline ({amountOfChanges} change
+              {amountOfChanges === 1 ? "" : "s"})
             </BigBrainElement>
           ) : null}
           {[...Array(amountOfBets)].map((_e, i) => {
