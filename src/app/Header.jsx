@@ -3,8 +3,8 @@ import {
   Center,
   CircularProgress,
   CircularProgressLabel,
-  Container,
   Divider,
+  Flex,
   Heading,
   HStack,
   InputGroup,
@@ -17,7 +17,6 @@ import {
   Skeleton,
   SkeletonText,
   Spacer,
-  Stack,
   Text,
   useColorModeValue,
   useToast,
@@ -44,7 +43,7 @@ function PreviousRoundInfo() {
   const { roundState } = useContext(RoundContext);
 
   return (
-    <Text as={Box} fontSize="xs" display={{ sm: "none", md: "block" }}>
+    <Text as={Box} fontSize="xs">
       <VStack>
         <>Round {roundState.currentSelectedRound} ended</>
         <Moment
@@ -136,7 +135,7 @@ function RoundInfo() {
     element = <CurrentRoundInfo />;
   }
 
-  return <Box display={{ base: "none", sm: "block" }}>{element}</Box>;
+  return element;
 }
 
 function MaxBetInput() {
@@ -240,7 +239,6 @@ function TitleHeading(props) {
             fontSize="xl"
             display={{
               base: "none",
-              sm: "none",
               md: "inline-block",
               lg: "none",
             }}
@@ -302,21 +300,12 @@ function HeaderContent() {
 
   return (
     <>
-      <Stack
-        as={Container}
-        maxW={"7xl"}
-        py={4}
-        direction={"row"}
-        spacing={4}
-        justify={"space-between"}
-        align={"center"}
-      >
+      <HStack p={4} spacing={4} as={Flex}>
         <TitleHeading />
         <Spacer />
 
         <Box
           p={2}
-          h="4.5rem"
           maxW="lg"
           borderWidth="1px"
           borderRadius="md"
@@ -337,7 +326,7 @@ function HeaderContent() {
           </HStack>
         </Box>
         <Spacer />
-      </Stack>
+      </HStack>
     </>
   );
 }
