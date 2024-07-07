@@ -44,6 +44,9 @@ export default function useRoundData(currentSelectedRound) {
         if (data?.winners[0] > 0) {
           // we don't need to keep polling if the round has ended
           dontLoop = true;
+          if (currentSelectedRound === currentRound) {
+            setCurrentRound(currentSelectedRound + 1);
+          }
         }
       } catch (error) {
         toast({
