@@ -32,7 +32,7 @@ import {
 import React, { useContext } from "react";
 import moment from "moment";
 import "moment-timezone";
-import { FaSackDollar, FaCirclePlay, FaSkullCrossbones } from "react-icons/fa6";
+import { FaSackDollar, FaUtensils, FaSkullCrossbones } from "react-icons/fa6";
 
 import {
   ARENA_NAMES,
@@ -276,7 +276,9 @@ const OddsTimeline = (props) => {
             <Stack divider={<StackDivider />} spacing="4">
               <Box>
                 <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-                  <Icon boxSize={10} as={FaCirclePlay} color="blue.500" />
+                  <Circle boxSize={10} bgColor="blue.500">
+                    <Icon as={FaUtensils} boxSize={6} />
+                  </Circle>
                   <Box>
                     <Heading size="sm">
                       Round started{" - "}
