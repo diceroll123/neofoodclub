@@ -449,17 +449,21 @@ const NormalTable = (props) => {
           <Th>
             <TextTooltip text="Curr" label="Current Odds" />
           </Th>
-          <CustomOddsElement as={Th}>
-            <TextTooltip text="Custom Odds" />
+          <CustomOddsElement as={Th} whiteSpace="nowrap">
+            Custom Odds
           </CustomOddsElement>
           {roundState.advanced.oddsTimeline ? (
-            <BigBrainElement as={Th} w="300px">
+            <BigBrainElement as={Th} minW="300px">
               Odds Timeline ({amountOfChanges} change
               {amountOfChanges === 1 ? "" : "s"})
             </BigBrainElement>
           ) : null}
           {[...Array(amountOfBets)].map((_e, i) => {
-            return <Th key={i}>Bet {i + 1}</Th>;
+            return (
+              <Th key={i} whiteSpace="nowrap">
+                Bet {i + 1}
+              </Th>
+            );
           })}
           <Th>
             <ClearBetsButton />
@@ -530,14 +534,16 @@ const NormalTable = (props) => {
                   {[...Array(amountOfBets)].map((_bet, betNum) => {
                     return (
                       <Td key={betNum} backgroundColor={gray}>
-                        <Radio
-                          name={`bet${betNum + 1}${arenaId}`}
-                          value={0}
-                          onChange={() => changeBet(betNum + 1, arenaId, 0)}
-                          isChecked={
-                            allBets[currentBet][betNum + 1][arenaId] === 0
-                          }
-                        />
+                        <center>
+                          <Radio
+                            name={`bet${betNum + 1}${arenaId}`}
+                            value={0}
+                            onChange={() => changeBet(betNum + 1, arenaId, 0)}
+                            isChecked={
+                              allBets[currentBet][betNum + 1][arenaId] === 0
+                            }
+                          />
+                        </center>
                       </Td>
                     );
                   })}
@@ -700,17 +706,19 @@ const NormalTable = (props) => {
                   {[...Array(amountOfBets)].map((_bet, betNum) => {
                     return (
                       <Td key={betNum}>
-                        <Radio
-                          name={`bet${betNum + 1}${arenaId}`}
-                          value={pirateIndex + 1}
-                          onChange={() =>
-                            changeBet(betNum + 1, arenaId, pirateIndex + 1)
-                          }
-                          isChecked={
-                            allBets[currentBet][betNum + 1][arenaId] ===
-                            pirateIndex + 1
-                          }
-                        />
+                        <center>
+                          <Radio
+                            name={`bet${betNum + 1}${arenaId}`}
+                            value={pirateIndex + 1}
+                            onChange={() =>
+                              changeBet(betNum + 1, arenaId, pirateIndex + 1)
+                            }
+                            isChecked={
+                              allBets[currentBet][betNum + 1][arenaId] ===
+                              pirateIndex + 1
+                            }
+                          />
+                        </center>
                       </Td>
                     );
                   })}
