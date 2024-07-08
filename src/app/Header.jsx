@@ -46,10 +46,13 @@ function PreviousRoundInfo() {
     <Text as={Box} fontSize="xs">
       <VStack>
         <>Round {roundState.currentSelectedRound} ended</>
-        <Moment
-          format="YYYY-MM-DD hh:mm:ss A"
-          date={roundState.roundData.timestamp}
-        />
+        <>
+          <Moment
+            format="YYYY-MM-DD hh:mm:ss A [NST]"
+            date={roundState.roundData.timestamp}
+            tz="America/Los_Angeles"
+          />
+        </>
       </VStack>
     </Text>
   );

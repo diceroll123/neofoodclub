@@ -282,10 +282,9 @@ const OddsTimeline = (props) => {
                   <Box>
                     <Heading size="sm">
                       Round started{" - "}
-                      <Moment tz="America/Los_Angeles" format="LTS">
+                      <Moment tz="America/Los_Angeles" format="LTS [NST]">
                         {start}
-                      </Moment>{" "}
-                      NST
+                      </Moment>
                     </Heading>
                     <Text as="i">
                       {pirateName} opened at {openingOdds}:1
@@ -318,10 +317,9 @@ const OddsTimeline = (props) => {
                       <Spacer />
 
                       <Text as="i" fontSize="xs">
-                        <Moment tz="America/Los_Angeles" format="LTS">
+                        <Moment tz="America/Los_Angeles" format="LTS [NST]">
                           {change.t}
-                        </Moment>{" "}
-                        NST
+                        </Moment>
                       </Text>
                     </Flex>
                   </Box>
@@ -343,10 +341,9 @@ const OddsTimeline = (props) => {
                       <Box>
                         <Heading size="sm">
                           Round Over{" - "}
-                          <Moment tz="America/Los_Angeles" format="LTS">
+                          <Moment tz="America/Los_Angeles" format="LTS [NST]">
                             {endTime}
-                          </Moment>{" "}
-                          NST
+                          </Moment>
                         </Heading>
                         <Stack spacing={0}>
                           <Text as="i">
