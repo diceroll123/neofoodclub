@@ -102,8 +102,14 @@ export function parseBetUrl(url) {
     betAmounts[index] = tempBetAmounts[index] || -1000;
   }
 
+  let round = urlParams.get("round");
+
+  if (!/^\d+$/.test(round)) {
+    round = "";
+  }
+
   return {
-    round: urlParams.get("round"),
+    round: round,
     bets: bets,
     betAmounts: betAmounts,
   };
