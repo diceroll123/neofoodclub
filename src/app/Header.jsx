@@ -3,10 +3,10 @@ import {
   Center,
   CircularProgress,
   CircularProgressLabel,
-  Divider,
   Flex,
   Heading,
   HStack,
+  Icon,
   InputGroup,
   InputLeftAddon,
   NumberDecrementStepper,
@@ -17,7 +17,9 @@ import {
   Skeleton,
   SkeletonText,
   Spacer,
+  StackDivider,
   Text,
+  Tooltip,
   useColorModeValue,
   useToast,
   VStack,
@@ -36,6 +38,8 @@ import {
 } from "./util";
 import { RoundContext } from "./RoundState";
 import RoundInput from "./components/RoundInput";
+import { FaSync } from "react-icons/fa";
+import { FaClockRotateLeft } from "react-icons/fa6";
 
 moment.relativeTimeThreshold("ss", 0);
 
@@ -96,34 +100,45 @@ function CurrentRoundInfo() {
   }
 
   return (
-    <Box textAlign="left">
-      <Text fontSize="xs" as={element}>
-        Last Update:{" "}
-        <Moment
-          date={roundState.roundData.timestamp}
-          fromNow
-          withTitle
-          titleFormat="LLL"
-          interval={1}
-        />
-      </Text>
+    <VStack divider={<StackDivider />} spacing={1} minW="140px">
+      <HStack>
+        <Tooltip label="Last Update">
+          <div>
+            <Icon as={FaSync} />
+          </div>
+        </Tooltip>
+        <Text fontSize="xs" as={element} minW="100px">
+          <Moment
+            date={roundState.roundData.timestamp}
+            tz={"America/Los_Angeles"}
+            fromNow
+            withTitle
+            titleFormat="LLL [NST]"
+            interval={1}
+          />
+        </Text>
+      </HStack>
       {roundState.roundData.lastChange &&
         roundState.roundData.start !== roundState.roundData.lastChange && (
-          <>
-            <Divider my={1} />
-            <Text fontSize="xs">
-              Last Change:{" "}
+          <HStack>
+            <Tooltip label="Last Change">
+              <div>
+                <Icon as={FaClockRotateLeft} />
+              </div>
+            </Tooltip>
+            <Text fontSize="xs" minW="100px">
               <Moment
                 date={roundState.roundData.lastChange}
+                tz={"America/Los_Angeles"}
                 fromNow
                 withTitle
-                titleFormat="LLL"
+                titleFormat="LLL [NST]"
                 interval={1}
               />
             </Text>
-          </>
+          </HStack>
         )}
-    </Box>
+    </VStack>
   );
 }
 
