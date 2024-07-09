@@ -28,6 +28,7 @@ import {
   Stack,
   StackDivider,
   Spacer,
+  VStack,
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 import moment from "moment";
@@ -264,9 +265,11 @@ const OddsTimeline = (props) => {
                 <Text as="i" fontSize="md">
                   Round {roundState.roundData.round}
                   {" - "}
-                  <Moment tz="America/Los_Angeles" format="dddd, MMMM Do YYYY">
-                    {start}
-                  </Moment>
+                  <Moment
+                    tz="America/Los_Angeles"
+                    format="dddd, MMMM Do YYYY"
+                    date={start}
+                  />
                 </Text>
               </Box>
             </Flex>
@@ -282,9 +285,11 @@ const OddsTimeline = (props) => {
                   <Box>
                     <Heading size="sm">
                       Round started{" - "}
-                      <Moment tz="America/Los_Angeles" format="LTS [NST]">
-                        {start}
-                      </Moment>
+                      <Moment
+                        tz="America/Los_Angeles"
+                        format="LTS [NST]"
+                        date={start}
+                      />
                     </Heading>
                     <Text as="i">
                       {pirateName} opened at {openingOdds}:1
@@ -316,11 +321,27 @@ const OddsTimeline = (props) => {
                       </Box>
                       <Spacer />
 
-                      <Text as="i" fontSize="xs">
-                        <Moment tz="America/Los_Angeles" format="LTS [NST]">
-                          {change.t}
-                        </Moment>
-                      </Text>
+                      <VStack spacing={0}>
+                        <Text as="i" fontSize="xs">
+                          <Moment
+                            tz="America/Los_Angeles"
+                            format="LTS [NST]"
+                            date={change.t}
+                            withTitle
+                            titleFormat="LLL [NST]"
+                          />
+                        </Text>
+                        <Text as="i" fontSize="xs" hidden={isRoundOver}>
+                          <Moment
+                            tz="America/Los_Angeles"
+                            date={change.t}
+                            fromNow
+                            withTitle
+                            titleFormat="LLL [NST]"
+                            interval={1}
+                          />
+                        </Text>
+                      </VStack>
                     </Flex>
                   </Box>
                 );
@@ -341,9 +362,11 @@ const OddsTimeline = (props) => {
                       <Box>
                         <Heading size="sm">
                           Round Over{" - "}
-                          <Moment tz="America/Los_Angeles" format="LTS [NST]">
-                            {endTime}
-                          </Moment>
+                          <Moment
+                            tz="America/Los_Angeles"
+                            format="LTS [NST]"
+                            date={endTime}
+                          />
                         </Heading>
                         <Stack spacing={0}>
                           <Text as="i">
@@ -362,9 +385,8 @@ const OddsTimeline = (props) => {
                             <Moment
                               tz="America/Los_Angeles"
                               format="dddd, MMMM Do YYYY"
-                            >
-                              {endTime}
-                            </Moment>
+                              date={endTime}
+                            />
                           </Text>
                         </Stack>
                       </Box>
