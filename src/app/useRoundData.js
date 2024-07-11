@@ -11,7 +11,7 @@ export default function useRoundData(currentSelectedRound) {
   useEffect(() => {
     const fetchCurrentRound = async () => {
       const currentRoundResponse = await fetch(
-        `https://neofoodclub.b-cdn.net/current_round.txt`
+        `https://cdn.neofood.club/current_round.txt`
       );
       const currentRoundData = await currentRoundResponse.text();
       if (/\d+/.test(currentRoundData)) {
@@ -35,7 +35,7 @@ export default function useRoundData(currentSelectedRound) {
       }
       try {
         const response = await fetch(
-          `https://neofoodclub.b-cdn.net/rounds/${currentSelectedRound}.json`
+          `https://cdn.neofood.club/rounds/${currentSelectedRound}.json`
         );
         const data = await response.json();
         if (!response.ok) {
