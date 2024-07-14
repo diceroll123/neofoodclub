@@ -27,7 +27,18 @@ export default function useRoundData(currentSelectedRound) {
       return;
     }
 
+    const currentSelectedRoundInt = parseInt(currentSelectedRound);
+
     let dontLoop = false;
+    let intervalMs = 5000;
+
+    if (currentSelectedRoundInt === currentRound) {
+      // If the selected round is the current round, we poll every 5 seconds
+      intervalMs = 5000;
+    } else if (currentSelectedRoundInt === currentRound - 1) {
+      // If the selected round is the previous round, we poll every minute
+      intervalMs = 60000;
+    }
 
     const fetchRoundData = async () => {
       if (dontLoop) {
@@ -35,7 +46,7 @@ export default function useRoundData(currentSelectedRound) {
       }
       try {
         const response = await fetch(
-          `https://cdn.neofood.club/rounds/${currentSelectedRound}.json`
+          `https://cdn.neofood.club/rounds/${currentSelectedRoundInt}.json`
         );
         const data = await response.json();
         if (!response.ok) {
@@ -44,15 +55,18 @@ export default function useRoundData(currentSelectedRound) {
         setRoundData(data);
 
         if (data?.winners[0] > 0) {
-          // we don't need to keep polling if the round has ended
-          dontLoop = true;
-          if (currentSelectedRound === currentRound) {
-            setCurrentRound(currentSelectedRound + 1);
+          if (currentSelectedRoundInt === currentRound) {
+            setCurrentRound(currentSelectedRoundInt + 1);
+          }
+
+          if (currentSelectedRoundInt < currentRound - 1) {
+            // if the round is older than the previous round, we stop polling
+            dontLoop = true;
           }
         }
       } catch (error) {
         toast({
-          title: `Failed to fetch round ${currentSelectedRound}`,
+          title: `Failed to fetch round ${currentSelectedRoundInt}`,
           description: "Please try again later.",
           status: "error",
           duration: 3000,
@@ -62,14 +76,14 @@ export default function useRoundData(currentSelectedRound) {
     };
 
     fetchRoundData(); // Fetch immediately when the round is selected
-    let interval = setInterval(fetchRoundData, 5000);
+    let interval = setInterval(fetchRoundData, intervalMs);
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
         clearInterval(interval);
       } else {
         fetchRoundData(); // Fetch immediately when the page becomes visible
-        interval = setInterval(fetchRoundData, 5000);
+        interval = setInterval(fetchRoundData, intervalMs);
       }
     };
 
