@@ -14,7 +14,6 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Skeleton,
   SkeletonText,
   Spacer,
   StackDivider,
@@ -171,60 +170,58 @@ function MaxBetInput() {
   }, [roundState.currentSelectedRound]);
 
   return (
-    <Skeleton isLoaded={roundState.roundData}>
-      <InputGroup size="xs">
-        <InputLeftAddon children="Max Bet" />
-        <NumberInput
-          value={tempMaxBet.toString()}
-          onChange={(value) => setTempMaxBet(value)}
-          onFocus={(e) => {
-            setHasFocus(true);
-            e.target.select();
-          }}
-          onBlur={(e) => {
-            setHasFocus(false);
-            let value = parseInt(e.target.value);
-            if (value === tempMaxBet) {
-              // don't save over it if it's the same
-              return;
-            }
+    <InputGroup size="xs">
+      <InputLeftAddon children="Max Bet" />
+      <NumberInput
+        value={tempMaxBet.toString()}
+        onChange={(value) => setTempMaxBet(value)}
+        onFocus={(e) => {
+          setHasFocus(true);
+          e.target.select();
+        }}
+        onBlur={(e) => {
+          setHasFocus(false);
+          let value = parseInt(e.target.value);
+          if (value === tempMaxBet) {
+            // don't save over it if it's the same
+            return;
+          }
 
-            if (isNaN(value) || value < 50) {
-              value = -1000;
-            }
+          if (isNaN(value) || value < 50) {
+            value = -1000;
+          }
 
-            setTempMaxBet(value);
+          setTempMaxBet(value);
 
-            let baseMaxBet = calculateBaseMaxBet(
-              value,
-              roundState.currentSelectedRound
-            );
-            cookies.set("baseMaxBet", baseMaxBet, {
-              expires: moment().add(100, "years").toDate(),
-            });
+          let baseMaxBet = calculateBaseMaxBet(
+            value,
+            roundState.currentSelectedRound
+          );
+          cookies.set("baseMaxBet", baseMaxBet, {
+            expires: moment().add(100, "years").toDate(),
+          });
 
-            toast.closeAll();
-            toast({
-              title: `Max Bet Saved!`,
-              status: "success",
-              duration: 2000,
-              isClosable: true,
-            });
-          }}
-          min={-1000}
-          max={500000}
-          allowMouseWheel
-        >
-          <NumberInputField />
-          {hasFocus && (
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          )}
-        </NumberInput>
-      </InputGroup>
-    </Skeleton>
+          toast.closeAll();
+          toast({
+            title: `Max Bet Saved!`,
+            status: "success",
+            duration: 2000,
+            isClosable: true,
+          });
+        }}
+        min={-1000}
+        max={500000}
+        allowMouseWheel
+      >
+        <NumberInputField />
+        {hasFocus && (
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        )}
+      </NumberInput>
+    </InputGroup>
   );
 }
 
