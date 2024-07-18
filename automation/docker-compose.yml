@@ -5,3 +5,4 @@ services:
     image: nfc_values
     volumes:
       - ${PWD}:/app
+    mem_limit: 15g
