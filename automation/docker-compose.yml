@@ -1,8 +1,10 @@
-version: '3.8'
-
 services:
   nfc_values:
-    image: nfc_values
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - ${PWD}:/app
     mem_limit: 15g
+    stop_signal: SIGINT
+    command: ['./runner.sh']

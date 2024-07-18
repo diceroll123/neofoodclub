@@ -8,9 +8,6 @@ RUN /install.sh && rm /install.sh
 COPY requirements.txt /tmp/requirements.txt
 RUN /root/.cargo/bin/uv pip install --system --no-cache -r /tmp/requirements.txt
 
-
 # copy the app
 COPY . /app
 WORKDIR /app
-
-CMD rm -rf ./output && mkdir ./output && python -u grab_rounds.py && python preprocessing.py && python final.py
