@@ -2,6 +2,6 @@
 
 rm -rf ./output
 mkdir ./output
-python -u grab_rounds.py
-python preprocessing.py
-python final.py
+uv run grab_rounds.py
+uv run preprocessing.py
+uv run final.py

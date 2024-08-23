@@ -1,3 +1,11 @@
+# /// script
+# requires-python = ">=3.9"
+# dependencies = [
+#     "numpy",
+#     "pandas",
+#     "pylogit",
+# ]
+# ///
 from collections import OrderedDict
 from pathlib import Path
 

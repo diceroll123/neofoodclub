@@ -1,7 +1,0 @@
-pandas
-statsmodels
-numpy
-scipy
-pylogit
-scikit-learn
-requests

@@ -1,3 +1,8 @@
+# /// script
+# dependencies = [
+#     "requests<3",
+# ]
+# ///
 from pathlib import Path
 
 import requests

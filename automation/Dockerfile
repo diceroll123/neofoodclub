@@ -1,12 +1,9 @@
 FROM python:3.9-bookworm
 # py3.9 because of collections.Iterable
 
-ADD --chmod=755 https://astral.sh/uv/install.sh /install.sh
-RUN /install.sh && rm /install.sh
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-# install requirements
-COPY requirements.txt /tmp/requirements.txt
-RUN /root/.cargo/bin/uv pip install --system --no-cache -r /tmp/requirements.txt
+ENV PYTHONUNBUFFERED=1
 
 # copy the app
 COPY . /app
