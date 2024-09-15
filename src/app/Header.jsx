@@ -234,6 +234,9 @@ function TitleHeading(props) {
         display={{ base: "none", md: "block" }}
         cursor={"pointer"}
         userSelect={"none"}
+        onClick={() => {
+          setRoundState({ viewMode: false });
+        }}
       >
         <Center>
           <Box
