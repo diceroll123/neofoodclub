@@ -47,7 +47,7 @@ function PreviousRoundInfo() {
 
   return (
     <Text as={Box} fontSize="xs">
-      <VStack>
+      <VStack spacing={0}>
         <>Round {roundState.currentSelectedRound} ended</>
         <>
           <Moment
