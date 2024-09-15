@@ -226,9 +226,15 @@ function MaxBetInput() {
 }
 
 function TitleHeading(props) {
+  const { setRoundState } = useContext(RoundContext);
+
   return (
     <>
-      <HStack display={{ base: "none", md: "block" }}>
+      <HStack
+        display={{ base: "none", md: "block" }}
+        cursor={"pointer"}
+        userSelect={"none"}
+      >
         <Center>
           <Box
             as="img"
