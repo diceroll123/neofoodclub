@@ -236,6 +236,9 @@ function TitleHeading(props) {
         userSelect={"none"}
         onClick={() => {
           setRoundState({ viewMode: false });
+
+          // scroll to top
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       >
         <Center>
