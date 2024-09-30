@@ -226,7 +226,7 @@ function MaxBetInput() {
 }
 
 function TitleHeading(props) {
-  const { setRoundState } = useContext(RoundContext);
+  const { setRoundState, roundState } = useContext(RoundContext);
 
   return (
     <>
@@ -239,6 +239,16 @@ function TitleHeading(props) {
 
           // scroll to top
           window.scrollTo({ top: 0, behavior: "smooth" });
+
+          if (
+            window.scrollY === 0 &&
+            roundState.currentSelectedRound !== roundState.currentRound
+          ) {
+            // TODO MAYBE: add a confirmation dialog?
+            setRoundState({
+              currentSelectedRound: roundState.currentRound,
+            });
+          }
         }}
       >
         <Center>
