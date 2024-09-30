@@ -187,10 +187,13 @@ const PayoutTable = (props) => {
                     />
                   </Td>
                   <Td isNumeric backgroundColor={erBg}>
-                    {er.toFixed(3)}:1
+                    <TextTooltip text={er.toFixed(3) + ":1"} label={er} />
                   </Td>
                   <Td isNumeric backgroundColor={neBg}>
-                    {ne.toFixed(2).toLocaleString()}
+                    <TextTooltip
+                      text={ne.toFixed(2).toLocaleString()}
+                      label={ne}
+                    />
                   </Td>
                   <Td isNumeric backgroundColor={mbBg}>
                     {betMaxBets[betIndex + 1].toLocaleString()}
@@ -257,9 +260,17 @@ const PayoutTable = (props) => {
                 )}
               </Th>
               <Th />
-              <Th isNumeric>{totalBetExpectedRatios.toFixed(3)}</Th>
               <Th isNumeric>
-                {totalBetNetExpected.toFixed(2).toLocaleString()}
+                <TextTooltip
+                  text={totalBetExpectedRatios.toFixed(3)}
+                  label={totalBetExpectedRatios}
+                />
+              </Th>
+              <Th isNumeric>
+                <TextTooltip
+                  text={totalBetNetExpected.toFixed(2).toLocaleString()}
+                  label={totalBetNetExpected}
+                />
               </Th>
               <Th />
               <Th />
