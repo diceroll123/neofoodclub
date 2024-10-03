@@ -1125,9 +1125,10 @@ const BetBadges = (props) => {
     if (bustChance === 0) {
       badges.push(<Badge variant="subtle">🎉 Bust-proof!</Badge>);
     } else {
+      const beakerEmoji = roundState.advanced.useLogitModel ? "🧪" : "";
       badges.push(
         <Badge variant="subtle">
-          {bustEmoji} {Math.floor(bustChance)}% Bust
+          {bustEmoji} {Math.floor(bustChance)}% Bust {beakerEmoji}
         </Badge>
       );
     }
