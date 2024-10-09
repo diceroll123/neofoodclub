@@ -55,6 +55,12 @@ const PlaceThisBetButton = (props) => {
   }
 
   const generate_bet_link = (bet, betNum) => {
+	const a = document.createElement('a');
+    const e = new MouseEvent('click', {
+      ctrlKey: true, // for Windows or Linux
+      metaKey: true, // for MacOS
+    });
+	
     let urlString = "https://www.neopets.com/pirates/process_foodclub.phtml?";
     const { pirates } = roundState.roundData;
     for (let i = 0; i < 5; i++) {
@@ -71,7 +77,9 @@ const PlaceThisBetButton = (props) => {
     urlString += `total_odds=${betOdds[betNum]}&`;
     urlString += `winnings=${betPayoffs[betNum]}&`;
     urlString += "type=bet";
-    return window.open(urlString);
+	a.href = urlString;
+    a.target = '_blank';
+    return a.dispatchEvent(e);
   };
 
   return (
