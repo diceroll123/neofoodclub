@@ -1,6 +1,8 @@
 name: Update S3 Cache-Control
 
 on:
+  pull_request:
+    types: [opened, synchronize]
   schedule:
     - cron: "0 0 * * *" # This runs daily at midnight UTC.
   workflow_dispatch:
