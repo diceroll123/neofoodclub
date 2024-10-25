@@ -55,12 +55,6 @@ const PlaceThisBetButton = (props) => {
   }
 
   const generate_bet_link = (bet, betNum) => {
-	const a = document.createElement('a');
-    const e = new MouseEvent('click', {
-      ctrlKey: true, // for Windows or Linux
-      metaKey: true, // for MacOS
-    });
-	
     let urlString = "https://www.neopets.com/pirates/process_foodclub.phtml?";
     const { pirates } = roundState.roundData;
     for (let i = 0; i < 5; i++) {
@@ -77,9 +71,31 @@ const PlaceThisBetButton = (props) => {
     urlString += `total_odds=${betOdds[betNum]}&`;
     urlString += `winnings=${betPayoffs[betNum]}&`;
     urlString += "type=bet";
-	a.href = urlString;
-    a.target = '_blank';
-    return a.dispatchEvent(e);
+
+    // Detect if we're on a desktop environment
+    const isDesktop = navigator.userAgentData
+      ? navigator.userAgentData.mobile === false
+      : !/Mobi|Android/i.test(navigator.userAgent);
+
+    if (isDesktop) {
+      // Use metaKey for MacOS, ctrlKey for Windows/Linux
+      const isMac = navigator.userAgentData
+        ? navigator.userAgentData.platform === "macOS"
+        : /Mac/i.test(navigator.userAgent);
+
+      const e = new MouseEvent("click", {
+        ctrlKey: !isMac, // ctrlKey for Windows/Linux
+        metaKey: isMac, // metaKey for MacOS
+      });
+
+      const a = document.createElement("a");
+      a.href = urlString;
+      a.target = "_blank";
+      a.dispatchEvent(e);
+    } else {
+      // For mobile devices, fallback to window.open
+      window.open(urlString, "_blank");
+    }
   };
 
   return (
