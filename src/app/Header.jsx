@@ -39,6 +39,7 @@ import { RoundContext } from "./RoundState";
 import RoundInput from "./components/RoundInput";
 import { FaSync } from "react-icons/fa";
 import { FaClockRotateLeft } from "react-icons/fa6";
+import GlowCard from "./components/GlowCard";
 
 moment.relativeTimeThreshold("ss", 0);
 
@@ -341,14 +342,7 @@ function HeaderContent() {
         <TitleHeading />
         <Spacer />
 
-        <Box
-          p={2}
-          maxW="lg"
-          borderWidth="1px"
-          borderRadius="md"
-          boxShadow={isGlowing ? "outline" : undefined}
-          transition="box-shadow 4s"
-        >
+        <GlowCard p={2} maxW="lg" animate={isGlowing}>
           <HStack spacing={3} h="100%">
             <VStack spacing={1} maxW={"140px"}>
               <RoundInput />
@@ -361,7 +355,7 @@ function HeaderContent() {
               </HStack>
             </SkeletonText>
           </HStack>
-        </Box>
+        </GlowCard>
         <Spacer />
       </HStack>
     </>
