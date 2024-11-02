@@ -1,9 +1,3 @@
-# /// script
-# requires-python = ">=3.9"
-# dependencies = [
-#     "pandas",
-# ]
-# ///
 import json
 from pathlib import Path
 
