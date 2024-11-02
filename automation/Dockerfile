@@ -1,7 +1,5 @@
-FROM python:3.9-bookworm
+FROM ghcr.io/astral-sh/uv:python3.9-bookworm-slim
 # py3.9 because of collections.Iterable
-
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 ENV PYTHONUNBUFFERED=1
 
