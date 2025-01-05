@@ -1,6 +1,9 @@
 # Get the directory of the current script
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Change to the script's directory
+cd "$DIR"
+
 # Build/run the docker container
 docker compose run --rm nfc_values
 
