@@ -1,16 +1,19 @@
+# Get the directory of the current script
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Build/run the docker container
 docker compose run --rm nfc_values
 
 # copy file from ./output/javascript.js to ../src/app/constants_logit.js
-cp ./output/javascript.js ../src/app/constants_logit.js
+cp "$DIR/output/javascript.js" "$DIR/../src/app/constants_logit.js"
 
 # stage the changes
-git add ./output/
-git add ./raw_json/
-git add ../src/app/constants_logit.js
+git add "$DIR/output/"
+git add "$DIR/raw_json/"
+git add "$DIR/../src/app/constants_logit.js"
 
 # check if the files exist before committing or pushing
-if [ ! -f ./output/javascript.js ]; then
+if [ ! -f "$DIR/output/javascript.js" ]; then
     exit 1
 fi
 
