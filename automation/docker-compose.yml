@@ -7,4 +7,12 @@ services:
       - ${PWD}:/app
     mem_limit: 15g
     stop_signal: SIGINT
-    command: ['./runner.sh']
+    command: >
+      sh -c "
+        rm -rf ./output &&
+        mkdir ./output &&
+        uv sync &&
+        uv run grab_rounds.py &&
+        uv run preprocessing.py &&
+        uv run final.py
+      "
