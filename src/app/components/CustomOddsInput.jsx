@@ -1,3 +1,4 @@
+import React, { useState, useContext, useEffect } from "react";
 import {
   NumberDecrementStepper,
   NumberIncrementStepper,
@@ -5,7 +6,6 @@ import {
   NumberInputField,
   NumberInputStepper,
 } from "@chakra-ui/react";
-import { useState, useContext, useEffect } from "react";
 import { produce } from "immer";
 
 import { RoundContext } from "../RoundState";
