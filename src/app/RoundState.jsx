@@ -1,4 +1,4 @@
-import { createContext, useReducer, useState, useEffect } from "react";
+import React, { createContext, useReducer, useState, useEffect } from "react";
 import {
   getTableMode,
   reducer,
