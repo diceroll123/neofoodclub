@@ -11,7 +11,7 @@ import {
     useColorMode,
 } from "@chakra-ui/react";
 import Cookies from "universal-cookie";
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useCallback, useMemo, useState, memo } from "react";
 
 import { FaGlobe, FaMoon, FaSun } from "react-icons/fa6";
 
@@ -73,26 +73,42 @@ const TestTubeIcon = (props) => (
     </svg>
 );
 
-const TableModes = () => {
+const TableModes = React.memo(function TableModes() {
     const { setRoundState } = useContext(RoundContext);
-    const cookies = new Cookies();
+    const cookies = useMemo(() => new Cookies(), []);
     const [value, setValue] = useState(getTableMode());
+
+    const onChange = useCallback(
+        (v) => {
+            setValue(v);
+            cookies.set("tableMode", v);
+            setRoundState({ tableMode: v });
+        },
+        [cookies, setRoundState]
+    );
+
+    const radioButtons = useMemo(
+        () => (
+            <Stack>
+                <Radio value="normal">Normal Mode</Radio>
+                <Radio value="dropdown">Dropdown Mode</Radio>
+            </Stack>
+        ),
+        []
+    );
+
+    const memoizedRadioGroup = useMemo(
+        () => (
+            <RadioGroup onChange={onChange} value={value}>
+                {radioButtons}
+            </RadioGroup>
+        ),
+        [onChange, value, radioButtons]
+    );
 
     return (
         <ExtraBox whiteSpace="nowrap">
-            <RadioGroup
-                onChange={(v) => {
-                    setValue(v);
-                    cookies.set("tableMode", v);
-                    setRoundState({ tableMode: v });
-                }}
-                value={value}
-            >
-                <Stack>
-                    <Radio value="normal">Normal Mode</Radio>
-                    <Radio value="dropdown">Dropdown Mode</Radio>
-                </Stack>
-            </RadioGroup>
+            {memoizedRadioGroup}
             {/*<Checkbox mt={1}*/}
             {/*          isChecked={Object.keys(roundState.bets).length === 15}*/}
             {/*          onChange={(e) => {*/}
@@ -115,41 +131,185 @@ const TableModes = () => {
             {/*</Checkbox>*/}
         </ExtraBox>
     );
-};
+});
 
-const NormalExtras = (props) => {
-    const { roundState, setRoundState } = useContext(RoundContext);
+const NormalExtras = React.memo(function NormalExtras(props) {
+    const {
+        roundState: { advanced, roundData },
+        setRoundState,
+    } = useContext(RoundContext);
 
     const [bigBrain, setBigBrain] = useState(true);
     const [faDetails, setFaDetails] = useState(false);
     const [customOddsMode, setCustomOddsMode] = useState(false);
     const [oddsTimeline, setOddsTimeline] = useState(false);
 
-    const brainSize = bigBrain ? "2em" : "1em";
+    const brainSize = useMemo(() => (bigBrain ? "2em" : "1em"), [bigBrain]);
 
-    const notUsingNormal = getTableMode() !== "normal";
+    const notUsingNormal = useMemo(() => getTableMode() !== "normal", []);
 
-    return (
-        <ExtraBox {...props}>
+    const iconStyle = useMemo(
+        () => ({
+            transition:
+                "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        }),
+        []
+    );
+
+    const handleBigBrainClick = useCallback(() => {
+        setBigBrain((v) => !v);
+        setRoundState({
+            advanced: {
+                ...advanced,
+                bigBrain: !bigBrain,
+            },
+            customOdds: null,
+            customProbs: null,
+        });
+    }, [setRoundState, advanced, bigBrain]);
+
+    const handleCustomOddsChange = useCallback(
+        (e) => {
+            const checked = e.target.checked;
+            setCustomOddsMode(checked);
+            setRoundState({
+                advanced: {
+                    ...advanced,
+                    customOddsMode: checked,
+                },
+                customOdds: null,
+                customProbs: null,
+            });
+        },
+        [setRoundState, advanced]
+    );
+
+    const handleFaDetailsChange = useCallback(
+        (e) => {
+            const checked = e.target.checked;
+            setFaDetails(checked);
+            setRoundState({
+                advanced: {
+                    ...advanced,
+                    faDetails: checked,
+                },
+            });
+        },
+        [setRoundState, advanced]
+    );
+
+    const handleOddsTimelineChange = useCallback(
+        (e) => {
+            const checked = e.target.checked;
+            setOddsTimeline(checked);
+            setRoundState({
+                advanced: {
+                    ...advanced,
+                    oddsTimeline: checked,
+                },
+            });
+        },
+        [setRoundState, advanced]
+    );
+
+    const memoizedStack = useMemo(
+        () => (
             <Stack>
                 <Button
-                    onClick={() => {
-                        setBigBrain((v) => !v);
-                        let currentAdvanced = roundState.advanced;
-                        setRoundState({
-                            advanced: {
-                                ...currentAdvanced,
-                                bigBrain: !bigBrain,
-                            },
-                            customOdds: null,
-                            customProbs: null,
-                        });
-                    }}
+                    onClick={handleBigBrainClick}
                     leftIcon={
                         <Icon
                             as={BrainIcon}
                             w={brainSize}
                             h={brainSize}
+                            style={iconStyle}
+                        />
+                    }
+                    size="sm"
+                    w="190px"
+                    isDisabled={notUsingNormal}
+                >
+                    Big Brain Mode is {bigBrain ? "ON" : "OFF"}
+                </Button>
+                <Checkbox
+                    isChecked={customOddsMode}
+                    isDisabled={!(bigBrain && roundData) || notUsingNormal}
+                    onChange={handleCustomOddsChange}
+                >
+                    Custom probs/odds
+                </Checkbox>
+                <Checkbox
+                    isChecked={faDetails}
+                    isDisabled={
+                        !(roundData?.foods && bigBrain) || notUsingNormal
+                    }
+                    onChange={handleFaDetailsChange}
+                >
+                    FA Details
+                </Checkbox>
+                <Checkbox
+                    isChecked={oddsTimeline}
+                    isDisabled={
+                        !(roundData?.foods && bigBrain) || notUsingNormal
+                    }
+                    onChange={handleOddsTimelineChange}
+                >
+                    Odds Timeline
+                </Checkbox>
+            </Stack>
+        ),
+        [
+            handleBigBrainClick,
+            handleCustomOddsChange,
+            handleFaDetailsChange,
+            handleOddsTimelineChange,
+            bigBrain,
+            brainSize,
+            notUsingNormal,
+            customOddsMode,
+            faDetails,
+            oddsTimeline,
+            roundData,
+            iconStyle,
+        ]
+    );
+
+    return <ExtraBox {...props}>{memoizedStack}</ExtraBox>;
+});
+
+const LogitModelToggle = React.memo(function LogitModelToggle() {
+    const { roundState, setRoundState } = useContext(RoundContext);
+    const testTubeSize = useMemo(
+        () => (roundState.advanced.useLogitModel ? "2em" : "1em"),
+        [roundState.advanced.useLogitModel]
+    );
+    const cookies = new Cookies();
+
+    const tooltip = useMemo(
+        () => (
+            <Tooltip
+                label="The experimental model uses multinomial logit to predict the probabilities and should yield better TER, especially for smaller max bets."
+                openDelay={600}
+            >
+                <Button
+                    onClick={() => {
+                        cookies.set(
+                            "useLogitModel",
+                            !roundState.advanced.useLogitModel
+                        );
+                        setRoundState({
+                            advanced: {
+                                ...roundState.advanced,
+                                useLogitModel:
+                                    !roundState.advanced.useLogitModel,
+                            },
+                        });
+                    }}
+                    leftIcon={
+                        <Icon
+                            as={TestTubeIcon}
+                            w={testTubeSize}
+                            h={testTubeSize}
                             style={{
                                 transition:
                                     "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -157,159 +317,68 @@ const NormalExtras = (props) => {
                         />
                     }
                     size="sm"
-                    w="190px"
-                    isDisabled={notUsingNormal}
                 >
-                    Big Brain Mode is {bigBrain === true ? "ON" : "OFF"}
+                    Experimental Model is{" "}
+                    {roundState.advanced.useLogitModel ? "ON" : "OFF"}
                 </Button>
-                <Checkbox
-                    isChecked={customOddsMode}
-                    isDisabled={
-                        !(bigBrain && roundState.roundData) || notUsingNormal
-                    }
-                    onChange={(e) => {
-                        let checked = e.target.checked;
-                        setCustomOddsMode(checked);
-                        setRoundState({
-                            advanced: {
-                                ...roundState.advanced,
-                                customOddsMode: checked,
-                            },
-                            customOdds: null,
-                            customProbs: null,
-                        });
-                    }}
-                >
-                    Custom probs/odds
-                </Checkbox>
-                <Checkbox
-                    isChecked={faDetails}
-                    isDisabled={
-                        !(roundState.roundData?.foods && bigBrain) ||
-                        notUsingNormal
-                    }
-                    onChange={(e) => {
-                        let checked = e.target.checked;
-                        setFaDetails(checked);
-                        setRoundState({
-                            advanced: {
-                                ...roundState.advanced,
-                                faDetails: checked,
-                            },
-                        });
-                    }}
-                >
-                    FA Details
-                </Checkbox>
-                <Checkbox
-                    isChecked={oddsTimeline}
-                    isDisabled={
-                        !(roundState.roundData?.foods && bigBrain) ||
-                        notUsingNormal
-                    }
-                    onChange={(e) => {
-                        let checked = e.target.checked;
-                        setOddsTimeline(checked);
-                        setRoundState({
-                            advanced: {
-                                ...roundState.advanced,
-                                oddsTimeline: checked,
-                            },
-                        });
-                    }}
-                >
-                    Odds Timeline
-                </Checkbox>
-            </Stack>
-        </ExtraBox>
+            </Tooltip>
+        ),
+        [
+            roundState.advanced.useLogitModel,
+            testTubeSize,
+            setRoundState,
+            cookies,
+        ]
     );
-};
 
-const LogitModelToggle = () => {
-    const { roundState, setRoundState } = useContext(RoundContext);
-    const testTubeSize = useMemo(
-        () => (roundState.advanced.useLogitModel ? "2em" : "1em"),
-        [roundState.advanced.useLogitModel]
-    );
-    const cookies = new Cookies();
-    return (
-        <Tooltip
-            label="The experimental model uses multinomial logit to predict the probabilities and should yield better TER, especially for smaller max bets."
-            openDelay={600}
-        >
-            <Button
-                onClick={() => {
-                    cookies.set(
-                        "useLogitModel",
-                        !roundState.advanced.useLogitModel
-                    );
-                    setRoundState({
-                        advanced: {
-                            ...roundState.advanced,
-                            useLogitModel: !roundState.advanced.useLogitModel,
-                        },
-                    });
-                }}
-                leftIcon={
-                    <Icon
-                        as={TestTubeIcon}
-                        w={testTubeSize}
-                        h={testTubeSize}
-                        style={{
-                            transition:
-                                "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                        }}
-                    />
-                }
-                size="sm"
-            >
-                Experimental Model is{" "}
-                {roundState.advanced.useLogitModel ? "ON" : "OFF"}
-            </Button>
-        </Tooltip>
-    );
-};
+    return tooltip;
+});
 
-const CopyWithDomain = () => {
+const CopyWithDomain = React.memo(function CopyWithDomain() {
     const { setRoundState } = useContext(RoundContext);
     const cookies = new Cookies();
     const [useWebDomain, toggleUseWebDomain] = useState(getUseWebDomain());
 
     let iconSize = useWebDomain ? "2em" : "1em";
 
-    return (
-        <Tooltip
-            label={`Include domain when copying bets\n(${window.location.origin}/)`}
-            openDelay="600"
-        >
-            <Button
-                size="sm"
-                leftIcon={
-                    <Icon
-                        as={FaGlobe}
-                        w={iconSize}
-                        h={iconSize}
-                        color="blue.300"
-                        style={{
-                            transition:
-                                "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                        }}
-                    />
-                }
-                onClick={() => {
-                    let checked = !useWebDomain;
-                    toggleUseWebDomain(checked);
-                    cookies.set("useWebDomain", checked);
-                    setRoundState({ useWebDomain: checked });
-                }}
+    const tooltip = useMemo(
+        () => (
+            <Tooltip
+                label={`Include domain when copying bets\n(${window.location.origin}/)`}
+                openDelay="600"
             >
-                Copy domain with bets is {useWebDomain ? "ON" : "OFF"}
-            </Button>
-        </Tooltip>
+                <Button
+                    size="sm"
+                    leftIcon={
+                        <Icon
+                            as={FaGlobe}
+                            w={iconSize}
+                            h={iconSize}
+                            color="blue.300"
+                            style={{
+                                transition:
+                                    "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                            }}
+                        />
+                    }
+                    onClick={() => {
+                        let checked = !useWebDomain;
+                        toggleUseWebDomain(checked);
+                        cookies.set("useWebDomain", checked);
+                        setRoundState({ useWebDomain: checked });
+                    }}
+                >
+                    Copy domain with bets is {useWebDomain ? "ON" : "OFF"}
+                </Button>
+            </Tooltip>
+        ),
+        [useWebDomain, iconSize, setRoundState, cookies]
     );
-};
 
-const ColorModeButton = () => {
+    return tooltip;
+});
+
+const ColorModeButton = React.memo(function ColorModeButton() {
     const { colorMode, toggleColorMode } = useColorMode();
     const label = colorMode === "light" ? "Dark mode" : "Light mode";
     const SwitchIcon = useColorModeValue(FaMoon, FaSun);
@@ -324,18 +393,25 @@ const ColorModeButton = () => {
             {label} is OFF
         </Button>
     );
-};
+});
 
-const TableSettings = (props) => {
+const TableSettings = memo(function TableSettings(props) {
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
+    const hStack = useMemo(
+        () => (
+            <HStack>
+                <TableModes />
+                <NormalExtras />
+            </HStack>
+        ),
+        []
+    );
+
     return (
         <HorizontalScrollingBox bgColor={gray}>
             <SettingsBox {...props}>
                 <Stack p={4}>
-                    <HStack>
-                        <TableModes />
-                        <NormalExtras />
-                    </HStack>
+                    {hStack}
 
                     <ExtraBox>
                         <Stack>
@@ -348,6 +424,6 @@ const TableSettings = (props) => {
             </SettingsBox>
         </HorizontalScrollingBox>
     );
-};
+});
 
 export default TableSettings;

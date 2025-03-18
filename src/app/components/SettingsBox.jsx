@@ -1,9 +1,9 @@
 import { Flex } from "@chakra-ui/react";
-import React from "react";
+import React, { memo } from "react";
 
 // this element is the gray box that contains other elements, for example the "copy markdown code" button
 
-const SettingsBox = (props) => {
+const SettingsBox = memo((props) => {
     const { background, children, ...rest } = props;
     return (
         <Flex
@@ -15,6 +15,6 @@ const SettingsBox = (props) => {
             {children}
         </Flex>
     );
-};
+});
 
 export default SettingsBox;

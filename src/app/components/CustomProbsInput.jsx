@@ -1,4 +1,11 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, {
+    useContext,
+    useState,
+    useEffect,
+    useCallback,
+    useMemo,
+    useRef,
+} from "react";
 import {
     NumberDecrementStepper,
     NumberIncrementStepper,
@@ -16,23 +23,46 @@ export default function CustomProbsInput(props) {
     const { setRoundState } = useContext(RoundContext);
     const { arenaIndex, pirateIndex, used, ...rest } = props;
     const [prob, setProb] = useState(used[arenaIndex][pirateIndex] * 100);
+    const timeoutRef = useRef(null);
+    const usedValue = used[arenaIndex][pirateIndex];
 
     // we multiply by 100 to make it visibly a percentage
 
-    const verify = (value) => {
+    const verify = useCallback((value) => {
         return !isNaN(parseFloat(value));
-    };
+    }, []);
+
+    const handleChange = useCallback((value) => {
+        setProb(value);
+    }, []);
+
+    const handleBlur = useCallback(
+        (e) => {
+            if (e.target.value === "") {
+                setProb(usedValue * 100);
+            }
+        },
+        [usedValue]
+    );
+
+    const handleFocus = useCallback((e) => {
+        e.target.select();
+    }, []);
 
     useEffect(() => {
         if (!verify(prob)) {
             return;
         }
 
-        if (prob === used[arenaIndex][pirateIndex] * 100) {
+        if (prob === usedValue * 100) {
             return;
         }
 
-        const timeoutId = setTimeout(() => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(() => {
             const customProbs = produce(used, (draftCustomProbs) => {
                 draftCustomProbs[arenaIndex][pirateIndex] = prob / 100;
             });
@@ -40,30 +70,32 @@ export default function CustomProbsInput(props) {
         }, 400);
 
         return () => {
-            clearTimeout(timeoutId);
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
         };
-    }, [prob, arenaIndex, pirateIndex, used, setRoundState]);
+    }, [prob, arenaIndex, pirateIndex, usedValue, used, setRoundState, verify]);
+
+    const memoizedNumberInputField = useMemo(() => <NumberInputField />, []);
+    const memoizedNumberIncrementStepper = useMemo(
+        () => <NumberIncrementStepper />,
+        []
+    );
 
     return (
         <NumberInput
             {...rest}
             value={prob}
-            onChange={(value) => {
-                setProb(value);
-            }}
-            onBlur={(e) => {
-                if (e.target.value === "") {
-                    setProb(used[arenaIndex][pirateIndex] * 100);
-                }
-            }}
-            onFocus={(e) => e.target.select()}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            onFocus={handleFocus}
             size="sm"
             allowMouseWheel
             width="100px"
         >
-            <NumberInputField />
+            {memoizedNumberInputField}
             <NumberInputStepper width="16px">
-                <NumberIncrementStepper />
+                {memoizedNumberIncrementStepper}
                 <NumberDecrementStepper />
             </NumberInputStepper>
         </NumberInput>

@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/react";
-import React from "react";
+import React, { useMemo } from "react";
 import styled, { keyframes } from "styled-components";
 
 const angleProperty = `
@@ -61,12 +61,15 @@ const CardContainer = styled(Box)`
     }
 `;
 
-const GlowCard = ({ children, animate, ...props }) => {
-    return (
-        <CardContainer animate={animate} {...props}>
-            {children}
-        </CardContainer>
+const GlowCard = React.memo(function GlowCard({ children, animate, ...props }) {
+    return useMemo(
+        () => (
+            <CardContainer animate={animate} {...props}>
+                {children}
+            </CardContainer>
+        ),
+        [animate, props, children]
     );
-};
+});
 
 export default GlowCard;

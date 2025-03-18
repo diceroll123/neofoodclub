@@ -11,11 +11,11 @@ import {
     SimpleGrid,
     Flex,
 } from "@chakra-ui/react";
-import * as React from "react";
+import React, { memo } from "react";
 import NeopointIcon from "./images/np-icon.svg";
 import { VercelCredit } from "./components/VercelCredit";
 
-function Logo() {
+const Logo = memo(function Logo() {
     return (
         <Stack direction="row">
             <Box as="img" src={NeopointIcon} height="1.5em" width="1.5em" />
@@ -29,17 +29,17 @@ function Logo() {
             </Heading>
         </Stack>
     );
-}
+});
 
-function ListHeader(props) {
+const ListHeader = memo(function ListHeader(props) {
     return (
         <Text fontWeight={"500"} fontSize={"lg"} mb={2}>
             {props.children}
         </Text>
     );
-}
+});
 
-function KoFiButtion() {
+const KoFiButtion = memo(function KoFiButtion() {
     return (
         <>
             <Link href="https://ko-fi.com/dice" isExternal>
@@ -53,9 +53,9 @@ function KoFiButtion() {
             </Link>
         </>
     );
-}
+});
 
-export default function Footer() {
+const Footer = memo(function Footer() {
     return (
         <>
             <Divider />
@@ -156,4 +156,6 @@ export default function Footer() {
             </Box>
         </>
     );
-}
+});
+
+export default Footer;

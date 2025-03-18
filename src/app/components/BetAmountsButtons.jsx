@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import {
     Button,
     ButtonGroup,
@@ -8,12 +8,12 @@ import {
     Tooltip,
     Wrap,
 } from "@chakra-ui/react";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { RoundContext } from "../RoundState";
 import { determineBetAmount, getMaxBet } from "../util";
 import { FaFillDrip, FaInfinity } from "react-icons/fa";
 
-const BetAmountsButtons = (props) => {
+const BetAmountsButtons = memo((props) => {
     const {
         roundState,
         calculations,
@@ -63,89 +63,147 @@ const BetAmountsButtons = (props) => {
     const increment = () => updateBetAmounts(2);
     const decrement = () => updateBetAmounts(-2);
 
-    return (
-        <>
-            <Stack>
-                <Heading size="sm" textTransform="uppercase">
-                    Set bet amounts
-                </Heading>
-                <ButtonGroup as={Wrap} mt={2}>
-                    <Tooltip
-                        label="Sets all bet amounts to whichever is lower: your max bet amount, or the value in the MAXBET column below + 1. This prevents you from betting more than necessary to earn 1M NP from the bet, given the current odds."
-                        openDelay="600"
-                        placement="top"
-                    >
-                        <Button
-                            leftIcon={
-                                <Icon as={FaFillDrip} w="1.4em" h="1.4em" />
-                            }
-                            size="sm"
-                            colorScheme="green"
-                            onClick={() => {
-                                setBetAmounts(
-                                    getMaxBet(roundState.currentSelectedRound),
-                                    true
-                                );
-                            }}
-                            {...rest}
-                        >
-                            Capped
-                        </Button>
-                    </Tooltip>
-                    <Tooltip
-                        label="Sets all bet amounts your max bet, regardless of overflow with the MAXBET column below. This is generally used by people who would like to maximize profits in the event of odds changing."
-                        openDelay="600"
-                        placement="top"
-                    >
-                        <Button
-                            leftIcon={
-                                <Icon as={FaInfinity} w="1.4em" h="1.4em" />
-                            }
-                            size="sm"
-                            colorScheme="blue"
-                            onClick={() => {
-                                setBetAmounts(
-                                    getMaxBet(roundState.currentSelectedRound),
-                                    false
-                                );
-                            }}
-                            {...rest}
-                        >
-                            Uncapped
-                        </Button>
-                    </Tooltip>
-                    <Button
-                        size="sm"
-                        onClick={() => {
-                            setBetAmounts(-1000, false);
-                        }}
-                        colorScheme="red"
-                        {...rest}
-                    >
-                        Clear
-                    </Button>
-
-                    <ButtonGroup size="sm" colorScheme="purple">
-                        <Tooltip
-                            label="Increment all bet amounts by 2"
-                            openDelay="600"
-                            placement="top"
-                        >
-                            <Button onClick={increment}>+2</Button>
-                        </Tooltip>
-
-                        <Tooltip
-                            label="Decrement all bet amounts by 2"
-                            openDelay="600"
-                            placement="top"
-                        >
-                            <Button onClick={decrement}>-2</Button>
-                        </Tooltip>
-                    </ButtonGroup>
-                </ButtonGroup>
-            </Stack>
-        </>
+    const memoizedHeading = useMemo(
+        () => (
+            <Heading size="sm" textTransform="uppercase">
+                Set bet amounts
+            </Heading>
+        ),
+        []
     );
-};
+
+    const memoizedTooltipCapped = useMemo(
+        () => (
+            <Tooltip
+                label="Sets all bet amounts to whichever is lower: your max bet amount, or the value in the MAXBET column below + 1. This prevents you from betting more than necessary to earn 1M NP from the bet, given the current odds."
+                openDelay="600"
+                placement="top"
+            >
+                <Button
+                    leftIcon={<Icon as={FaFillDrip} w="1.4em" h="1.4em" />}
+                    size="sm"
+                    colorScheme="green"
+                    onClick={() => {
+                        setBetAmounts(
+                            getMaxBet(roundState.currentSelectedRound),
+                            true
+                        );
+                    }}
+                    {...rest}
+                >
+                    Capped
+                </Button>
+            </Tooltip>
+        ),
+        [roundState.currentSelectedRound, allBetAmounts, setAllBetAmounts, rest]
+    );
+
+    const memoizedTooltipUncapped = useMemo(
+        () => (
+            <Tooltip
+                label="Sets all bet amounts your max bet, regardless of overflow with the MAXBET column below. This is generally used by people who would like to maximize profits in the event of odds changing."
+                openDelay="600"
+                placement="top"
+            >
+                <Button
+                    leftIcon={<Icon as={FaInfinity} w="1.4em" h="1.4em" />}
+                    size="sm"
+                    colorScheme="blue"
+                    onClick={() => {
+                        setBetAmounts(
+                            getMaxBet(roundState.currentSelectedRound),
+                            false
+                        );
+                    }}
+                    {...rest}
+                >
+                    Uncapped
+                </Button>
+            </Tooltip>
+        ),
+        [roundState.currentSelectedRound, allBetAmounts, setAllBetAmounts, rest]
+    );
+
+    const memoizedClearButton = useMemo(
+        () => (
+            <Button
+                size="sm"
+                onClick={() => {
+                    setBetAmounts(-1000, false);
+                }}
+                colorScheme="red"
+                {...rest}
+            >
+                Clear
+            </Button>
+        ),
+        [allBetAmounts, setAllBetAmounts, rest]
+    );
+
+    const memoizedIncrementTooltip = useMemo(
+        () => (
+            <Tooltip
+                label="Increment all bet amounts by 2"
+                openDelay="600"
+                placement="top"
+            >
+                <Button onClick={increment}>+2</Button>
+            </Tooltip>
+        ),
+        [increment]
+    );
+
+    const memoizedDecrementTooltip = useMemo(
+        () => (
+            <Tooltip
+                label="Decrement all bet amounts by 2"
+                openDelay="600"
+                placement="top"
+            >
+                <Button onClick={decrement}>-2</Button>
+            </Tooltip>
+        ),
+        [decrement]
+    );
+
+    const memoizedButtonGroup = useMemo(
+        () => (
+            <ButtonGroup size="sm" colorScheme="purple">
+                {memoizedIncrementTooltip}
+                {memoizedDecrementTooltip}
+            </ButtonGroup>
+        ),
+        [memoizedIncrementTooltip, memoizedDecrementTooltip]
+    );
+
+    const memoizedButtonGroupWrap = useMemo(
+        () => (
+            <ButtonGroup as={Wrap} mt={2}>
+                {memoizedTooltipCapped}
+                {memoizedTooltipUncapped}
+                {memoizedClearButton}
+                {memoizedButtonGroup}
+            </ButtonGroup>
+        ),
+        [
+            memoizedTooltipCapped,
+            memoizedTooltipUncapped,
+            memoizedClearButton,
+            memoizedButtonGroup,
+        ]
+    );
+
+    const memoizedStack = useMemo(
+        () => (
+            <Stack>
+                {memoizedHeading}
+                {memoizedButtonGroupWrap}
+            </Stack>
+        ),
+        [memoizedHeading, memoizedButtonGroupWrap]
+    );
+
+    return <>{memoizedStack}</>;
+});
 
 export default BetAmountsButtons;

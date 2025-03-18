@@ -1,11 +1,11 @@
 import { Box } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { useContext, memo } from "react";
 
 import { RoundContext } from "../RoundState";
 
 // elements inside of this element will only show when custom mode is on
 
-const CustomOddsElement = (props) => {
+const CustomOddsElement = memo((props) => {
     const { roundState } = useContext(RoundContext);
     const { children, ...rest } = props;
 
@@ -22,6 +22,6 @@ const CustomOddsElement = (props) => {
     }
 
     return <Box {...rest}>{children}</Box>;
-};
+});
 
 export default CustomOddsElement;

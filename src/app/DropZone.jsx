@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, memo } from "react";
 import { RoundContext } from "./RoundState";
 import { anyBetsExist, parseBetUrl } from "./util";
 import { useToast } from "@chakra-ui/react";
@@ -7,7 +7,7 @@ function removeHtmlTags(str) {
     return str.replace(/<\/?[^>]+(>|$)/g, "");
 }
 
-const DropZone = ({ children }) => {
+const DropZone = memo(({ children }) => {
     const toast = useToast();
     const { addNewSet } = useContext(RoundContext);
 
@@ -52,6 +52,6 @@ const DropZone = ({ children }) => {
     }, [addNewSet, toast]);
 
     return <>{children}</>;
-};
+});
 
 export default DropZone;

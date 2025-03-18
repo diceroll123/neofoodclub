@@ -1,5 +1,5 @@
 import { Button } from "@chakra-ui/react";
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useContext, useState, memo } from "react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 import { RoundContext } from "../RoundState";
@@ -15,7 +15,7 @@ const BetButton = (props) => {
     );
 };
 
-const ErrorBetButton = (props) => {
+const ErrorBetButton = React.memo((props) => {
     const { children, ...rest } = props;
 
     return (
@@ -23,9 +23,9 @@ const ErrorBetButton = (props) => {
             {children}
         </BetButton>
     );
-};
+});
 
-const PlaceThisBetButton = (props) => {
+const PlaceThisBetButton = memo((props) => {
     const { bet, betNum } = props;
     const { roundState, calculations, currentBet, allBetAmounts, allBets } =
         useContext(RoundContext);
@@ -111,6 +111,6 @@ const PlaceThisBetButton = (props) => {
             {clicked ? "Bet placed!" : "Place bet!"}
         </BetButton>
     );
-};
+});
 
 export default PlaceThisBetButton;

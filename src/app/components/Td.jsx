@@ -3,10 +3,12 @@ import React from "react";
 
 // this element is a chakra <Td> but with less y-padding, to make our tables a little less large
 
-const Td = (props) => (
-    <OriginalTd py={1} {...props}>
-        {props.children}
-    </OriginalTd>
-);
+const Td = React.memo(function Td({ children, style, ...otherProps }) {
+    return (
+        <OriginalTd py={1} style={style} {...otherProps}>
+            {children}
+        </OriginalTd>
+    );
+});
 
 export default Td;

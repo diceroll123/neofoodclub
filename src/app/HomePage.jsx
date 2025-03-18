@@ -1,10 +1,10 @@
 import { Box, useColorModeValue } from "@chakra-ui/react";
-import React from "react";
+import React, { memo } from "react";
 import Footer from "./Footer";
 import Header from "./Header";
 import EditBets from "./components/EditBets";
 
-export default function HomePage() {
+const HomePage = memo(function HomePage() {
     // we'll keep the colors here and bring them down
     const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
     const orange = useColorModeValue("nfc.orange", "nfc.orangeDark");
@@ -40,4 +40,6 @@ export default function HomePage() {
             <Footer />
         </>
     );
-}
+});
+
+export default HomePage;

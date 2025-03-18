@@ -51,7 +51,7 @@ import {
     FaLink,
     FaSackDollar,
 } from "react-icons/fa6";
-import React, { useContext, useEffect, useMemo } from "react";
+import React, { useContext, useMemo, useCallback, memo } from "react";
 import {
     anyBetsExist,
     cloneArray,
@@ -92,7 +92,10 @@ const BuildSetMenu = (props) => {
     const [max, setMax] = React.useState(0); // maximum pirate amount
     const [buildButtonEnabled, setBuildButtonEnabled] = React.useState(false); // whether the build button is enabled, if we're within min/max to do so
 
-    const maxBet = getMaxBet(roundState.currentSelectedRound);
+    const maxBet = useMemo(
+        () => getMaxBet(roundState.currentSelectedRound),
+        [roundState.currentSelectedRound]
+    );
 
     const handleChange = (arenaIndex, pirateIndex) => {
         let newPirateIndices = cloneArray(pirateIndices);
@@ -100,31 +103,31 @@ const BuildSetMenu = (props) => {
         setPirateIndices(newPirateIndices);
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         // count the amount of non-zero elements in pirateIndices
         let amount = pirateIndices.reduce((a, b) => a + (b !== 0 ? 1 : 0), 0);
         setBuildButtonEnabled(amount >= min && amount <= max);
     }, [pirateIndices, min, max]);
 
-    const handleTenBetClick = () => {
+    const handleTenBetClick = React.useCallback(() => {
         setMode("Ten-bet");
         // reset state
         setMin(1);
         setMax(3);
         setPirateIndices([0, 0, 0, 0, 0]);
         onOpen();
-    };
+    }, [onOpen]);
 
-    const handleGambitClick = () => {
+    const handleGambitClick = React.useCallback(() => {
         setMode("Gambit");
         // reset state
         setMin(5);
         setMax(5);
         setPirateIndices([0, 0, 0, 0, 0]);
         onOpen();
-    };
+    }, [onOpen]);
 
-    const handleBuildClick = () => {
+    const handleBuildClick = React.useCallback(() => {
         if (mode === "Ten-bet") {
             const { bets, betAmounts } = tenbetSet(pirateIndices);
             addNewSet(
@@ -144,9 +147,17 @@ const BuildSetMenu = (props) => {
             );
         }
         onClose();
-    };
+    }, [
+        mode,
+        tenbetSet,
+        pirateIndices,
+        gambitWithPirates,
+        addNewSet,
+        maxBet,
+        onClose,
+    ]);
 
-    const randomizeIndices = () => {
+    const randomizeIndices = useCallback(() => {
         // generate a full set of random indices
         let newIndices = [
             generateRandomPirateIndex(),
@@ -171,7 +182,7 @@ const BuildSetMenu = (props) => {
         // this allows us to stay within the boundaries without having per-algorithm functions to do this
 
         setPirateIndices(newIndices);
-    };
+    }, [min, max]);
 
     return (
         <>
@@ -380,7 +391,7 @@ function createHtmlTable(calculations, roundState, bets) {
     return html;
 }
 
-const BetCopyButtons = (props) => {
+const BetCopyButtons = memo((props) => {
     let { index, ...rest } = props;
     const { roundState, calculations, allBets, allBetAmounts } =
         useContext(RoundContext);
@@ -394,7 +405,10 @@ const BetCopyButtons = (props) => {
         [roundState.useWebDomain]
     );
 
-    const origin = useWebDomain ? window.location.origin : "";
+    const origin = useMemo(
+        () => (useWebDomain ? window.location.origin : ""),
+        [useWebDomain]
+    );
 
     const urlClip = useClipboard(
         origin +
@@ -467,7 +481,7 @@ const BetCopyButtons = (props) => {
             </ButtonGroup>
         </HStack>
     );
-};
+});
 
 const calculateBets = (roundState, usedProbabilities, ...pirates) => {
     const maxBet = getMaxBet(roundState.currentSelectedRound);
@@ -510,7 +524,7 @@ const calculateBets = (roundState, usedProbabilities, ...pirates) => {
     return { betCaps, betOdds, pirateCombos };
 };
 
-const BetFunctions = (props) => {
+const BetFunctions = memo(function BetFunctions(props) {
     const {
         blue,
         orange,
@@ -545,24 +559,24 @@ const BetFunctions = (props) => {
 
     const positiveArenas = arenaRatios.filter((x) => x > 0).length;
 
-    const newEmptySet = () => {
+    const newEmptySet = React.useCallback(() => {
         const amountOfBets = Object.keys(allBets[currentBet]).length;
         addNewSet(
             "New Set",
             makeEmptyBets(amountOfBets),
             makeEmptyBetAmounts(amountOfBets)
         );
-    };
+    }, [addNewSet, allBets, currentBet]);
 
-    const cloneSet = () => {
+    const cloneSet = React.useCallback(() => {
         addNewSet(
             `${allNames[currentBet]} (Clone)`,
             allBets[currentBet],
             allBetAmounts[currentBet]
         );
-    };
+    }, [addNewSet, allBets, allBetAmounts, allNames, currentBet]);
 
-    const deleteSet = () => {
+    const deleteSet = React.useCallback(() => {
         const currentIndex = Object.keys(allBets).indexOf(currentBet);
         let useIndex = currentIndex - 1;
         if (useIndex < 0) {
@@ -592,7 +606,16 @@ const BetFunctions = (props) => {
         setAllBetAmounts({ ...allBetAmountsCopy });
         setAllNames({ ...allNamesCopy });
         setCurrentBet(previousElement);
-    };
+    }, [
+        allBets,
+        allBetAmounts,
+        allNames,
+        currentBet,
+        setAllBets,
+        setAllBetAmounts,
+        setAllNames,
+        setCurrentBet,
+    ]);
 
     const merSet = () => {
         const maxBet = getMaxBet(roundState.currentSelectedRound);
@@ -692,7 +715,7 @@ const BetFunctions = (props) => {
         addNewSet(`Gambit Set (${maxBet} NP)`, bets, betAmounts, true);
     };
 
-    const bustproofSet = () => {
+    const bustproofSet = React.useCallback(() => {
         const maxBet = getMaxBet(roundState.currentSelectedRound);
         const { betOdds } = calculateBets(
             roundState,
@@ -814,7 +837,14 @@ const BetFunctions = (props) => {
             betAmounts,
             true
         );
-    };
+    }, [
+        addNewSet,
+        roundState,
+        calculateBets,
+        usedProbabilities,
+        arenaRatios,
+        positiveArenas,
+    ]);
 
     const winningGambitSet = () => {
         if (winningPiratesBinary === 0) {
@@ -1090,9 +1120,11 @@ const BetFunctions = (props) => {
             </Stack>
         </SettingsBox>
     );
-};
+});
 
-const BetBadges = (props) => {
+const USER_SELECT_NONE = { userSelect: "none" };
+
+const BetBadges = memo((props) => {
     const { index, ...rest } = props;
     const { calculations, roundState, allBets, allBetAmounts } =
         useContext(RoundContext);
@@ -1322,12 +1354,12 @@ const BetBadges = (props) => {
     }
 
     return (
-        <VStack spacing={1} style={{ userSelect: "none" }} {...rest}>
-            {badges.map((badge, index) => {
-                return <Box key={index}>{badge}</Box>;
-            })}
+        <VStack spacing={1} style={USER_SELECT_NONE} {...rest}>
+            {badges.map((badge, index) => (
+                <Box key={index}>{badge}</Box>
+            ))}
         </VStack>
     );
-};
+});
 
 export default BetFunctions;

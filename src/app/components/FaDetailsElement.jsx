@@ -1,11 +1,11 @@
 import { Box } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { useContext, memo } from "react";
 
 import { RoundContext } from "../RoundState";
 
 // this element will only show children (which are only expected to be food data in the normal table) if they exist and the FA checkbox is checked
 
-const FaDetailsElement = (props) => {
+const FaDetailsElement = memo(function FaDetailselement(props) {
     const { roundState } = useContext(RoundContext);
     const { children, ...rest } = props;
 
@@ -29,6 +29,6 @@ const FaDetailsElement = (props) => {
             {children}
         </Box>
     );
-};
+});
 
 export default FaDetailsElement;

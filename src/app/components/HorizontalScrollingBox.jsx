@@ -1,9 +1,9 @@
 import { Box } from "@chakra-ui/react";
-import React from "react";
+import React, { memo } from "react";
 
 // this is an imaginary box that makes things inside it side-scrollable
 
-const HorizontalScrollingBox = (props) => {
+const HorizontalScrollingBox = memo((props) => {
     const { children, ...rest } = props;
 
     // Prevent position:absolute elements from escaping. Without this, elements
@@ -15,6 +15,6 @@ const HorizontalScrollingBox = (props) => {
             {children}
         </Box>
     );
-};
+});
 
 export default HorizontalScrollingBox;

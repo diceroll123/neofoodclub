@@ -5,13 +5,13 @@ import {
     NumberInputField,
     NumberInputStepper,
 } from "@chakra-ui/react";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, memo, useMemo } from "react";
 
 import { RoundContext } from "../RoundState";
 
 // this is the number input element next to bets
 
-export default function BetAmountInput(props) {
+export default memo(function BetAmountInput(props) {
     const { currentBet, allBetAmounts, setAllBetAmounts } =
         useContext(RoundContext);
     const { betIndex, ...rest } = props;
@@ -42,33 +42,38 @@ export default function BetAmountInput(props) {
         };
     }, [tempMaxBet, allBetAmounts, currentBet, betIndex, setAllBetAmounts]);
 
-    return (
-        <NumberInput
-            {...rest}
-            value={tempMaxBet.toString()}
-            onChange={(value) => setTempMaxBet(value)}
-            onBlur={(e) => {
-                let value = parseInt(e.target.value);
-                if (isNaN(value) || value < 50) {
-                    value = -1000;
-                }
+    const memoizedNumberInput = useMemo(
+        () => (
+            <NumberInput
+                {...rest}
+                value={tempMaxBet.toString()}
+                onChange={(value) => setTempMaxBet(value)}
+                onBlur={(e) => {
+                    let value = parseInt(e.target.value);
+                    if (isNaN(value) || value < 50) {
+                        value = -1000;
+                    }
 
-                value = Math.min(value, 500000);
+                    value = Math.min(value, 500000);
 
-                setTempMaxBet(value);
-            }}
-            onFocus={(e) => e.target.select()}
-            size="sm"
-            min={-1000}
-            max={500000}
-            allowMouseWheel
-            width="90px"
-        >
-            <NumberInputField />
-            <NumberInputStepper width="16px">
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-            </NumberInputStepper>
-        </NumberInput>
+                    setTempMaxBet(value);
+                }}
+                onFocus={(e) => e.target.select()}
+                size="sm"
+                min={-1000}
+                max={500000}
+                allowMouseWheel
+                width="90px"
+            >
+                <NumberInputField />
+                <NumberInputStepper width="16px">
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                </NumberInputStepper>
+            </NumberInput>
+        ),
+        [rest, tempMaxBet, setTempMaxBet]
     );
-}
+
+    return memoizedNumberInput;
+});

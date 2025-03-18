@@ -12,7 +12,7 @@ import {
     Text,
     IconButton,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { useContext, memo } from "react";
 
 import { PIRATE_NAMES } from "../constants";
 import { computePirateBinary } from "../maths";
@@ -26,7 +26,7 @@ import TextTooltip from "./TextTooltip";
 
 // this element is the colorful and informative table full of your bet data
 
-const PayoutTable = (props) => {
+const PayoutTable = memo((props) => {
     const { blue, orange, green, red, yellow, getPirateBgColor, ...rest } =
         props;
     const {
@@ -364,6 +364,6 @@ const PayoutTable = (props) => {
             )}
         </Table>
     );
-};
+});
 
 export default PayoutTable;

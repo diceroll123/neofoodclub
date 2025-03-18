@@ -1,11 +1,11 @@
 import { Box } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { useContext, memo } from "react";
 
 import { RoundContext } from "../RoundState";
 
 // elements inside this component will only show if the big-brain setting is on
 
-const BigBrainElement = (props) => {
+const BigBrainElement = memo(function BigBrainElement(props) {
     const { roundState } = useContext(RoundContext);
     const { children, ...rest } = props;
 
@@ -14,6 +14,6 @@ const BigBrainElement = (props) => {
     }
 
     return <Box {...rest}>{children}</Box>;
-};
+});
 
 export default BigBrainElement;

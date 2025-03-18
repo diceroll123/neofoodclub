@@ -1,9 +1,9 @@
 import { useColorModeValue, Box } from "@chakra-ui/react";
-import React from "react";
+import React, { memo } from "react";
 
 // this element is the darker box inside settingsbox, for example the container of the normal/dropdown mode radio buttons
 
-const ExtraBox = (props) => {
+const ExtraBox = memo((props) => {
     const { children, ...rest } = props;
     const defaultBgColor = useColorModeValue("white", "gray.800");
     return (
@@ -17,6 +17,6 @@ const ExtraBox = (props) => {
             {children}
         </Box>
     );
-};
+});
 
 export default ExtraBox;

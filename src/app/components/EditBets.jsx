@@ -30,7 +30,7 @@ import {
     Spacer,
     VStack,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { useMemo, useCallback, useContext, memo } from "react";
 import moment from "moment";
 import "moment-timezone";
 import { FaSackDollar, FaUtensils, FaSkullCrossbones } from "react-icons/fa6";
@@ -69,14 +69,16 @@ import TableSettings from "./TableSettings";
 import { FaEdit } from "react-icons/fa";
 import Moment from "react-moment";
 
-const StickyTd = (props) => {
+const stickyStyle = { position: "sticky", left: "0" };
+
+const StickyTd = React.memo(function StickyTd(props) {
     const { children, ...rest } = props;
     return (
-        <Td style={{ position: "sticky", left: "0" }} zIndex={1} {...rest}>
+        <Td style={stickyStyle} zIndex={1} {...rest}>
             {children}
         </Td>
     );
-};
+});
 
 function PirateFA(props) {
     const { pirateId, foodId } = props;
@@ -452,7 +454,7 @@ const OddsTimeline = (props) => {
     );
 };
 
-const NormalTable = (props) => {
+const NormalTable = memo(function NormalTable(props) {
     const { red, green, getPirateBgColor } = props;
     const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
     const { roundState, calculations, currentBet, allBets, setAllBets } =
@@ -484,7 +486,10 @@ const NormalTable = (props) => {
         setAllBets({ ...allBets, [currentBet]: newBets });
     };
 
-    const amountOfChanges = (roundState?.roundData?.changes || []).length;
+    const amountOfChanges = useMemo(
+        () => (roundState?.roundData?.changes || []).length,
+        [roundState]
+    );
 
     return (
         <Table size="sm" width="auto">
@@ -911,7 +916,7 @@ const NormalTable = (props) => {
             })}
         </Table>
     );
-};
+});
 
 const DropDownTable = (props) => {
     let { ...rest } = props;
@@ -1106,14 +1111,14 @@ const DropDownTable = (props) => {
     );
 };
 
-const PirateTable = (props) => {
+const PirateTable = memo(function PirateTable(props) {
     const { roundState } = useContext(RoundContext);
     if (roundState.tableMode === "dropdown") {
         return <DropDownTable {...props} />;
     }
 
     return <NormalTable {...props} />;
-};
+});
 
 export default function EditBets(props) {
     const { blue, orange, green, red, yellow, gray, getPirateBgColor } = props;
@@ -1121,21 +1126,40 @@ export default function EditBets(props) {
     const { roundState, setRoundState, currentBet, allBets } =
         useContext(RoundContext);
 
-    const anyBets = anyBetsExist(allBets[currentBet]);
+    const anyBets = useMemo(
+        () => anyBetsExist(allBets[currentBet]),
+        [allBets, currentBet]
+    );
+
+    const memoizedBetAmountsSettings = useMemo(
+        () => <BetAmountsSettings boxShadow="md" />,
+        []
+    );
+
+    const memoizedLeftIcon = useMemo(() => <Icon as={FaEdit} />, []);
+
+    const handleEditClick = useCallback(() => {
+        setRoundState({ viewMode: false });
+    }, [setRoundState]);
+
+    const memoizedButton = useMemo(
+        () => (
+            <Button
+                leftIcon={memoizedLeftIcon}
+                colorScheme="blackAlpha"
+                onClick={handleEditClick}
+            >
+                Edit these bets
+            </Button>
+        ),
+        [memoizedLeftIcon, handleEditClick]
+    );
 
     return (
         <>
             <Collapse in={roundState.viewMode}>
                 <Box bgColor={blue} p={4}>
-                    <Button
-                        leftIcon={<Icon as={FaEdit} />}
-                        colorScheme="blackAlpha"
-                        onClick={() => {
-                            setRoundState({ viewMode: false });
-                        }}
-                    >
-                        Edit these bets
-                    </Button>
+                    {memoizedButton}
                 </Box>
             </Collapse>
 
@@ -1164,7 +1188,7 @@ export default function EditBets(props) {
 
             {anyBets && (
                 <>
-                    <BetAmountsSettings boxShadow="md" />
+                    {memoizedBetAmountsSettings}
 
                     <HorizontalScrollingBox py={4}>
                         <PayoutTable

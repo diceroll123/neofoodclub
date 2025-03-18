@@ -1,7 +1,7 @@
-import React from "react";
+import React, { memo } from "react";
 import { Box } from "@chakra-ui/react";
 
-export function VercelCredit() {
+export const VercelCredit = memo(function VercelCredit() {
     return (
         <Box
             mt="6"
@@ -21,4 +21,4 @@ export function VercelCredit() {
             Vercel
         </Box>
     );
-}
+});

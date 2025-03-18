@@ -26,7 +26,14 @@ import {
 import { useScroll } from "framer-motion";
 import Cookies from "universal-cookie";
 import Moment from "react-moment";
-import React, { useContext, useEffect, useState, useMemo } from "react";
+import React, {
+    useContext,
+    useEffect,
+    useState,
+    useMemo,
+    useCallback,
+    memo,
+} from "react";
 import moment from "moment";
 import NeopointIcon from "./images/np-icon.svg";
 
@@ -43,26 +50,31 @@ import GlowCard from "./components/GlowCard";
 
 moment.relativeTimeThreshold("ss", 0);
 
-function PreviousRoundInfo() {
+const PreviousRoundInfo = memo(function PreviousRoundInfo() {
     const { roundState } = useContext(RoundContext);
 
-    return (
-        <Text as={Box} fontSize="xs">
-            <VStack spacing={0}>
-                <>Round {roundState.currentSelectedRound} ended</>
-                <>
-                    <Moment
-                        format="YYYY-MM-DD hh:mm:ss A [NST]"
-                        date={roundState.roundData.timestamp}
-                        tz="America/Los_Angeles"
-                    />
-                </>
-            </VStack>
-        </Text>
+    const memoizedText = useMemo(
+        () => (
+            <Text as={Box} fontSize="xs">
+                <VStack spacing={0}>
+                    <>Round {roundState.currentSelectedRound} ended</>
+                    <>
+                        <Moment
+                            format="YYYY-MM-DD hh:mm:ss A [NST]"
+                            date={roundState.roundData.timestamp}
+                            tz="America/Los_Angeles"
+                        />
+                    </>
+                </VStack>
+            </Text>
+        ),
+        [roundState.currentSelectedRound, roundState.roundData.timestamp]
     );
-}
 
-function CurrentRoundProgress() {
+    return memoizedText;
+});
+
+const CurrentRoundProgress = memo(function CurrentRoundProgress() {
     const { roundState } = useContext(RoundContext);
     const roundPercentOver = calculateRoundOverPercentage(roundState);
 
@@ -89,12 +101,21 @@ function CurrentRoundProgress() {
             )}
         </>
     );
-}
+});
 
-function CurrentRoundInfo() {
+// Define constants outside the component to ensure stability across renders
+const divider = <StackDivider />;
+const LABEL_LAST_UPDATE = "Last Update";
+const LABEL_LAST_CHANGE = "Last Change";
+
+const CurrentRoundInfo = memo(function CurrentRoundInfo() {
     const { roundState } = useContext(RoundContext);
 
-    const timestamp = moment(roundState.roundData.timestamp);
+    // Memoize the timestamp to avoid recalculating on every render
+    const timestamp = useMemo(
+        () => moment(roundState.roundData.timestamp),
+        [roundState.roundData.timestamp]
+    );
 
     let element = "span";
 
@@ -104,12 +125,10 @@ function CurrentRoundInfo() {
     }
 
     return (
-        <VStack divider={<StackDivider />} spacing={1} minW="140px">
+        <VStack divider={divider} spacing={1} minW="140px">
             <HStack>
-                <Tooltip label="Last Update">
-                    <div>
-                        <Icon as={FaSync} />
-                    </div>
+                <Tooltip label={LABEL_LAST_UPDATE}>
+                    <Icon as={FaSync} />
                 </Tooltip>
                 <Text fontSize="xs" as={element} minW="100px">
                     <Moment
@@ -118,7 +137,6 @@ function CurrentRoundInfo() {
                         fromNow
                         withTitle
                         titleFormat="LLL [NST]"
-                        interval={1}
                     />
                 </Text>
             </HStack>
@@ -126,10 +144,8 @@ function CurrentRoundInfo() {
                 roundState.roundData.start !==
                     roundState.roundData.lastChange && (
                     <HStack>
-                        <Tooltip label="Last Change">
-                            <div>
-                                <Icon as={FaClockRotateLeft} />
-                            </div>
+                        <Tooltip label={LABEL_LAST_CHANGE}>
+                            <Icon as={FaClockRotateLeft} />
                         </Tooltip>
                         <Text fontSize="xs" minW="100px">
                             <Moment
@@ -138,16 +154,15 @@ function CurrentRoundInfo() {
                                 fromNow
                                 withTitle
                                 titleFormat="LLL [NST]"
-                                interval={1}
                             />
                         </Text>
                     </HStack>
                 )}
         </VStack>
     );
-}
+});
 
-function RoundInfo() {
+const RoundInfo = memo(function RoundInfo() {
     const { roundState } = useContext(RoundContext);
 
     let element = null;
@@ -159,79 +174,98 @@ function RoundInfo() {
     }
 
     return element;
-}
+});
 
-function MaxBetInput() {
+const MaxBetInput = memo(function MaxBetInput() {
     const { roundState } = useContext(RoundContext);
-    const cookies = new Cookies();
+    const cookies = useMemo(() => new Cookies(), []);
     const toast = useToast();
     const [hasFocus, setHasFocus] = useState(false);
 
-    const [tempMaxBet, setTempMaxBet] = useState(
-        getMaxBet(roundState.currentSelectedRound)
+    const maxBet = useMemo(
+        () => getMaxBet(roundState.currentSelectedRound),
+        [roundState.currentSelectedRound]
     );
+
+    const [tempMaxBet, setTempMaxBet] = useState(maxBet);
 
     useEffect(() => {
-        setTempMaxBet(getMaxBet(roundState.currentSelectedRound));
-    }, [roundState.currentSelectedRound]);
+        setTempMaxBet(maxBet);
+    }, [maxBet]);
 
-    return (
-        <InputGroup size="xs">
-            <InputLeftAddon children="Max Bet" />
-            <NumberInput
-                value={tempMaxBet.toString()}
-                onChange={(value) => setTempMaxBet(value)}
-                onFocus={(e) => {
-                    setHasFocus(true);
-                    e.target.select();
-                }}
-                onBlur={(e) => {
-                    setHasFocus(false);
-                    let value = parseInt(e.target.value);
-                    if (value === tempMaxBet) {
-                        // don't save over it if it's the same
-                        return;
-                    }
+    const handleChange = useCallback((value) => {
+        setTempMaxBet(value);
+    }, []);
 
-                    if (isNaN(value) || value < 50) {
-                        value = -1000;
-                    }
+    const handleFocus = useCallback((e) => {
+        setHasFocus(true);
+        e.target.select();
+    }, []);
 
-                    setTempMaxBet(value);
+    const handleBlur = useCallback(
+        (e) => {
+            setHasFocus(false);
+            let value = parseInt(e.target.value);
+            if (value === tempMaxBet) {
+                // don't save over it if it's the same
+                return;
+            }
 
-                    let baseMaxBet = calculateBaseMaxBet(
-                        value,
-                        roundState.currentSelectedRound
-                    );
-                    cookies.set("baseMaxBet", baseMaxBet, {
-                        expires: moment().add(100, "years").toDate(),
-                    });
+            if (isNaN(value) || value < 50) {
+                value = -1000;
+            }
 
-                    toast.closeAll();
-                    toast({
-                        title: `Max Bet Saved!`,
-                        status: "success",
-                        duration: 2000,
-                        isClosable: true,
-                    });
-                }}
-                min={-1000}
-                max={500000}
-                allowMouseWheel
-            >
-                <NumberInputField />
-                {hasFocus && (
-                    <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                    </NumberInputStepper>
-                )}
-            </NumberInput>
-        </InputGroup>
+            setTempMaxBet(value);
+
+            let baseMaxBet = calculateBaseMaxBet(
+                value,
+                roundState.currentSelectedRound
+            );
+            cookies.set("baseMaxBet", baseMaxBet, {
+                expires: moment().add(100, "years").toDate(),
+            });
+
+            toast.closeAll();
+            toast({
+                title: `Max Bet Saved!`,
+                status: "success",
+                duration: 2000,
+                isClosable: true,
+            });
+        },
+        [tempMaxBet, cookies, roundState.currentSelectedRound, toast]
     );
-}
 
-function TitleHeading(props) {
+    const memoizedInputGroup = useMemo(
+        () => (
+            <InputGroup size="xs">
+                <InputLeftAddon children="Max Bet" />
+                <NumberInput
+                    value={tempMaxBet.toString()}
+                    onChange={handleChange}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    min={-1000}
+                    max={500000}
+                    allowMouseWheel
+                >
+                    <NumberInputField />
+                    {hasFocus && (
+                        <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                        </NumberInputStepper>
+                    )}
+                </NumberInput>
+            </InputGroup>
+        ),
+        [tempMaxBet, hasFocus, handleChange, handleFocus, handleBlur]
+    );
+
+    return memoizedInputGroup;
+});
+
+const TitleHeading = React.memo(function TitleHeading() {
     const { setRoundState, roundState } = useContext(RoundContext);
 
     return (
@@ -293,26 +327,27 @@ function TitleHeading(props) {
             </HStack>
         </>
     );
-}
+});
 
-function HeaderContent() {
+const HeaderContent = memo(function HeaderContent() {
     const { roundState } = useContext(RoundContext);
+    const { roundData } = roundState;
     const [isGlowing, setIsGlowing] = useState(false);
     const [currentTimestamp, setCurrentTimestamp] = useState("");
     const [winnersExist, setWinnersExist] = useState(false);
 
     const anyWinners = useMemo(() => {
-        const winners = roundState.roundData?.winners || [];
+        const winners = roundData?.winners || [];
         return winners.some((winner) => winner > 0);
-    }, [roundState.roundData?.winners]);
+    }, [roundData?.winners]);
 
     useEffect(() => {
-        if (!roundState.roundData) {
+        if (!roundData) {
             setIsGlowing(false);
             return;
         }
 
-        const timestamp = roundState.roundData?.timestamp;
+        const timestamp = roundData?.timestamp;
 
         setWinnersExist(anyWinners);
 
@@ -326,24 +361,26 @@ function HeaderContent() {
             return;
         }
 
-        if (timestamp === roundState.roundData.start) {
+        if (timestamp === roundData.start) {
             setIsGlowing(false);
             return;
         }
 
         if (currentTimestamp !== timestamp) {
             setIsGlowing(true);
+            setCurrentTimestamp(timestamp);
         }
 
-        setCurrentTimestamp(timestamp);
         const timeout = setTimeout(() => {
             setIsGlowing(false);
         }, 4000);
         return () => clearTimeout(timeout);
-    }, [roundState, currentTimestamp, anyWinners]);
+    }, [roundData?.winners, currentTimestamp, anyWinners, roundData?.timestamp, roundData?.start]);
 
-    return (
-        <>
+    const isLoaded = useMemo(() => !!roundData, [roundData]);
+
+    const memoizedHStack = useMemo(
+        () => (
             <HStack p={4} spacing={4} as={Flex}>
                 <TitleHeading />
                 <Spacer />
@@ -354,10 +391,7 @@ function HeaderContent() {
                             <RoundInput />
                             <MaxBetInput />
                         </VStack>
-                        <SkeletonText
-                            minW={"130"}
-                            isLoaded={roundState?.roundData}
-                        >
+                        <SkeletonText minW={"130"} isLoaded={isLoaded}>
                             <HStack>
                                 <CurrentRoundProgress hidden={winnersExist} />
                                 <RoundInfo />
@@ -367,11 +401,14 @@ function HeaderContent() {
                 </GlowCard>
                 <Spacer />
             </HStack>
-        </>
+        ),
+        [isGlowing, isLoaded, winnersExist]
     );
-}
 
-function Header(props) {
+    return memoizedHStack;
+});
+
+const Header = memo(function Header() {
     const bg = useColorModeValue(
         "rgba(255, 255, 255, 0.7)",
         "rgba(26, 32, 44, 0.7)"
@@ -383,24 +420,26 @@ function Header(props) {
         scrollY.on("change", () => setY(scrollY.get()));
     }, [scrollY]);
 
-    return (
-        <Box
-            as={"header"}
-            shadow={y > 0 ? "lg" : undefined}
-            transition="box-shadow 0.2s"
-            pos="fixed"
-            top="0"
-            zIndex="2"
-            bg={bg}
-            style={{ backdropFilter: "saturate(180%) blur(5px)" }}
-            left="0"
-            right="0"
-            width="full"
-            {...props}
-        >
-            <HeaderContent />
-        </Box>
+    return useMemo(
+        () => (
+            <Box
+                as={"header"}
+                shadow={y > 0 ? "lg" : undefined}
+                transition="box-shadow 0.2s"
+                pos="fixed"
+                top="0"
+                zIndex="2"
+                bg={bg}
+                backdropFilter="saturate(180%) blur(5px)"
+                left="0"
+                right="0"
+                width="full"
+            >
+                <HeaderContent />
+            </Box>
+        ),
+        [y, bg]
     );
-}
+});
 
 export default Header;
