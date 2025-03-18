@@ -1,3 +1,4 @@
+import React from "react";
 import { useColorModeValue } from "@chakra-ui/react";
 import SettingsBox from "./SettingsBox";
 import BetAmountsButtons from "./BetAmountsButtons";
