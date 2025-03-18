@@ -797,7 +797,7 @@ const DropDownTable = (props) => {
         <Tr>
           {ARENA_NAMES.map((arenaName, arenaId) => {
             return (
-              <Th>
+              <Th key={arenaId}>
                 {arenaName} ({displayAsPercent(arenaRatios[arenaId], 1)})
               </Th>
             );
