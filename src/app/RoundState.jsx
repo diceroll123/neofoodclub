@@ -10,6 +10,7 @@ import {
     cloneArray,
 } from "./util";
 import DropZone from "./DropZone";
+import { useCallback, useMemo } from "react";
 
 const RoundContext = createContext(null);
 const { Provider } = RoundContext;
@@ -55,46 +56,73 @@ const StateProvider = ({ children }) => {
     );
 
     useEffect(() => {
-        let bets = allBets[currentBet];
-        let betAmounts = allBetAmounts[currentBet];
-
-        setCalculations(calculateRoundData(roundState, bets, betAmounts));
+        setCalculations(
+            calculateRoundData(
+                roundState,
+                allBets[currentBet],
+                allBetAmounts[currentBet]
+            )
+        );
     }, [roundState, currentBet, allBets, allBetAmounts]);
 
-    const addNewSet = (name, bets, betAmounts, maybe_replace = false) => {
-        // will modify the current set if the current set is empty and maybe_replace is explicitly set to true
+    const addNewSet = useCallback(
+        (name, bets, betAmounts, maybe_replace = false) => {
+            // will modify the current set if the current set is empty and maybe_replace is explicitly set to true
 
-        const newIndex =
-            maybe_replace && !anyBetsExist(allBets[currentBet])
-                ? currentBet
-                : (parseInt(Object.keys(allBets).slice(-1)[0]) + 1).toString();
+            const newIndex =
+                maybe_replace && !anyBetsExist(allBets[currentBet])
+                    ? currentBet
+                    : (
+                          parseInt(Object.keys(allBets).slice(-1)[0]) + 1
+                      ).toString();
 
-        const clonedBets = cloneArray(bets);
-        const clonedBetAmounts = cloneArray(betAmounts);
+            const clonedBets = cloneArray(bets);
+            const clonedBetAmounts = cloneArray(betAmounts);
 
-        setAllNames({ ...allNames, [newIndex]: name });
-        setAllBets({ ...allBets, [newIndex]: clonedBets });
-        setAllBetAmounts({ ...allBetAmounts, [newIndex]: clonedBetAmounts });
-        setCurrentBet(newIndex);
-    };
+            setAllNames((prevNames) => ({ ...prevNames, [newIndex]: name }));
+            setAllBets((prevBets) => ({ ...prevBets, [newIndex]: clonedBets }));
+            setAllBetAmounts((prevAmounts) => ({
+                ...prevAmounts,
+                [newIndex]: clonedBetAmounts,
+            }));
+            setCurrentBet(newIndex);
+        },
+        [allBets, currentBet]
+    );
+
+    const providerValue = useMemo(
+        () => ({
+            roundState,
+            setRoundState,
+            calculations,
+            addNewSet,
+            currentBet,
+            setCurrentBet,
+            allNames,
+            setAllNames,
+            allBets,
+            setAllBets,
+            allBetAmounts,
+            setAllBetAmounts,
+        }),
+        [
+            roundState,
+            setRoundState,
+            calculations,
+            addNewSet,
+            currentBet,
+            setCurrentBet,
+            allNames,
+            setAllNames,
+            allBets,
+            setAllBets,
+            allBetAmounts,
+            setAllBetAmounts,
+        ]
+    );
 
     return (
-        <Provider
-            value={{
-                roundState,
-                setRoundState,
-                calculations,
-                addNewSet,
-                currentBet,
-                setCurrentBet,
-                allNames,
-                setAllNames,
-                allBets,
-                setAllBets,
-                allBetAmounts,
-                setAllBetAmounts,
-            }}
-        >
+        <Provider value={providerValue}>
             <DropZone>{children}</DropZone>
         </Provider>
     );
