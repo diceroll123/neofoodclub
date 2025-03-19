@@ -1124,7 +1124,7 @@ const BetFunctions = memo(function BetFunctions(props) {
 
 const USER_SELECT_NONE = { userSelect: "none" };
 
-const BetBadges = memo((props) => {
+const BetBadges = memo(function BetBadges(props) {
     const { index, ...rest } = props;
     const { calculations, roundState, allBets, allBetAmounts } =
         useContext(RoundContext);
