@@ -11,7 +11,7 @@ import {
     SimpleGrid,
     Flex,
 } from "@chakra-ui/react";
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import NeopointIcon from "./images/np-icon.svg";
 import { VercelCredit } from "./components/VercelCredit";
 
@@ -56,102 +56,134 @@ const KoFiButtion = memo(function KoFiButtion() {
 });
 
 const Footer = memo(function Footer() {
+    const boxBg = useColorModeValue("gray.50", "gray.900");
+    const boxColor = useColorModeValue("gray.700", "gray.200");
+    const dividerBorderColor = useColorModeValue("gray.200", "gray.700");
+
+    const columns = useMemo(() => ({ base: 1, sm: 2, md: 3 }), []);
+
+    const beforeProps = useMemo(
+        () => ({
+            content: '""',
+            borderBottom: "1px solid",
+            borderColor: dividerBorderColor,
+            flexGrow: 1,
+            mr: 8,
+        }),
+        [dividerBorderColor]
+    );
+
+    const afterProps = useMemo(
+        () => ({
+            content: '""',
+            borderBottom: "1px solid",
+            borderColor: dividerBorderColor,
+            flexGrow: 1,
+            ml: 8,
+        }),
+        [dividerBorderColor]
+    );
+
+    const memoizedKoFiButton = useMemo(() => <KoFiButtion />, []);
+    const memoizedLogo = useMemo(() => <Logo />, []);
+    const memoizedVercelCredit = useMemo(() => <VercelCredit />, []);
+
+    const memoizedFoodClubLinks = useMemo(
+        () => (
+            <Stack align={"flex-start"}>
+                <ListHeader>Food Club Links</ListHeader>
+                <Link
+                    isExternal
+                    href="https://www.neopets.com/pirates/foodclub.phtml?type=bet"
+                >
+                    Place Bets
+                </Link>
+                <Link
+                    isExternal
+                    href="https://www.neopets.com/pirates/foodclub.phtml?type=current_bets"
+                >
+                    Current Bets
+                </Link>
+                <Link
+                    isExternal
+                    href="https://www.neopets.com/pirates/foodclub.phtml?type=collect"
+                >
+                    Collect Winnings
+                </Link>
+                <Link
+                    isExternal
+                    href="https://www.neopets.com/gamescores.phtml?game_id=88"
+                >
+                    High Score List
+                </Link>
+            </Stack>
+        ),
+        []
+    );
+
+    const memoizedNeoFoodClubStuff = useMemo(
+        () => (
+            <Stack align={"flex-start"}>
+                <ListHeader>NeoFoodClub Stuff</ListHeader>
+                <Link isExternal href="https://foodclub.neocities.org/">
+                    Classic NeoFoodClub
+                </Link>
+                <Link
+                    isExternal
+                    href="https://github.com/diceroll123/neofoodclub"
+                >
+                    Source Code
+                </Link>
+            </Stack>
+        ),
+        []
+    );
+
+    const memoizedSupportUs = useMemo(
+        () => (
+            <Stack align={"flex-start"}>
+                <ListHeader>Support us</ListHeader>
+                {memoizedKoFiButton}
+            </Stack>
+        ),
+        [memoizedKoFiButton]
+    );
+
+    const memoizedFooterText = useMemo(
+        () => (
+            <Text pt={6} fontSize={"sm"} textAlign={"center"}>
+                Website, design, and code &copy; neofood.club
+                <br />
+                This is an unofficial Neopets fansite with no
+                affiliation/endorsement with Neopets.
+                <br /> Images/Names &copy; Neopets, Inc. All rights reserved.
+                Used With Permission
+            </Text>
+        ),
+        []
+    );
+
     return (
         <>
             <Divider />
-            <Box
-                bg={useColorModeValue("gray.50", "gray.900")}
-                color={useColorModeValue("gray.700", "gray.200")}
-            >
+            <Box bg={boxBg} color={boxColor}>
                 <Container as={Stack} maxW={"6xl"} py={10}>
-                    <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={8}>
-                        <Stack align={"flex-start"}>
-                            <ListHeader>Food Club Links</ListHeader>
-                            <Link
-                                isExternal
-                                href="https://www.neopets.com/pirates/foodclub.phtml?type=bet"
-                            >
-                                Place Bets
-                            </Link>
-                            <Link
-                                isExternal
-                                href="https://www.neopets.com/pirates/foodclub.phtml?type=current_bets"
-                            >
-                                Current Bets
-                            </Link>
-                            <Link
-                                isExternal
-                                href="https://www.neopets.com/pirates/foodclub.phtml?type=collect"
-                            >
-                                Collect Winnings
-                            </Link>
-                            <Link
-                                isExternal
-                                href="https://www.neopets.com/gamescores.phtml?game_id=88"
-                            >
-                                High Score List
-                            </Link>
-                        </Stack>
-
-                        <Stack align={"flex-start"}>
-                            <ListHeader>NeoFoodClub Stuff</ListHeader>
-                            <Link
-                                isExternal
-                                href="https://foodclub.neocities.org/"
-                            >
-                                Classic NeoFoodClub
-                            </Link>
-                            <Link
-                                isExternal
-                                href="https://github.com/diceroll123/neofoodclub"
-                            >
-                                Source Code
-                            </Link>
-                        </Stack>
-
-                        <Stack align={"flex-start"}>
-                            <ListHeader>Support us</ListHeader>
-                            <KoFiButtion />
-                        </Stack>
+                    <SimpleGrid columns={columns} spacing={8}>
+                        {memoizedFoodClubLinks}
+                        {memoizedNeoFoodClubStuff}
+                        {memoizedSupportUs}
                     </SimpleGrid>
                 </Container>
                 <Box py={10}>
                     <Flex
                         align={"center"}
-                        _before={{
-                            content: '""',
-                            borderBottom: "1px solid",
-                            borderColor: useColorModeValue(
-                                "gray.200",
-                                "gray.700"
-                            ),
-                            flexGrow: 1,
-                            mr: 8,
-                        }}
-                        _after={{
-                            content: '""',
-                            borderBottom: "1px solid",
-                            borderColor: useColorModeValue(
-                                "gray.200",
-                                "gray.700"
-                            ),
-                            flexGrow: 1,
-                            ml: 8,
-                        }}
+                        _before={beforeProps}
+                        _after={afterProps}
                     >
-                        <Logo />
+                        {memoizedLogo}
                     </Flex>
-                    <Text pt={6} fontSize={"sm"} textAlign={"center"}>
-                        Website, design, and code &copy; neofood.club
-                        <br />
-                        This is an unofficial Neopets fansite with no
-                        affiliation/endorsement with Neopets.
-                        <br /> Images/Names &copy; Neopets, Inc. All rights
-                        reserved. Used With Permission
-                    </Text>
-                    <Center>
-                        <VercelCredit />
-                    </Center>
+                    {memoizedFooterText}
+                    <Center>{memoizedVercelCredit}</Center>
                 </Box>
             </Box>
         </>
