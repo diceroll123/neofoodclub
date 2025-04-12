@@ -9,6 +9,12 @@ const ColorModeButton = () => {
   const { setColorMode } = useColorMode();
   const cookies = new Cookies();
 
+  const options = [
+    { value: "light", label: "Light", icon: FaSun, color: "yellow.300" },
+    { value: "dark", label: "Dark", icon: FaMoon, color: "gray.400" },
+    // { value: "system", label: "System", icon: FaDesktop, color: "blue.500" },  // TODO:  investigate lag
+  ];
+
   // Get preferred mode (returns 'light', 'dark', or 'system')
   const getPreferredMode = () => {
     const stored = cookies.get("colorMode");
@@ -47,12 +53,6 @@ const ColorModeButton = () => {
       setColorMode(newMode);
     }
   };
-
-  const options = [
-    { value: "light", label: "Light", icon: FaSun, color: "yellow.300" },
-    { value: "dark", label: "Dark", icon: FaMoon, color: "gray.400" },
-    // { value: "system", label: "System", icon: FaDesktop, color: "blue.500" },  // TODO:  investigate lag
-  ];
 
   return (
     <SectionPanel title="Appearance">
