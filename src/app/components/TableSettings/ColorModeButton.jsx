@@ -12,7 +12,7 @@ const ColorModeButton = () => {
   // Get preferred mode (returns 'light', 'dark', or 'system')
   const getPreferredMode = () => {
     const stored = cookies.get("colorMode");
-    return stored || "system";
+    return stored || options[options.length - 1].value; // use the last one, whether it's system or dark
   };
 
   const preferredMode = getPreferredMode();
