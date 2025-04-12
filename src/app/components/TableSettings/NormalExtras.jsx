@@ -1,4 +1,4 @@
-import { VStack } from "@chakra-ui/react";
+import { Collapse, VStack } from "@chakra-ui/react";
 import React, { useContext, useState } from "react";
 import {
   getTableMode,
@@ -21,7 +21,7 @@ const NormalExtras = (props) => {
   const [customOddsMode, setCustomOddsMode] = useState(getCustomOddsMode());
   const [oddsTimeline, setOddsTimeline] = useState(getOddsTimelineMode());
 
-  const notUsingNormal = getTableMode() !== "normal";
+  const usingNormal = getTableMode() === "normal";
 
   const toggleBigBrain = () => {
     const newValue = !bigBrain;
@@ -90,61 +90,63 @@ const NormalExtras = (props) => {
   };
 
   return (
-    <SectionPanel title="Advanced (Table Mode)" {...props}>
-      <VStack align="stretch" spacing={3} width="100%">
-        <SettingsRow
-          icon={FaBrain}
-          label="Big Brain Mode"
-          isChecked={bigBrain}
-          onChange={toggleBigBrain}
-          isDisabled={notUsingNormal}
-          colorScheme="pink"
-          iconProps={{
-            color: "pink.300",
-          }}
-        />
+    <Collapse in={usingNormal}>
+      <SectionPanel title="Advanced (Table Mode)" {...props}>
+        <VStack align="stretch" spacing={3} width="100%">
+          <SettingsRow
+            icon={FaBrain}
+            label="Big Brain Mode"
+            isChecked={bigBrain}
+            onChange={toggleBigBrain}
+            isDisabled={!usingNormal}
+            colorScheme="pink"
+            iconProps={{
+              color: "pink.300",
+            }}
+          />
 
-        <SettingsRow
-          icon={FaTimeline}
-          label="Odds Timeline"
-          isChecked={oddsTimeline}
-          onChange={toggleOddsTimeline}
-          isDisabled={
-            !(roundState.roundData?.foods && bigBrain) || notUsingNormal
-          }
-          colorScheme="purple"
-          iconProps={{
-            color: "purple.300",
-          }}
-        />
+          <SettingsRow
+            icon={FaTimeline}
+            label="Odds Timeline"
+            isChecked={oddsTimeline}
+            onChange={toggleOddsTimeline}
+            isDisabled={
+              !(roundState.roundData?.foods && bigBrain) || !usingNormal
+            }
+            colorScheme="purple"
+            iconProps={{
+              color: "purple.300",
+            }}
+          />
 
-        <SettingsRow
-          icon={FaCookieBite}
-          label="FA Details"
-          isChecked={faDetails}
-          onChange={toggleFaDetails}
-          isDisabled={
-            !(roundState.roundData?.foods && bigBrain) || notUsingNormal
-          }
-          colorScheme="orange"
-          iconProps={{
-            color: "orange",
-          }}
-        />
+          <SettingsRow
+            icon={FaCookieBite}
+            label="FA Details"
+            isChecked={faDetails}
+            onChange={toggleFaDetails}
+            isDisabled={
+              !(roundState.roundData?.foods && bigBrain) || !usingNormal
+            }
+            colorScheme="orange"
+            iconProps={{
+              color: "orange",
+            }}
+          />
 
-        <SettingsRow
-          icon={FaSliders}
-          label="Custom probs/odds"
-          isChecked={customOddsMode}
-          onChange={toggleCustomOddsMode}
-          isDisabled={!(bigBrain && roundState.roundData) || notUsingNormal}
-          colorScheme="blue"
-          iconProps={{
-            color: "blue.300",
-          }}
-        />
-      </VStack>
-    </SectionPanel>
+          <SettingsRow
+            icon={FaSliders}
+            label="Custom probs/odds"
+            isChecked={customOddsMode}
+            onChange={toggleCustomOddsMode}
+            isDisabled={!(bigBrain && roundState.roundData) || !usingNormal}
+            colorScheme="blue"
+            iconProps={{
+              color: "blue.300",
+            }}
+          />
+        </VStack>
+      </SectionPanel>
+    </Collapse>
   );
 };
 
