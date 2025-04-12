@@ -19,10 +19,10 @@ const CopyWithDomain = () => {
   };
 
   return (
-    <SectionPanel title="Copy Settings">
+    <SectionPanel title="Clipboard">
       <SettingsRow
         icon={FaGlobe}
-        label="Copy domain with bets"
+        label="Copy domain w/ bets"
         isChecked={useWebDomain}
         onChange={handleToggle}
         colorScheme="blue"
