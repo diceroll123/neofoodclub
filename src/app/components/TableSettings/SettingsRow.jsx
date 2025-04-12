@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Flex,
-  Icon,
-  Switch,
-  Text,
-  Tooltip,
-  useColorModeValue,
-  Box,
-} from "@chakra-ui/react";
+import { Flex, Icon, Switch, Text, Tooltip, Box } from "@chakra-ui/react";
 
 /**
  * A generic settings row component that displays an icon, label, and a toggle control (Switch or Checkbox)
@@ -20,9 +12,7 @@ import {
  * @param {string} props.tooltipText - Optional tooltip text to display on hover
  * @param {string} props.colorScheme - Optional color scheme for the switch (defaults to current color mode)
  * @param {Object} props.iconProps - Optional additional props for the icon
- * @param {string} props.controlType - Type of control to use ("switch" or "checkbox"), defaults to "switch"
  * @param {boolean} props.isDisabled - Whether the control is disabled
- * @param {boolean} props.growIconOnCheck - Whether the icon should grow when checked
  */
 const SettingsRow = ({
   icon,
