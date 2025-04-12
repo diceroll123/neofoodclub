@@ -58,15 +58,17 @@ const PayoutTable = (props) => {
   const amountOfBets = Object.keys(allBets[currentBet]).length;
 
   const swapBets = (index, newIndex) => {
-    let bets = allBets[currentBet];
-    let betAmounts = allBetAmounts[currentBet];
-    [bets[index], bets[newIndex]] = [bets[newIndex], bets[index]];
-    [betAmounts[index], betAmounts[newIndex]] = [
-      betAmounts[newIndex],
-      betAmounts[index],
+    const newBets = JSON.parse(JSON.stringify(allBets[currentBet]));
+    const newBetAmounts = JSON.parse(JSON.stringify(allBetAmounts[currentBet]));
+
+    [newBets[index], newBets[newIndex]] = [newBets[newIndex], newBets[index]];
+    [newBetAmounts[index], newBetAmounts[newIndex]] = [
+      newBetAmounts[newIndex],
+      newBetAmounts[index],
     ];
-    setAllBets({ ...allBets, [currentBet]: bets });
-    setAllBetAmounts({ ...allBetAmounts, [currentBet]: betAmounts });
+
+    setAllBets({ ...allBets, [currentBet]: newBets });
+    setAllBetAmounts({ ...allBetAmounts, [currentBet]: newBetAmounts });
   };
 
   const getMaxBetColor = (betNum) => {
