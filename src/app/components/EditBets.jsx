@@ -418,7 +418,7 @@ const NormalTable = (props) => {
 
   const changeBet = (betIndex, arenaIndex, pirateIndex) => {
     // change a single pirate in a single arena
-    let newBets = allBets[currentBet];
+    const newBets = JSON.parse(JSON.stringify(allBets[currentBet]));
     newBets[betIndex][arenaIndex] = pirateIndex;
     setAllBets({ ...allBets, [currentBet]: newBets });
   };
@@ -426,7 +426,7 @@ const NormalTable = (props) => {
   const changeBetLine = (arenaIndex, pirateValue) => {
     // change the entire row to pirateValue
     // for the 10-bet button
-    let newBets = allBets[currentBet];
+    const newBets = JSON.parse(JSON.stringify(allBets[currentBet]));
     for (let x = 1; x <= amountOfBets; x++) {
       newBets[x][arenaIndex] = pirateValue;
     }
@@ -785,7 +785,7 @@ const DropDownTable = (props) => {
 
   const changeBet = (betIndex, arenaIndex, pirateIndex) => {
     // change a single pirate in a single arena
-    let newBets = allBets[currentBet];
+    const newBets = JSON.parse(JSON.stringify(allBets[currentBet]));
     newBets[betIndex][arenaIndex] = pirateIndex;
     setAllBets({ ...allBets, [currentBet]: newBets });
   };
