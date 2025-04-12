@@ -8,6 +8,10 @@ import {
   getUseLogitModel,
   anyBetsExist,
   cloneArray,
+  getBigBrainMode,
+  getFaDetailsMode,
+  getCustomOddsMode,
+  getOddsTimelineMode,
 } from "./util";
 import DropZone from "./DropZone";
 
@@ -29,10 +33,10 @@ const StateProvider = ({ children }) => {
     customProbs: null,
     tableMode: getTableMode(),
     advanced: {
-      bigBrain: true,
-      faDetails: false,
-      customOddsMode: false,
-      oddsTimeline: false,
+      bigBrain: getBigBrainMode(),
+      faDetails: getFaDetailsMode(),
+      customOddsMode: getCustomOddsMode(),
+      oddsTimeline: getOddsTimelineMode(),
       useLogitModel: getUseLogitModel(),
     },
     viewMode: initialViewMode,

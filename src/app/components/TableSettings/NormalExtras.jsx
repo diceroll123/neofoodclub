@@ -1,28 +1,41 @@
 import { VStack } from "@chakra-ui/react";
 import React, { useContext, useState } from "react";
-import { getTableMode } from "../../util";
+import {
+  getTableMode,
+  getBigBrainMode,
+  getFaDetailsMode,
+  getCustomOddsMode,
+  getOddsTimelineMode,
+} from "../../util";
 import SectionPanel from "../SectionPanel";
 import { RoundContext } from "../../RoundState";
 import SettingsRow from "./SettingsRow";
 import { FaSliders, FaBrain, FaTimeline, FaCookieBite } from "react-icons/fa6";
+import Cookies from "universal-cookie";
 
 const NormalExtras = (props) => {
   const { roundState, setRoundState } = useContext(RoundContext);
 
-  const [bigBrain, setBigBrain] = useState(true);
-  const [faDetails, setFaDetails] = useState(false);
-  const [customOddsMode, setCustomOddsMode] = useState(false);
-  const [oddsTimeline, setOddsTimeline] = useState(false);
+  const [bigBrain, setBigBrain] = useState(getBigBrainMode());
+  const [faDetails, setFaDetails] = useState(getFaDetailsMode());
+  const [customOddsMode, setCustomOddsMode] = useState(getCustomOddsMode());
+  const [oddsTimeline, setOddsTimeline] = useState(getOddsTimelineMode());
 
   const notUsingNormal = getTableMode() !== "normal";
 
   const toggleBigBrain = () => {
-    setBigBrain((v) => !v);
+    const newValue = !bigBrain;
+    setBigBrain(newValue);
+
+    // Save to cookie
+    const cookies = new Cookies();
+    cookies.set("bigBrainMode", newValue);
+
     let currentAdvanced = roundState.advanced;
     setRoundState({
       advanced: {
         ...currentAdvanced,
-        bigBrain: !bigBrain,
+        bigBrain: newValue,
       },
       customOdds: null,
       customProbs: null,
@@ -32,6 +45,10 @@ const NormalExtras = (props) => {
   const toggleCustomOddsMode = () => {
     const checked = !customOddsMode;
     setCustomOddsMode(checked);
+
+    // Save to sessionStorage
+    sessionStorage.setItem("customOddsMode", JSON.stringify(checked));
+
     setRoundState({
       advanced: {
         ...roundState.advanced,
@@ -45,6 +62,10 @@ const NormalExtras = (props) => {
   const toggleFaDetails = () => {
     const checked = !faDetails;
     setFaDetails(checked);
+
+    // Save to sessionStorage
+    sessionStorage.setItem("faDetailsMode", JSON.stringify(checked));
+
     setRoundState({
       advanced: {
         ...roundState.advanced,
@@ -56,6 +77,10 @@ const NormalExtras = (props) => {
   const toggleOddsTimeline = () => {
     const checked = !oddsTimeline;
     setOddsTimeline(checked);
+
+    // Save to sessionStorage
+    sessionStorage.setItem("oddsTimelineMode", JSON.stringify(checked));
+
     setRoundState({
       advanced: {
         ...roundState.advanced,
