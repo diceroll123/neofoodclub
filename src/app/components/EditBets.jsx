@@ -67,7 +67,7 @@ import Td from "./Td";
 import TextTooltip from "./TextTooltip";
 import TableSettings from "./TableSettings";
 import { FaEdit } from "react-icons/fa";
-import Moment from "react-moment";
+import DateFormatter from "./DateFormatter";
 
 const StickyTd = (props) => {
   const { children, ...rest } = props;
@@ -265,7 +265,7 @@ const OddsTimeline = (props) => {
                 <Text as="i" fontSize="md">
                   Round {roundState.roundData.round}
                   {" - "}
-                  <Moment
+                  <DateFormatter
                     tz="America/Los_Angeles"
                     format="dddd, MMMM Do YYYY"
                     date={start}
@@ -285,10 +285,10 @@ const OddsTimeline = (props) => {
                   <Box>
                     <Heading size="sm">
                       Round started{" - "}
-                      <Moment
-                        tz="America/Los_Angeles"
+                      <DateFormatter
                         format="LTS [NST]"
                         date={start}
+                        tz="America/Los_Angeles"
                       />
                     </Heading>
                     <Text as="i">
@@ -323,8 +323,7 @@ const OddsTimeline = (props) => {
 
                       <VStack spacing={0}>
                         <Text as="i" fontSize="xs">
-                          <Moment
-                            tz="America/Los_Angeles"
+                          <DateFormatter
                             format="LTS [NST]"
                             date={change.t}
                             withTitle
@@ -332,8 +331,8 @@ const OddsTimeline = (props) => {
                           />
                         </Text>
                         <Text as="i" fontSize="xs" hidden={isRoundOver}>
-                          <Moment
-                            tz="America/Los_Angeles"
+                          <DateFormatter
+                            format="llll [NST]"
                             date={change.t}
                             fromNow
                             withTitle
@@ -362,10 +361,10 @@ const OddsTimeline = (props) => {
                       <Box>
                         <Heading size="sm">
                           Round Over{" - "}
-                          <Moment
-                            tz="America/Los_Angeles"
+                          <DateFormatter
                             format="LTS [NST]"
                             date={endTime}
+                            tz="America/Los_Angeles"
                           />
                         </Heading>
                         <Stack spacing={0}>
@@ -382,10 +381,10 @@ const OddsTimeline = (props) => {
                                 }`}
                           </Text>
                           <Text as="i">
-                            <Moment
-                              tz="America/Los_Angeles"
+                            <DateFormatter
                               format="dddd, MMMM Do YYYY"
                               date={endTime}
+                              tz="America/Los_Angeles"
                             />
                           </Text>
                         </Stack>
