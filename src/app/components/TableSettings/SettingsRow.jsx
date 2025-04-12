@@ -32,17 +32,6 @@ const SettingsRow = ({
   // Extract props we don't want to pass directly to the Icon component
   const { baseSize: _, largeSize: _2, ...safeIconProps } = iconProps;
 
-  const renderControl = () => {
-    return (
-      <Switch
-        isChecked={isChecked}
-        onChange={onChange}
-        colorScheme={colorScheme || undefined}
-        isDisabled={isDisabled}
-      />
-    );
-  };
-
   const rowContent = (
     <Flex justify="space-between" align="center" width="100%">
       <Flex align="center">
@@ -70,7 +59,12 @@ const SettingsRow = ({
         </Box>
         <Text>{label}</Text>
       </Flex>
-      {renderControl()}
+      <Switch
+        isChecked={isChecked}
+        onChange={onChange}
+        colorScheme={colorScheme || undefined}
+        isDisabled={isDisabled}
+      />
     </Flex>
   );
 
