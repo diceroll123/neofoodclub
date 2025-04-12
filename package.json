@@ -34,7 +34,13 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "plugins": [
+      "react-compiler"
+    ],
+    "rules": {
+      "react-compiler/react-compiler": "error"
+    }
   },
   "browserslist": {
     "production": [
@@ -49,6 +55,8 @@
     ]
   },
   "devDependencies": {
+    "babel-plugin-react-compiler": "^19.0.0-beta-e993439-20250405",
+    "eslint-plugin-react-compiler": "^19.0.0-beta-e993439-20250405",
     "eslint-plugin-react-hooks": "^5.2.0"
   }
 }
