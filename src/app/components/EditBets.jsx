@@ -65,8 +65,7 @@ import Pd from "./Pd";
 import { RoundContext } from "../RoundState";
 import Td from "./Td";
 import TextTooltip from "./TextTooltip";
-import TableSettings from "./TableSettings";
-import { FaEdit } from "react-icons/fa";
+import { FaPenToSquare } from "react-icons/fa6";
 import DateFormatter from "./DateFormatter";
 
 const StickyTd = (props) => {
@@ -938,7 +937,7 @@ export default function EditBets(props) {
       <Collapse in={roundState.viewMode}>
         <Box bgColor={blue} p={4}>
           <Button
-            leftIcon={<Icon as={FaEdit} />}
+            leftIcon={<Icon as={FaPenToSquare} />}
             colorScheme="blackAlpha"
             onClick={() => {
               setRoundState({ viewMode: false });
@@ -950,8 +949,6 @@ export default function EditBets(props) {
       </Collapse>
 
       <Collapse in={!roundState.viewMode}>
-        <TableSettings />
-
         <HorizontalScrollingBox>
           <PirateTable
             m={4}
