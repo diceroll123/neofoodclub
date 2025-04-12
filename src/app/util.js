@@ -534,3 +534,39 @@ export function calculateRoundData(roundState, bets, betAmounts) {
     totalEnabledBets,
   };
 }
+
+// DateFormatter utility to replace react-moment
+export function formatDate(date, options = {}) {
+  const {
+    format,
+    fromNow,
+    toNow,
+    calendar,
+    tz = "America/Los_Angeles",
+  } = options;
+
+  if (!date) {
+    return "";
+  }
+
+  const momentDate = moment(date);
+
+  // Set timezone if specified
+  if (tz) {
+    momentDate.tz(tz);
+  }
+
+  // Return formatted date based on options
+  if (fromNow) {
+    return momentDate.fromNow();
+  } else if (toNow) {
+    return momentDate.toNow();
+  } else if (calendar) {
+    return momentDate.calendar();
+  } else if (format) {
+    return momentDate.format(format);
+  }
+
+  // Default format
+  return momentDate.format("YYYY-MM-DD HH:mm:ss");
+}

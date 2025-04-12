@@ -25,7 +25,6 @@ import {
 } from "@chakra-ui/react";
 import { useScroll } from "framer-motion";
 import Cookies from "universal-cookie";
-import Moment from "react-moment";
 import React, { useContext, useEffect, useState, useMemo } from "react";
 import moment from "moment";
 import NeopointIcon from "./images/np-icon.svg";
@@ -40,6 +39,7 @@ import RoundInput from "./components/RoundInput";
 import { FaSync } from "react-icons/fa";
 import { FaClockRotateLeft } from "react-icons/fa6";
 import GlowCard from "./components/GlowCard";
+import DateFormatter from "./components/DateFormatter";
 
 moment.relativeTimeThreshold("ss", 0);
 
@@ -51,7 +51,7 @@ function PreviousRoundInfo() {
       <VStack spacing={0}>
         <>Round {roundState.currentSelectedRound} ended</>
         <>
-          <Moment
+          <DateFormatter
             format="YYYY-MM-DD hh:mm:ss A [NST]"
             date={roundState.roundData.timestamp}
             tz="America/Los_Angeles"
@@ -108,7 +108,7 @@ function CurrentRoundInfo() {
           </div>
         </Tooltip>
         <Text fontSize="xs" as={element} minW="100px">
-          <Moment
+          <DateFormatter
             date={roundState.roundData.timestamp}
             tz={"America/Los_Angeles"}
             fromNow
@@ -127,7 +127,7 @@ function CurrentRoundInfo() {
               </div>
             </Tooltip>
             <Text fontSize="xs" minW="100px">
-              <Moment
+              <DateFormatter
                 date={roundState.roundData.lastChange}
                 tz={"America/Los_Angeles"}
                 fromNow
