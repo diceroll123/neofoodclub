@@ -1,54 +1,62 @@
 import { useColorMode } from "@chakra-ui/react";
 import { FaMoon, FaSun, FaDesktop } from "react-icons/fa6";
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import Cookies from "universal-cookie";
 import SectionPanel from "../SectionPanel";
 import OptionButtons from "../OptionButtons";
 
 const ColorModeButton = () => {
-  const { setColorMode } = useColorMode();
-  const cookies = new Cookies();
+  const { colorMode, setColorMode } = useColorMode();
+  const cookies = useMemo(() => new Cookies(), []);
+
+  // Check for system dark/light preference
+  const getSystemPreference = useCallback(() => {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }, []);
+
+  const [selectedMode, setSelectedMode] = useState(() => {
+    // Initialize from cookie on mount
+    const stored = cookies.get("colorMode");
+    return stored || "system";
+  });
 
   const options = [
     { value: "light", label: "Light", icon: FaSun, color: "yellow.300" },
     { value: "dark", label: "Dark", icon: FaMoon, color: "gray.400" },
-    // { value: "system", label: "System", icon: FaDesktop, color: "blue.500" },  // TODO:  investigate lag
+    { value: "system", label: "System", icon: FaDesktop, color: "blue.500" },
   ];
 
-  // Get preferred mode (returns 'light', 'dark', or 'system')
-  const getPreferredMode = () => {
-    const stored = cookies.get("colorMode");
-    return stored || options[options.length - 1].value; // use the last one, whether it's system or dark
-  };
+  // Apply color mode on initial load and when selectedMode changes
+  useEffect(() => {
+    if (selectedMode === "system") {
+      setColorMode(getSystemPreference());
+    } else {
+      setColorMode(selectedMode);
+    }
+  }, [selectedMode, getSystemPreference, setColorMode]);
 
-  const preferredMode = getPreferredMode();
-
-  // Handle system preference changes
+  // Set up listener for system color scheme changes
   useEffect(() => {
     const handleSystemChange = (e) => {
-      if (preferredMode === "system") {
+      if (cookies.get("colorMode") === "system") {
         setColorMode(e.matches ? "dark" : "light");
       }
     };
 
-    if (preferredMode === "system") {
-      const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
-      setColorMode(isDarkMode.matches ? "dark" : "light");
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    mediaQuery.addEventListener("change", handleSystemChange);
 
-      // Listen for system preference changes
-      isDarkMode.addEventListener("change", handleSystemChange);
-      return () => isDarkMode.removeEventListener("change", handleSystemChange);
-    }
-  }, [preferredMode, setColorMode]);
+    return () => mediaQuery.removeEventListener("change", handleSystemChange);
+  }, [cookies, setColorMode]);
 
   const handleChange = (newMode) => {
+    setSelectedMode(newMode);
     cookies.set("colorMode", newMode);
 
     if (newMode === "system") {
-      const isDarkMode = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      setColorMode(isDarkMode ? "dark" : "light");
+      setColorMode(getSystemPreference());
     } else {
       setColorMode(newMode);
     }
@@ -58,7 +66,7 @@ const ColorModeButton = () => {
     <SectionPanel title="Appearance">
       <OptionButtons
         options={options}
-        currentValue={preferredMode}
+        currentValue={selectedMode}
         onChange={handleChange}
       />
     </SectionPanel>
