@@ -6,7 +6,7 @@ import FaviconGenerator from "./app/FaviconGenerator";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import reportWebVitals from "./reportWebVitals";
 import { StateProvider } from "./app/RoundState";
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import theme from "./theme";
 
 const rootElement = document.getElementById("root");
@@ -15,6 +15,7 @@ const root = ReactDOMClient.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <FaviconGenerator />
+    <ColorModeScript initialColorMode={theme.config.initialColorMode} />
     <ChakraProvider theme={theme}>
       <StateProvider>
         <App />
