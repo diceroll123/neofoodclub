@@ -19,7 +19,9 @@ const spin = keyframes`
   }
 `;
 
-const CardContainer = styled(Box)`
+const CardContainer = styled(Box).withConfig({
+  shouldForwardProp: (prop) => prop !== "animate",
+})`
   ${angleProperty}
 
   background: var(--chakra-colors-chakra-body-bg);
