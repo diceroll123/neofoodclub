@@ -6,7 +6,7 @@ import SectionPanel from "../SectionPanel";
 import OptionButtons from "../OptionButtons";
 
 const ColorModeButton = () => {
-  const { colorMode, setColorMode } = useColorMode();
+  const { setColorMode } = useColorMode();
   const cookies = useMemo(() => new Cookies(), []);
 
   // Check for system dark/light preference
