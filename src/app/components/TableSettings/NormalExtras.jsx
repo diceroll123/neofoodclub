@@ -46,7 +46,6 @@ const NormalExtras = (props) => {
     const checked = !customOddsMode;
     setCustomOddsMode(checked);
 
-    // Save to sessionStorage
     sessionStorage.setItem("customOddsMode", JSON.stringify(checked));
 
     setRoundState({
@@ -63,7 +62,6 @@ const NormalExtras = (props) => {
     const checked = !faDetails;
     setFaDetails(checked);
 
-    // Save to sessionStorage
     sessionStorage.setItem("faDetailsMode", JSON.stringify(checked));
 
     setRoundState({
@@ -78,7 +76,6 @@ const NormalExtras = (props) => {
     const checked = !oddsTimeline;
     setOddsTimeline(checked);
 
-    // Save to sessionStorage
     sessionStorage.setItem("oddsTimelineMode", JSON.stringify(checked));
 
     setRoundState({
