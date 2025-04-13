@@ -52,7 +52,7 @@ function PreviousRoundInfo() {
         <>Round {roundState.currentSelectedRound} ended</>
         <>
           <DateFormatter
-            format="YYYY-MM-DD hh:mm:ss A [NST]"
+            format={moment().year() === moment(roundState.roundData.timestamp).year() ? "MMM D, h:mm A [NST]" : "MMM D YYYY, h:mm A [NST]"}
             date={roundState.roundData.timestamp}
             tz="America/Los_Angeles"
           />
