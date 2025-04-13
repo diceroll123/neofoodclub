@@ -209,6 +209,27 @@ export function getTableMode() {
   return mode;
 }
 
+export function getBigBrainMode() {
+  const cookies = new Cookies();
+  let mode = cookies.get("bigBrainMode");
+  return mode !== undefined ? mode : true; // Default to true if not set
+}
+
+export function getFaDetailsMode() {
+  const stored = sessionStorage.getItem("faDetailsMode");
+  return stored !== null ? JSON.parse(stored) : false;
+}
+
+export function getCustomOddsMode() {
+  const stored = sessionStorage.getItem("customOddsMode");
+  return stored !== null ? JSON.parse(stored) : false;
+}
+
+export function getOddsTimelineMode() {
+  const stored = sessionStorage.getItem("oddsTimelineMode");
+  return stored !== null ? JSON.parse(stored) : false;
+}
+
 export function getUseWebDomain() {
   const cookies = new Cookies();
   return cookies.get("useWebDomain");

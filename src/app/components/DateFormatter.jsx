@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { formatDate } from "../util";
-import { Text } from "@chakra-ui/react";
 
 const DateFormatter = ({
   date,
@@ -41,7 +40,9 @@ const DateFormatter = ({
 
   // Set up interval for live updates if interval is provided
   useEffect(() => {
-    if (!interval) return;
+    if (!interval) {
+      return;
+    }
 
     const timer = setInterval(() => {
       updateDate();

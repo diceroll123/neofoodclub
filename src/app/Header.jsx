@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Center,
   CircularProgress,
   CircularProgressLabel,
@@ -36,11 +37,10 @@ import {
 } from "./util";
 import { RoundContext } from "./RoundState";
 import RoundInput from "./components/RoundInput";
-import { FaSync } from "react-icons/fa";
-import { FaClockRotateLeft } from "react-icons/fa6";
+import { FaRotate, FaClockRotateLeft } from "react-icons/fa6";
 import GlowCard from "./components/GlowCard";
 import DateFormatter from "./components/DateFormatter";
-
+import SidebarSettings from "./components/SidebarSettings";
 moment.relativeTimeThreshold("ss", 0);
 
 function PreviousRoundInfo() {
@@ -52,7 +52,7 @@ function PreviousRoundInfo() {
         <>Round {roundState.currentSelectedRound} ended</>
         <>
           <DateFormatter
-            format="YYYY-MM-DD hh:mm:ss A [NST]"
+            format={moment().year() === moment(roundState.roundData.timestamp).year() ? "MMM D, h:mm A [NST]" : "MMM D YYYY, h:mm A [NST]"}
             date={roundState.roundData.timestamp}
             tz="America/Los_Angeles"
           />
@@ -104,7 +104,7 @@ function CurrentRoundInfo() {
       <HStack>
         <Tooltip label="Last Update">
           <div>
-            <Icon as={FaSync} />
+            <Icon as={FaRotate} />
           </div>
         </Tooltip>
         <Text fontSize="xs" as={element} minW="100px">
@@ -229,20 +229,33 @@ function MaxBetInput() {
 function TitleHeading(props) {
   const { setRoundState, roundState } = useContext(RoundContext);
 
+  const { scrollY } = window;
+
+  let disabled = false;
+
+  if (
+    scrollY === 0 &&
+    roundState.currentSelectedRound === roundState.currentRound
+  ) {
+    disabled = true;
+  }
+
   return (
     <>
       <HStack
+        as={Button}
         display={{ base: "none", md: "block" }}
         cursor={"pointer"}
         userSelect={"none"}
+        variant="ghost"
+        _hover={{ bg: disabled ? "transparent" : undefined }}
         onClick={() => {
           setRoundState({ viewMode: false });
 
-          // scroll to top
-          window.scrollTo({ top: 0, behavior: "smooth" });
-
-          if (
-            window.scrollY === 0 &&
+          if (scrollY !== 0) {
+            // scroll to top
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          } else if (
             roundState.currentSelectedRound !== roundState.currentRound
           ) {
             // TODO MAYBE: add a confirmation dialog?
@@ -339,6 +352,7 @@ function HeaderContent() {
   return (
     <>
       <HStack p={4} spacing={4} as={Flex}>
+        <SidebarSettings />
         <TitleHeading />
         <Spacer />
 

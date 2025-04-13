@@ -10,7 +10,7 @@ import {
 import { useContext } from "react";
 import { RoundContext } from "../RoundState";
 import { determineBetAmount, getMaxBet } from "../util";
-import { FaFillDrip, FaInfinity } from "react-icons/fa";
+import { FaFillDrip, FaInfinity } from "react-icons/fa6";
 
 const BetAmountsButtons = (props) => {
   const {
