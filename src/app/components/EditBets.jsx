@@ -38,6 +38,7 @@ import { FaSackDollar, FaUtensils, FaSkullCrossbones } from "react-icons/fa6";
 import {
   ARENA_NAMES,
   FOODS,
+  FULL_PIRATE_NAMES,
   NEGATIVE_FAS,
   PIRATE_NAMES,
   POSITIVE_FAS,
@@ -48,6 +49,7 @@ import {
   anyBetsExist,
   getOdds,
   displayAsPlusMinus,
+  useTableColors,
 } from "../util";
 import BetAmountsSettings from "./BetAmountsSettings";
 import BetFunctions from "../BetFunctions";
@@ -69,9 +71,15 @@ import { FaPenToSquare } from "react-icons/fa6";
 import DateFormatter from "./DateFormatter";
 
 const StickyTd = (props) => {
-  const { children, ...rest } = props;
+  const { children, onClick, cursor, ...rest } = props;
   return (
-    <Td style={{ position: "sticky", left: "0" }} zIndex={1} {...rest}>
+    <Td
+      style={{ position: "sticky", left: "0" }}
+      zIndex={1}
+      onClick={onClick}
+      cursor={cursor}
+      {...rest}
+    >
       {children}
     </Td>
   );
@@ -171,10 +179,8 @@ const TimelineBar = (props) => {
   );
 };
 
-const OddsTimeline = (props) => {
-  const { roundState } = useContext(RoundContext);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = React.useRef();
+const TimelineContent = (props) => {
+  const { roundState, arenaId, pirateIndex } = props;
 
   if (!roundState.roundData) {
     return (
@@ -184,9 +190,7 @@ const OddsTimeline = (props) => {
     );
   }
 
-  const { arenaId, pirateIndex } = props;
   const pirateId = roundState.roundData.pirates[arenaId][pirateIndex];
-
   const openingOdds =
     roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
   const start = new Date(roundState.roundData.start);
@@ -207,10 +211,6 @@ const OddsTimeline = (props) => {
     }
   }
 
-  const percentages = calculatePercentages(
-    thisPiratesChangesTimes,
-    endTime.getTime()
-  );
   const pirateName = PIRATE_NAMES[pirateId];
 
   const winners = roundState.roundData.winners || [0, 0, 0, 0, 0];
@@ -229,180 +229,220 @@ const OddsTimeline = (props) => {
 
   return (
     <>
-      <Flex maxW="300px" ref={btnRef} onClick={onOpen} cursor="pointer">
-        {thisPiratesOdds.map((odds, i) => {
-          return (
-            <TimelineBar
-              key={i}
-              index={i}
-              odds={odds}
-              percent={percentages[i]}
-            />
-          );
-        })}
-      </Flex>
-      <Drawer
-        isOpen={isOpen}
-        placement="right"
-        onClose={onClose}
-        finalFocusRef={btnRef}
-        size="md"
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>
-            <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-              <Avatar
-                name={pirateName}
-                src={`https://images.neopets.com/pirates/fc/fc_pirate_${pirateId}.gif`}
+      <DrawerHeader>
+        <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
+          <Avatar
+            name={pirateName}
+            src={`https://images.neopets.com/pirates/fc/fc_pirate_${pirateId}.gif`}
+          />
+          <Box>
+            <Heading size="sm">
+              {pirateName} {oddsChangesCountLabel}
+            </Heading>
+            <Text as="i" fontSize="md">
+              Round {roundState.roundData.round}
+              {" - "}
+              <DateFormatter
+                tz="America/Los_Angeles"
+                format="dddd, MMMM Do YYYY"
+                date={start}
               />
+            </Text>
+          </Box>
+        </Flex>
+      </DrawerHeader>
+
+      <DrawerBody>
+        <Stack divider={<StackDivider />} spacing="4">
+          <Box>
+            <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
+              <Circle boxSize={10} bgColor="blue.500">
+                <Icon as={FaUtensils} boxSize={6} />
+              </Circle>
               <Box>
                 <Heading size="sm">
-                  {pirateName} {oddsChangesCountLabel}
-                </Heading>
-                <Text as="i" fontSize="md">
-                  Round {roundState.roundData.round}
-                  {" - "}
+                  Round started{" - "}
                   <DateFormatter
-                    tz="America/Los_Angeles"
-                    format="dddd, MMMM Do YYYY"
+                    format="LTS [NST]"
                     date={start}
+                    tz="America/Los_Angeles"
                   />
+                </Heading>
+                <Text as="i">
+                  {pirateName} opened at {openingOdds}:1
                 </Text>
               </Box>
             </Flex>
-          </DrawerHeader>
-
-          <DrawerBody>
-            <Stack divider={<StackDivider />} spacing="4">
-              <Box>
+          </Box>
+          {thisPiratesChanges.map((change, i) => {
+            const wentUp = change.new > change.old;
+            return (
+              <Box key={i}>
                 <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-                  <Circle boxSize={10} bgColor="blue.500">
-                    <Icon as={FaUtensils} boxSize={6} />
+                  <Circle
+                    size={8}
+                    bg={wentUp ? "tomato" : "green.500"}
+                    color="white"
+                  >
+                    <Text fontSize="sm" as="b">
+                      {displayAsPlusMinus(change.new - change.old)}
+                    </Text>
                   </Circle>
                   <Box>
                     <Heading size="sm">
-                      Round started{" - "}
+                      {change.old} to {change.new}
+                    </Heading>
+                    <Text fontSize="xs">
+                      {moment.localeData().ordinal(i + 1)} change
+                    </Text>
+                  </Box>
+                  <Spacer />
+
+                  <VStack spacing={0}>
+                    <Text as="i" fontSize="xs">
                       <DateFormatter
                         format="LTS [NST]"
-                        date={start}
+                        date={change.t}
+                        withTitle
+                        titleFormat="LLL [NST]"
+                      />
+                    </Text>
+                    <Text as="i" fontSize="xs" hidden={isRoundOver}>
+                      <DateFormatter
+                        format="llll [NST]"
+                        date={change.t}
+                        fromNow
+                        withTitle
+                        titleFormat="LLL [NST]"
+                        interval={1}
+                      />
+                    </Text>
+                  </VStack>
+                </Flex>
+              </Box>
+            );
+          })}
+          {isRoundOver ? (
+            <>
+              <Box>
+                <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
+                  <Circle size={10} bg={didPirateWin ? "green.500" : "tomato"}>
+                    <Icon
+                      boxSize={6}
+                      as={didPirateWin ? FaSackDollar : FaSkullCrossbones}
+                    />
+                  </Circle>
+                  <Box>
+                    <Heading size="sm">
+                      Round Over{" - "}
+                      <DateFormatter
+                        format="LTS [NST]"
+                        date={endTime}
                         tz="America/Los_Angeles"
                       />
                     </Heading>
-                    <Text as="i">
-                      {pirateName} opened at {openingOdds}:1
-                    </Text>
+                    <Stack spacing={0}>
+                      <Text as="i">
+                        {pirateName}{" "}
+                        {didPirateWin
+                          ? "Won!"
+                          : `lost to ${
+                              PIRATE_NAMES[
+                                roundState.roundData.pirates[arenaId][
+                                  winningPirate - 1
+                                ]
+                              ]
+                            }`}
+                      </Text>
+                      <Text as="i">
+                        <DateFormatter
+                          format="dddd, MMMM Do YYYY"
+                          date={endTime}
+                          tz="America/Los_Angeles"
+                        />
+                      </Text>
+                    </Stack>
                   </Box>
                 </Flex>
               </Box>
-              {thisPiratesChanges.map((change, i) => {
-                const wentUp = change.new > change.old;
-                return (
-                  <Box key={i}>
-                    <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-                      <Circle
-                        size={8}
-                        bg={wentUp ? "tomato" : "green.500"}
-                        color="white"
-                      >
-                        <Text fontSize="sm" as="b">
-                          {displayAsPlusMinus(change.new - change.old)}
-                        </Text>
-                      </Circle>
-                      <Box>
-                        <Heading size="sm">
-                          {change.old} to {change.new}
-                        </Heading>
-                        <Text fontSize="xs">
-                          {moment.localeData().ordinal(i + 1)} change
-                        </Text>
-                      </Box>
-                      <Spacer />
-
-                      <VStack spacing={0}>
-                        <Text as="i" fontSize="xs">
-                          <DateFormatter
-                            format="LTS [NST]"
-                            date={change.t}
-                            withTitle
-                            titleFormat="LLL [NST]"
-                          />
-                        </Text>
-                        <Text as="i" fontSize="xs" hidden={isRoundOver}>
-                          <DateFormatter
-                            format="llll [NST]"
-                            date={change.t}
-                            fromNow
-                            withTitle
-                            titleFormat="LLL [NST]"
-                            interval={1}
-                          />
-                        </Text>
-                      </VStack>
-                    </Flex>
-                  </Box>
-                );
-              })}
-              {isRoundOver ? (
-                <>
-                  <Box>
-                    <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-                      <Circle
-                        size={10}
-                        bg={didPirateWin ? "green.500" : "tomato"}
-                      >
-                        <Icon
-                          boxSize={6}
-                          as={didPirateWin ? FaSackDollar : FaSkullCrossbones}
-                        />
-                      </Circle>
-                      <Box>
-                        <Heading size="sm">
-                          Round Over{" - "}
-                          <DateFormatter
-                            format="LTS [NST]"
-                            date={endTime}
-                            tz="America/Los_Angeles"
-                          />
-                        </Heading>
-                        <Stack spacing={0}>
-                          <Text as="i">
-                            {pirateName}{" "}
-                            {didPirateWin
-                              ? "Won!"
-                              : `lost to ${
-                                  PIRATE_NAMES[
-                                    roundState.roundData.pirates[arenaId][
-                                      winningPirate - 1
-                                    ]
-                                  ]
-                                }`}
-                          </Text>
-                          <Text as="i">
-                            <DateFormatter
-                              format="dddd, MMMM Do YYYY"
-                              date={endTime}
-                              tz="America/Los_Angeles"
-                            />
-                          </Text>
-                        </Stack>
-                      </Box>
-                    </Flex>
-                  </Box>
-                </>
-              ) : null}
-            </Stack>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+            </>
+          ) : null}
+        </Stack>
+      </DrawerBody>
     </>
   );
 };
 
+const OddsTimeline = (props) => {
+  const { roundState, onClick, arenaId, pirateIndex } = props;
+
+  if (!roundState.roundData) {
+    return (
+      <Skeleton>
+        <Box>&nbsp;</Box>
+      </Skeleton>
+    );
+  }
+
+  // Get timeline data
+  const openingOdds =
+    roundState.roundData.openingOdds[arenaId][pirateIndex + 1];
+  const start = new Date(roundState.roundData.start);
+  const endTime = new Date(roundState.roundData.timestamp);
+  const changes = roundState.roundData.changes || [];
+
+  // Calculate pirate odds history
+  const thisPiratesOdds = [openingOdds];
+  const thisPiratesChangesTimes = [start.getTime()];
+
+  // Filter changes for this pirate
+  changes.forEach((change) => {
+    if (change.arena === arenaId && change.pirate === pirateIndex + 1) {
+      thisPiratesOdds.push(change.new);
+      thisPiratesChangesTimes.push(new Date(change.t).getTime());
+    }
+  });
+
+  // Calculate proportional widths for timeline bars
+  const percentages = calculatePercentages(
+    thisPiratesChangesTimes,
+    endTime.getTime()
+  );
+
+  return (
+    <Flex maxW="300px" onClick={onClick} cursor="pointer">
+      {thisPiratesOdds.map((odds, i) => (
+        <TimelineBar key={i} index={i} odds={odds} percent={percentages[i]} />
+      ))}
+    </Flex>
+  );
+};
+
+// Common utility function for changing bets
+const createChangeBet = (allBets, currentBet, setAllBets) => {
+  return (betIndex, arenaIndex, pirateIndex) => {
+    // change a single pirate in a single arena
+    const newBets = JSON.parse(JSON.stringify(allBets[currentBet]));
+    newBets[betIndex][arenaIndex] = pirateIndex;
+    setAllBets({ ...allBets, [currentBet]: newBets });
+  };
+};
+
+// Common utility function for changing bet lines
+const createChangeBetLine = (allBets, currentBet, setAllBets) => {
+  return (arenaIndex, pirateValue) => {
+    const amountOfBets = Object.keys(allBets[currentBet]).length;
+    // change the entire row to pirateValue for the 10-bet button
+    const newBets = JSON.parse(JSON.stringify(allBets[currentBet]));
+    for (let x = 1; x <= amountOfBets; x++) {
+      newBets[x][arenaIndex] = pirateValue;
+    }
+    setAllBets({ ...allBets, [currentBet]: newBets });
+  };
+};
+
 const NormalTable = (props) => {
-  const { red, green, getPirateBgColor } = props;
-  const gray = useColorModeValue("nfc.gray", "nfc.grayDark");
+  let { timelineHandlers, getPirateBgColor } = props;
   const { roundState, calculations, currentBet, allBets, setAllBets } =
     useContext(RoundContext);
   const {
@@ -415,22 +455,12 @@ const NormalTable = (props) => {
   } = calculations;
   const amountOfBets = Object.keys(allBets[currentBet]).length;
 
-  const changeBet = (betIndex, arenaIndex, pirateIndex) => {
-    // change a single pirate in a single arena
-    const newBets = JSON.parse(JSON.stringify(allBets[currentBet]));
-    newBets[betIndex][arenaIndex] = pirateIndex;
-    setAllBets({ ...allBets, [currentBet]: newBets });
-  };
+  const { openTimelineDrawer } = timelineHandlers;
 
-  const changeBetLine = (arenaIndex, pirateValue) => {
-    // change the entire row to pirateValue
-    // for the 10-bet button
-    const newBets = JSON.parse(JSON.stringify(allBets[currentBet]));
-    for (let x = 1; x <= amountOfBets; x++) {
-      newBets[x][arenaIndex] = pirateValue;
-    }
-    setAllBets({ ...allBets, [currentBet]: newBets });
-  };
+  const colors = useTableColors();
+
+  const changeBet = createChangeBet(allBets, currentBet, setAllBets);
+  const changeBetLine = createChangeBetLine(allBets, currentBet, setAllBets);
 
   const amountOfChanges = (roundState?.roundData?.changes || []).length;
 
@@ -515,7 +545,7 @@ const NormalTable = (props) => {
                 )}
               </BigBrainElement>
               <Td
-                backgroundColor={gray}
+                backgroundColor={colors.gray}
                 colSpan={
                   roundState.advanced.bigBrain
                     ? roundState.advanced.useLogitModel
@@ -524,7 +554,11 @@ const NormalTable = (props) => {
                     : 1
                 }
               />
-              <CustomOddsElement as={Td} backgroundColor={gray} colSpan={2} />
+              <CustomOddsElement
+                as={Td}
+                backgroundColor={colors.gray}
+                colSpan={2}
+              />
               {roundState.roundData?.foods ? (
                 <>
                   {roundState.roundData.foods[arenaId].map((foodId) => {
@@ -536,7 +570,7 @@ const NormalTable = (props) => {
                         whiteSpace="nowrap"
                         overflow="hidden"
                         textOverflow="ellipsis"
-                        backgroundColor={gray}
+                        backgroundColor={colors.gray}
                       >
                         <TextTooltip text={food} />
                       </FaDetailsElement>
@@ -544,16 +578,16 @@ const NormalTable = (props) => {
                   })}
                 </>
               ) : null}
-              <Td backgroundColor={gray} colSpan={2} />
-              <CustomOddsElement as={Td} backgroundColor={gray} />
+              <Td backgroundColor={colors.gray} colSpan={2} />
+              <CustomOddsElement as={Td} backgroundColor={colors.gray} />
               {roundState.advanced.oddsTimeline ? (
-                <BigBrainElement as={Td} backgroundColor={gray} />
+                <BigBrainElement as={Td} backgroundColor={colors.gray} />
               ) : null}
               {roundState.roundData ? (
                 <>
                   {[...Array(amountOfBets)].map((_bet, betNum) => {
                     return (
-                      <Td key={betNum} backgroundColor={gray}>
+                      <Td key={betNum} backgroundColor={colors.gray}>
                         <center>
                           <Radio
                             name={`bet${betNum + 1}${arenaId}`}
@@ -567,7 +601,7 @@ const NormalTable = (props) => {
                       </Td>
                     );
                   })}
-                  <Td backgroundColor={gray}>
+                  <Td backgroundColor={colors.gray}>
                     <Button
                       size="xs"
                       variant="outline"
@@ -581,7 +615,7 @@ const NormalTable = (props) => {
                 </>
               ) : (
                 <>
-                  <Td colSpan={100} backgroundColor={gray}>
+                  <Td colSpan={100} backgroundColor={colors.gray}>
                     <Skeleton height="24px">
                       <Box>&nbsp;</Box>
                     </Skeleton>
@@ -623,14 +657,22 @@ const NormalTable = (props) => {
               const payout = useOdds * prob - 1;
               let payoutBackground = "transparent";
               if (payout > 0) {
-                payoutBackground = green;
+                payoutBackground = colors.green;
               } else if (payout <= -0.1) {
-                payoutBackground = red;
+                payoutBackground = colors.red;
               }
 
               return (
-                <Tr key={pirateId} backgroundColor={pirateWon ? green : null}>
-                  <StickyTd backgroundColor={getPirateBgColor(opening)}>
+                <Tr
+                  key={pirateId}
+                  backgroundColor={pirateWon ? colors.green : null}
+                >
+                  <StickyTd
+                    backgroundColor={getPirateBgColor(opening)}
+                    onClick={() => openTimelineDrawer?.(arenaId, pirateIndex)}
+                    cursor="pointer"
+                    title={`Click to view odds timeline for ${FULL_PIRATE_NAMES[pirateId]}`}
+                  >
                     {PIRATE_NAMES[pirateId]}
                   </StickyTd>
                   {roundState.advanced.useLogitModel ? (
@@ -702,10 +744,10 @@ const NormalTable = (props) => {
                   <Td isNumeric>{opening}:1</Td>
                   <Td isNumeric whiteSpace="nowrap">
                     {current > opening && (
-                      <Icon as={TriangleUpIcon} mr={1} color={green} />
+                      <Icon as={TriangleUpIcon} mr={1} color={colors.green} />
                     )}
                     {current < opening && (
-                      <Icon as={TriangleDownIcon} mr={1} color={red} />
+                      <Icon as={TriangleDownIcon} mr={1} color={colors.red} />
                     )}
                     <Text as={current === opening ? "" : "b"}>{current}:1</Text>
                   </Td>
@@ -718,8 +760,12 @@ const NormalTable = (props) => {
                   {roundState.advanced.oddsTimeline ? (
                     <BigBrainElement as={Td} px={0}>
                       <OddsTimeline
+                        roundState={roundState}
                         arenaId={arenaId}
                         pirateIndex={pirateIndex}
+                        onClick={() =>
+                          openTimelineDrawer?.(arenaId, pirateIndex)
+                        }
                       />
                     </BigBrainElement>
                   ) : null}
@@ -763,31 +809,17 @@ const NormalTable = (props) => {
 };
 
 const DropDownTable = (props) => {
-  let { ...rest } = props;
+  let { timelineHandlers, getPirateBgColor, ...rest } = props;
   const { roundState, calculations, currentBet, allBets, setAllBets } =
     useContext(RoundContext);
   const { winningBetBinary, arenaRatios } = calculations;
   const amountOfBets = Object.keys(allBets[currentBet]).length;
 
-  const blue = useColorModeValue("nfc.blue", "nfc.blueDark");
-  const green = useColorModeValue("nfc.green", "nfc.greenDark");
-  const red = useColorModeValue("nfc.red", "nfc.redDark");
-  const orange = useColorModeValue("nfc.orange", "nfc.orangeDark");
+  const { openTimelineDrawer } = timelineHandlers;
 
-  const getPirateBgColor = (odds) => {
-    if ([3, 4, 5].includes(odds)) return blue;
-    if ([6, 7, 8, 9].includes(odds)) return orange;
-    if ([10, 11, 12, 13].includes(odds)) return red;
+  const colors = useTableColors();
 
-    return green;
-  };
-
-  const changeBet = (betIndex, arenaIndex, pirateIndex) => {
-    // change a single pirate in a single arena
-    const newBets = JSON.parse(JSON.stringify(allBets[currentBet]));
-    newBets[betIndex][arenaIndex] = pirateIndex;
-    setAllBets({ ...allBets, [currentBet]: newBets });
-  };
+  const changeBet = createChangeBet(allBets, currentBet, setAllBets);
 
   return (
     <Table size="sm" width="auto" {...rest}>
@@ -795,7 +827,7 @@ const DropDownTable = (props) => {
         <Tr>
           {ARENA_NAMES.map((arenaName, arenaId) => {
             return (
-              <Th>
+              <Th key={arenaId}>
                 {arenaName} ({displayAsPercent(arenaRatios[arenaId], 1)})
               </Th>
             );
@@ -852,13 +884,20 @@ const DropDownTable = (props) => {
                       return (
                         <Tr
                           key={pirateId}
-                          backgroundColor={pirateWon ? green : null}
+                          backgroundColor={pirateWon ? colors.green : null}
                         >
                           <Pd
                             whiteSpace="nowrap"
                             backgroundColor={
-                              pirateWon ? green : getPirateBgColor(opening)
+                              pirateWon
+                                ? colors.green
+                                : getPirateBgColor(opening)
                             }
+                            onClick={() =>
+                              openTimelineDrawer?.(arenaId, pirateIndex)
+                            }
+                            cursor="pointer"
+                            title={`Click to view odds timeline for ${FULL_PIRATE_NAMES[pirateId]}`}
                           >
                             {PIRATE_NAMES[pirateId]}
                           </Pd>
@@ -917,25 +956,76 @@ const DropDownTable = (props) => {
 
 const PirateTable = (props) => {
   const { roundState } = useContext(RoundContext);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedTimeline, setSelectedTimeline] = React.useState({
+    arenaId: 0,
+    pirateIndex: 0,
+  });
+  const timelineRef = React.useRef();
+
+  // Simplified drawer opening function
+  const openTimelineDrawer = (arenaId, pirateIndex) => {
+    setSelectedTimeline({ arenaId, pirateIndex });
+    onOpen();
+  };
+
+  // Timeline drawer component
+  const timelineDrawer = (
+    <Drawer
+      isOpen={isOpen}
+      placement="right"
+      onClose={onClose}
+      finalFocusRef={timelineRef}
+      size="md"
+    >
+      <DrawerOverlay />
+      <DrawerContent>
+        <DrawerCloseButton />
+        <TimelineContent
+          roundState={roundState}
+          arenaId={selectedTimeline.arenaId}
+          pirateIndex={selectedTimeline.pirateIndex}
+        />
+      </DrawerContent>
+    </Drawer>
+  );
+
+  // Common timeline handlers for both table modes
+  const timelineHandlers = {
+    openTimelineDrawer,
+    timelineRef,
+  };
+
   if (roundState.tableMode === "dropdown") {
-    return <DropDownTable {...props} />;
+    return (
+      <>
+        <DropDownTable timelineHandlers={timelineHandlers} {...props} />
+        {timelineDrawer}
+      </>
+    );
   }
 
-  return <NormalTable {...props} />;
+  return (
+    <>
+      <NormalTable timelineHandlers={timelineHandlers} {...props} />
+      {timelineDrawer}
+    </>
+  );
 };
 
 export default function EditBets(props) {
-  const { blue, orange, green, red, yellow, gray, getPirateBgColor } = props;
-
   const { roundState, setRoundState, currentBet, allBets } =
     useContext(RoundContext);
+
+  const { getPirateBgColor } = props;
+  const colors = useTableColors();
 
   const anyBets = anyBetsExist(allBets[currentBet]);
 
   return (
     <>
       <Collapse in={roundState.viewMode}>
-        <Box bgColor={blue} p={4}>
+        <Box bgColor={colors.blue} p={4}>
           <Button
             leftIcon={<Icon as={FaPenToSquare} />}
             colorScheme="blackAlpha"
@@ -950,23 +1040,10 @@ export default function EditBets(props) {
 
       <Collapse in={!roundState.viewMode}>
         <HorizontalScrollingBox>
-          <PirateTable
-            m={4}
-            red={red}
-            green={green}
-            getPirateBgColor={getPirateBgColor}
-          />
+          <PirateTable m={4} getPirateBgColor={getPirateBgColor} />
         </HorizontalScrollingBox>
 
-        <BetFunctions
-          blue={blue}
-          orange={orange}
-          red={red}
-          green={green}
-          yellow={yellow}
-          gray={gray}
-          getPirateBgColor={getPirateBgColor}
-        />
+        <BetFunctions getPirateBgColor={getPirateBgColor} />
       </Collapse>
 
       {anyBets && (
@@ -974,14 +1051,7 @@ export default function EditBets(props) {
           <BetAmountsSettings boxShadow="md" />
 
           <HorizontalScrollingBox py={4}>
-            <PayoutTable
-              blue={blue}
-              orange={orange}
-              red={red}
-              green={green}
-              yellow={yellow}
-              getPirateBgColor={getPirateBgColor}
-            />
+            <PayoutTable getPirateBgColor={getPirateBgColor} />
           </HorizontalScrollingBox>
 
           <HorizontalScrollingBox py={4}>

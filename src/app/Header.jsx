@@ -52,7 +52,11 @@ function PreviousRoundInfo() {
         <>Round {roundState.currentSelectedRound} ended</>
         <>
           <DateFormatter
-            format={moment().year() === moment(roundState.roundData.timestamp).year() ? "MMM D, h:mm A [NST]" : "MMM D YYYY, h:mm A [NST]"}
+            format={
+              moment().year() === moment(roundState.roundData.timestamp).year()
+                ? "MMM D, h:mm A [NST]"
+                : "MMM D YYYY, h:mm A [NST]"
+            }
             date={roundState.roundData.timestamp}
             tz="America/Los_Angeles"
           />
@@ -100,14 +104,24 @@ function CurrentRoundInfo() {
   }
 
   return (
-    <VStack divider={<StackDivider />} spacing={1} minW="140px">
+    <VStack
+      divider={<StackDivider />}
+      spacing={1}
+      minW={{ sm: "140px" }}
+      overflow="hidden"
+    >
       <HStack>
         <Tooltip label="Last Update">
           <div>
             <Icon as={FaRotate} />
           </div>
         </Tooltip>
-        <Text fontSize="xs" as={element} minW="100px">
+        <Text
+          fontSize="xs"
+          as={element}
+          minW={{ base: "auto", sm: "100px" }}
+          isTruncated
+        >
           <DateFormatter
             date={roundState.roundData.timestamp}
             tz={"America/Los_Angeles"}
@@ -126,7 +140,11 @@ function CurrentRoundInfo() {
                 <Icon as={FaClockRotateLeft} />
               </div>
             </Tooltip>
-            <Text fontSize="xs" minW="100px">
+            <Text
+              fontSize="xs"
+              minW={{ base: "auto", sm: "100px" }}
+              isTruncated
+            >
               <DateFormatter
                 date={roundState.roundData.lastChange}
                 tz={"America/Los_Angeles"}
@@ -171,7 +189,7 @@ function MaxBetInput() {
   }, [roundState.currentSelectedRound]);
 
   return (
-    <InputGroup size="xs">
+    <InputGroup size="xs" w="100%">
       <InputLeftAddon children="Max Bet" />
       <NumberInput
         value={tempMaxBet.toString()}
@@ -213,6 +231,7 @@ function MaxBetInput() {
         min={-1000}
         max={500000}
         allowMouseWheel
+        w="100%"
       >
         <NumberInputField />
         {hasFocus && (
@@ -354,23 +373,22 @@ function HeaderContent() {
       <HStack p={4} spacing={4} as={Flex}>
         <SidebarSettings />
         <TitleHeading />
-        <Spacer />
-
-        <GlowCard p={2} maxW="lg" animate={isGlowing}>
-          <HStack spacing={3} h="100%">
-            <VStack spacing={1} maxW={"140px"}>
+        <Spacer display={{ base: "none", md: "block" }} />
+        <GlowCard p={2} maxW="lg" animate={isGlowing} mx="auto">
+          <Flex h="100%" gap={2} align="center">
+            <VStack spacing={1} maxW="140px">
               <RoundInput />
               <MaxBetInput />
             </VStack>
-            <SkeletonText minW={"130"} isLoaded={roundState?.roundData}>
-              <HStack>
+            <SkeletonText isLoaded={roundState?.roundData}>
+              <Flex align="center" justify="center" gap={2}>
                 <CurrentRoundProgress hidden={winnersExist} />
-                <RoundInfo />
-              </HStack>
+                <RoundInfo display={{ base: "none", md: "block" }} />
+              </Flex>
             </SkeletonText>
-          </HStack>
+          </Flex>
         </GlowCard>
-        <Spacer />
+        <Spacer display={{ base: "none", md: "block" }} />
       </HStack>
     </>
   );

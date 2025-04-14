@@ -16,7 +16,7 @@ import React, { useContext } from "react";
 
 import { PIRATE_NAMES } from "../constants";
 import { computePirateBinary } from "../maths";
-import { displayAsPercent } from "../util";
+import { displayAsPercent, useTableColors } from "../util";
 import BetAmountInput from "./BetAmountInput";
 import Pd from "./Pd";
 import PlaceThisBetButton from "./PlaceThisBetButton";
@@ -27,7 +27,7 @@ import TextTooltip from "./TextTooltip";
 // this element is the colorful and informative table full of your bet data
 
 const PayoutTable = (props) => {
-  const { blue, orange, green, red, yellow, getPirateBgColor, ...rest } = props;
+  const { getPirateBgColor, ...rest } = props;
   const {
     roundState,
     calculations,
@@ -57,6 +57,8 @@ const PayoutTable = (props) => {
   } = calculations;
   const amountOfBets = Object.keys(allBets[currentBet]).length;
 
+  const colors = useTableColors();
+
   const swapBets = (index, newIndex) => {
     const newBets = JSON.parse(JSON.stringify(allBets[currentBet]));
     const newBetAmounts = JSON.parse(JSON.stringify(allBetAmounts[currentBet]));
@@ -75,10 +77,10 @@ const PayoutTable = (props) => {
     let betAmount = allBetAmounts[currentBet][betNum];
     let div = 1_000_000 / betOdds[betNum];
     if (betAmount > Math.ceil(div)) {
-      return orange;
+      return colors.orange;
     }
     if (betAmount > Math.floor(div)) {
-      return yellow;
+      return colors.yellow;
     }
     return "transparent";
   };
@@ -121,20 +123,23 @@ const PayoutTable = (props) => {
               }
 
               let er = betExpectedRatios[betIndex + 1];
-              let erBg = er - 1 < 0 ? red : "transparent";
+              let erBg = er - 1 < 0 ? colors.red : "transparent";
 
               let ne = betNetExpected[betIndex + 1];
-              let neBg = ne - 1 < 0 ? red : "transparent";
+              let neBg = ne - 1 < 0 ? colors.red : "transparent";
 
               let betAmount = allBetAmounts[currentBet][betIndex + 1];
-              let baBg = betAmount < 50 ? red : getMaxBetColor(betIndex + 1);
+              let baBg =
+                betAmount < 50 ? colors.red : getMaxBetColor(betIndex + 1);
               let mbBg = getMaxBetColor(betIndex + 1);
 
               let betNumBgColor = "transparent";
 
               if (winningBetBinary) {
                 betNumBgColor =
-                  (winningBetBinary & betBinary) === betBinary ? green : red;
+                  (winningBetBinary & betBinary) === betBinary
+                    ? colors.green
+                    : colors.red;
               }
 
               return (
@@ -211,9 +216,9 @@ const PayoutTable = (props) => {
                           pirateIndex
                         );
                         if ((winningBetBinary & pirateBin) === pirateBin) {
-                          bgColor = green;
+                          bgColor = colors.green;
                         } else {
-                          bgColor = red;
+                          bgColor = colors.red;
                         }
                       } else {
                         bgColor = getPirateBgColor(
