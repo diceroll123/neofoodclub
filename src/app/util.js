@@ -1,3 +1,4 @@
+import { useColorModeValue } from "@chakra-ui/react";
 import Cookies from "universal-cookie";
 import moment from "moment";
 import {
@@ -591,3 +592,14 @@ export function formatDate(date, options = {}) {
   // Default format
   return momentDate.format("YYYY-MM-DD HH:mm:ss");
 }
+
+export const useTableColors = () => {
+  return {
+    blue: useColorModeValue("nfc.blue", "nfc.blueDark"),
+    green: useColorModeValue("nfc.green", "nfc.greenDark"),
+    red: useColorModeValue("nfc.red", "nfc.redDark"),
+    orange: useColorModeValue("nfc.orange", "nfc.orangeDark"),
+    gray: useColorModeValue("nfc.gray", "nfc.grayDark"),
+    yellow: useColorModeValue("nfc.yellow", "nfc.yellowDark"),
+  };
+};

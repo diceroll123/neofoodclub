@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { formatDate } from "../util";
 
 const DateFormatter = ({
@@ -16,7 +16,7 @@ const DateFormatter = ({
   const [formattedDate, setFormattedDate] = useState("");
   const [title, setTitle] = useState("");
 
-  const updateDate = () => {
+  const updateDate = useCallback(() => {
     const options = {
       format,
       fromNow,
@@ -31,12 +31,12 @@ const DateFormatter = ({
     if (withTitle && titleFormat) {
       setTitle(formatDate(date, { format: titleFormat, tz }));
     }
-  };
+  }, [date, format, fromNow, toNow, calendar, withTitle, titleFormat, tz]);
 
   // Initial format
   useEffect(() => {
     updateDate();
-  }, [date, format, fromNow, toNow, calendar, withTitle, titleFormat, tz]);
+  }, [updateDate]);
 
   // Set up interval for live updates if interval is provided
   useEffect(() => {
@@ -49,17 +49,7 @@ const DateFormatter = ({
     }, interval * 1000);
 
     return () => clearInterval(timer);
-  }, [
-    interval,
-    date,
-    format,
-    fromNow,
-    toNow,
-    calendar,
-    withTitle,
-    titleFormat,
-    tz,
-  ]);
+  }, [interval, updateDate]);
 
   return (
     <span title={title} {...props}>
