@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "babel-plugin-react-compiler": "^19.0.0-beta-e993439-20250405",
-    "eslint-plugin-react-compiler": "^19.0.0-beta-e993439-20250405",
+    "eslint-plugin-react-compiler": "^19.0.0-beta-ebf51a3-20250411",
     "eslint-plugin-react-hooks": "^5.2.0"
   }
 }
