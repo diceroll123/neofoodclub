@@ -92,7 +92,7 @@ const NormalExtras = (props) => {
       hidden={!usingNormal}
       {...props}
     >
-      <VStack align="stretch" spacing={3} width="100%">
+      <VStack>
         <SettingsRow
           icon={FaBrain}
           label="Big Brain Mode"

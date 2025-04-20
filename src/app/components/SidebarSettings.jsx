@@ -50,7 +50,7 @@ const SidebarSettings = () => {
           <DrawerHeader borderBottomWidth="1px">Settings</DrawerHeader>
 
           <DrawerBody py={4}>
-            <VStack spacing={2} align="stretch" width="100%">
+            <VStack>
               <TableModes />
               <NormalExtras />
               <LogitModelToggle />

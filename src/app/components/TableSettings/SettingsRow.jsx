@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Flex,
-  Icon,
-  Switch,
-  Text,
-  Tooltip,
-  Box,
-  Button,
-} from "@chakra-ui/react";
+import { Flex, Icon, Switch, Text, Tooltip, Box } from "@chakra-ui/react";
 
 /**
  * A generic settings row component that displays an icon, label, and a toggle control (Switch or Checkbox)
@@ -40,63 +32,62 @@ const SettingsRow = ({
   // Extract props we don't want to pass directly to the Icon component
   const { baseSize: _, largeSize: _2, ...safeIconProps } = iconProps;
 
-  // Create a wrapper component for the Switch
-  const SwitchWrapper = ({ children }) => (
-    <Box
-      onClick={(e) => {
-        e.stopPropagation();
-        onChange(e);
-      }}
-    >
-      {children}
-    </Box>
-  );
-
   const rowContent = (
-    <Box
-      as={Button}
-      height="100%"
-      variant="unstyled"
-      isDisabled={isDisabled}
-      onClick={onChange}
+    <Flex
+      justify="space-between"
+      align="center"
       width="100%"
+      as="div"
+      opacity={isDisabled ? 0.6 : 1}
+      py={2}
+      borderRadius="md"
+      transition="background-color 0.2s"
     >
-      <Flex justify="space-between" align="center" width="100%">
-        <Flex align="center">
-          <Box
-            minWidth="24px"
-            width="24px"
-            display="flex"
-            justifyContent="center"
-            mr={2}
-          >
-            {icon && (
-              <Icon
-                as={icon}
-                color={safeIconProps.color}
-                w={iconSize}
-                h={iconSize}
-                style={{
-                  transition:
-                    "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                  ...safeIconProps.style,
-                }}
-                {...safeIconProps}
-              />
-            )}
-          </Box>
-          <Text>{label}</Text>
-        </Flex>
-        <SwitchWrapper>
-          <Switch
-            isChecked={isChecked}
-            // Don't add an onChange here - it's handled by the wrapper
-            colorScheme={colorScheme}
-            isDisabled={isDisabled}
-          />
-        </SwitchWrapper>
+      <Flex
+        align="center"
+        flex="1"
+        cursor={isDisabled ? "not-allowed" : "pointer"}
+        onClick={isDisabled ? undefined : onChange}
+        _hover={!isDisabled && { bg: "blackAlpha.50" }}
+      >
+        <Box
+          minWidth="24px"
+          width="24px"
+          display="flex"
+          justifyContent="center"
+          mr={2}
+        >
+          {icon && (
+            <Icon
+              as={icon}
+              color={safeIconProps.color}
+              w={iconSize}
+              h={iconSize}
+              style={{
+                transition:
+                  "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                ...safeIconProps.style,
+              }}
+              {...safeIconProps}
+            />
+          )}
+        </Box>
+        <Text>{label}</Text>
       </Flex>
-    </Box>
+      <Box
+        onClick={(e) => {
+          // Prevent event bubbling to the parent Flex
+          e.stopPropagation();
+        }}
+      >
+        <Switch
+          isChecked={isChecked}
+          colorScheme={colorScheme}
+          isDisabled={isDisabled}
+          onChange={onChange}
+        />
+      </Box>
+    </Flex>
   );
 
   if (tooltipText) {
