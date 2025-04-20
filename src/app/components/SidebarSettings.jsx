@@ -5,6 +5,7 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
+  DrawerFooter,
   useDisclosure,
   Icon,
   IconButton,
@@ -12,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { FaBars } from "react-icons/fa6";
 import React from "react";
+import { GitCommit } from "./GitCommit";
 
 // Import components directly from TableSettings.jsx since we haven't split them yet
 import NormalExtras from "./TableSettings/NormalExtras";
@@ -56,6 +58,10 @@ const SidebarSettings = () => {
               <ColorModeButton />
             </VStack>
           </DrawerBody>
+
+          <DrawerFooter borderTopWidth="1px" justifyContent="center" py={3}>
+            <GitCommit />
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </>
