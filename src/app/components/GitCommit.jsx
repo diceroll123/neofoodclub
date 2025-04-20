@@ -1,4 +1,4 @@
-import { Box, Link, Text } from "@chakra-ui/react";
+import { Box, Link, Text, Code } from "@chakra-ui/react";
 import React from "react";
 
 export function GitCommit() {
@@ -15,7 +15,7 @@ export function GitCommit() {
           isExternal
           ml={1}
         >
-          {shortHash}
+          <Code>{shortHash}</Code>
         </Link>
       ) : (
         <Box as="span" ml={1}>
