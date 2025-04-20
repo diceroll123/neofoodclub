@@ -14,7 +14,6 @@ import {
 import * as React from "react";
 import NeopointIcon from "./images/np-icon.svg";
 import { VercelCredit } from "./components/VercelCredit";
-import { GitCommit } from "./components/GitCommit";
 
 function Logo() {
   return (
@@ -138,9 +137,6 @@ export default function Footer() {
           </Text>
           <Center>
             <VercelCredit />
-          </Center>
-          <Center mt={2}>
-            <GitCommit />
           </Center>
         </Box>
       </Box>
