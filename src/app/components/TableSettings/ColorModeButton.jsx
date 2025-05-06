@@ -6,7 +6,7 @@ import SectionPanel from "../SectionPanel";
 import OptionButtons from "../OptionButtons";
 
 const ColorModeButton = () => {
-  const { setColorMode } = useColorMode();
+  const { colorMode, setColorMode } = useColorMode();
   const cookies = useMemo(() => new Cookies(), []);
 
   // Check for system dark/light preference
@@ -28,14 +28,22 @@ const ColorModeButton = () => {
     { value: "system", label: "System", icon: FaDesktop, color: "blue.500" },
   ];
 
-  // Apply color mode on initial load and when selectedMode changes
+  // Only apply the color mode if it's explicitly changed by the user
+  // or if it's the first mount and there's a stored preference
   useEffect(() => {
-    if (selectedMode === "system") {
-      setColorMode(getSystemPreference());
-    } else {
-      setColorMode(selectedMode);
+    const storedMode = cookies.get("colorMode") || "system";
+    // Only set the color mode if we have a stored preference that doesn't match current
+    if (storedMode) {
+      if (storedMode === "system") {
+        const systemPreference = getSystemPreference();
+        if (colorMode !== systemPreference) {
+          setColorMode(systemPreference);
+        }
+      } else if (colorMode !== storedMode) {
+        setColorMode(storedMode);
+      }
     }
-  }, [selectedMode, getSystemPreference, setColorMode]);
+  }, [cookies, colorMode, setColorMode, getSystemPreference]);
 
   // Set up listener for system color scheme changes
   useEffect(() => {
