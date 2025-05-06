@@ -31,7 +31,7 @@ const ColorModeButton = () => {
   // Only apply the color mode if it's explicitly changed by the user
   // or if it's the first mount and there's a stored preference
   useEffect(() => {
-    const storedMode = cookies.get("colorMode");
+    const storedMode = cookies.get("colorMode") || "system";
     // Only set the color mode if we have a stored preference that doesn't match current
     if (storedMode) {
       if (storedMode === "system") {
