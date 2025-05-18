@@ -66,6 +66,8 @@ export default defineConfig({
       process.env.REACT_APP_VERCEL_GIT_COMMIT_SHA
     ),
   },
+  // Configure the public directory to serve static assets
+  publicDir: "public",
   server: {
     port: 3000,
   },
