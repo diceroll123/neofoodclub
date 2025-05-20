@@ -5,8 +5,10 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // Custom plugin to inject react-scan in development
 function reactScanPlugin() {
-  // Enable by default unless explicitly disabled
-  const enableReactScan = process.env.DISABLE_REACT_SCAN !== "true";
+  // Only enable in development or Vercel preview
+  const isDev = process.env.NODE_ENV === "development";
+  const isPreview = process.env.VERCEL_ENV === "preview";
+  const enableReactScan = isDev || isPreview;
 
   return {
     name: "vite-plugin-react-scan",
