@@ -7,16 +7,15 @@ cd "$DIR"
 # Build/run the docker container
 docker compose run --rm nfc_values
 
-# copy file from ./output/javascript.js to ../src/app/constants_logit.js
-cp "$DIR/output/javascript.js" "$DIR/../src/app/constants_logit.js"
+cp "$DIR/output/typescript.ts" "$DIR/../src/app/constants_logit.ts"
 
 # stage the changes
 git add "$DIR/output/"
 git add "$DIR/raw_json/"
-git add "$DIR/../src/app/constants_logit.js"
+git add "$DIR/../src/app/constants_logit.ts"
 
 # check if the files exist before committing or pushing
-if [ ! -f "$DIR/output/javascript.js" ]; then
+if [ ! -f "$DIR/output/typescript.ts" ]; then
     exit 1
 fi
 
