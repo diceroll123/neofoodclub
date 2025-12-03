@@ -1,5 +1,5 @@
 services:
-  pipeline:
+  nfc_values:
     build: .
     stop_signal: SIGINT
     volumes:

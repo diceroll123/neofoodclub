@@ -1,10 +1,9 @@
-from collections import OrderedDict
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import pylogit as pl
 from constants import PIRATE_NAMES
+from xlogit import MultinomialLogit
 
 df = pd.read_csv("./output/history.csv")
 
@@ -100,46 +99,92 @@ long_format = convert_to_long_format_with_win(df)
 
 pirates_including_the_first = list(range(1, 21))
 pirates_except_the_first = list(range(2, 21))
-
-per_pirate_fa_and_per_pirate_pos_specification = OrderedDict()
-per_pirate_fa_and_per_pirate_pos_names = OrderedDict()
 pirates_except_goob = [i for i in range(1, 21) if i != 15]
-per_pirate_fa_and_per_pirate_pos_specification["intercept"] = pirates_except_goob
-per_pirate_fa_and_per_pirate_pos_names["intercept"] = [
-    f"ASC_{i}_{PIRATE_NAMES[i]}" for i in pirates_except_goob
-]
-per_pirate_fa_and_per_pirate_pos_specification["pfa"] = pirates_including_the_first
-per_pirate_fa_and_per_pirate_pos_names["pfa"] = [
-    f"PFA_{i}_{PIRATE_NAMES[i]}" for i in pirates_including_the_first
-]
-per_pirate_fa_and_per_pirate_pos_specification["nfa"] = pirates_including_the_first
-per_pirate_fa_and_per_pirate_pos_names["nfa"] = [
-    f"NFA_{i}_{PIRATE_NAMES[i]}" for i in pirates_including_the_first
-]
-per_pirate_fa_and_per_pirate_pos_specification["is_pos2"] = pirates_including_the_first
-per_pirate_fa_and_per_pirate_pos_names["is_pos2"] = [
-    f"is_pos2_{i}_{PIRATE_NAMES[i]}" for i in pirates_including_the_first
-]
-per_pirate_fa_and_per_pirate_pos_specification["is_pos3"] = pirates_including_the_first
-per_pirate_fa_and_per_pirate_pos_names["is_pos3"] = [
-    f"is_pos3_{i}_{PIRATE_NAMES[i]}" for i in pirates_including_the_first
-]
-per_pirate_fa_and_per_pirate_pos_specification["is_pos4"] = pirates_including_the_first
-per_pirate_fa_and_per_pirate_pos_names["is_pos4"] = [
-    f"is_pos4_{i}_{PIRATE_NAMES[i]}" for i in pirates_including_the_first
-]
 
-per_pirate_fa_and_per_pirate_pos_mnl = pl.create_choice_model(
-    data=long_format,
-    alt_id_col="pirate",
-    obs_id_col="match_id",
-    choice_col="win",
-    specification=per_pirate_fa_and_per_pirate_pos_specification,
-    model_type="MNL",
-    names=per_pirate_fa_and_per_pirate_pos_names,
+# For xlogit, we need to create interaction variables for each pirate
+# Build all new columns as a dictionary first to avoid fragmentation warnings
+new_columns = {}
+
+# Create pirate dummy columns
+for p in pirates_including_the_first:
+    new_columns[f"is_pirate_{p}"] = (long_format["pirate"] == p).astype(int)
+
+# Create interaction variables for intercepts (ASC) - all pirates except Goob (15)
+for p in pirates_except_goob:
+    new_columns[f"asc_{p}"] = new_columns[f"is_pirate_{p}"]
+
+# Create interaction variables for pfa
+for p in pirates_including_the_first:
+    new_columns[f"pfa_{p}"] = long_format["pfa"].values * new_columns[f"is_pirate_{p}"]
+
+# Create interaction variables for nfa
+for p in pirates_including_the_first:
+    new_columns[f"nfa_{p}"] = long_format["nfa"].values * new_columns[f"is_pirate_{p}"]
+
+# Create interaction variables for positional effects
+for p in pirates_including_the_first:
+    new_columns[f"is_pos2_{p}"] = (
+        long_format["is_pos2"].values * new_columns[f"is_pirate_{p}"]
+    )
+    new_columns[f"is_pos3_{p}"] = (
+        long_format["is_pos3"].values * new_columns[f"is_pirate_{p}"]
+    )
+    new_columns[f"is_pos4_{p}"] = (
+        long_format["is_pos4"].values * new_columns[f"is_pirate_{p}"]
+    )
+
+# Add all columns at once
+long_format = pd.concat([long_format, pd.DataFrame(new_columns)], axis=1)
+
+# Build variable names list in the same order as pylogit specification
+varnames = []
+varnames_with_descriptions = []
+
+# Intercepts (ASC) for all pirates except Goob
+for p in pirates_except_goob:
+    varnames.append(f"asc_{p}")
+    varnames_with_descriptions.append(f"ASC_{p}_{PIRATE_NAMES[p]}")
+
+# PFA for all pirates
+for p in pirates_including_the_first:
+    varnames.append(f"pfa_{p}")
+    varnames_with_descriptions.append(f"PFA_{p}_{PIRATE_NAMES[p]}")
+
+# NFA for all pirates
+for p in pirates_including_the_first:
+    varnames.append(f"nfa_{p}")
+    varnames_with_descriptions.append(f"NFA_{p}_{PIRATE_NAMES[p]}")
+
+# is_pos2 for all pirates
+for p in pirates_including_the_first:
+    varnames.append(f"is_pos2_{p}")
+    varnames_with_descriptions.append(f"is_pos2_{p}_{PIRATE_NAMES[p]}")
+
+# is_pos3 for all pirates
+for p in pirates_including_the_first:
+    varnames.append(f"is_pos3_{p}")
+    varnames_with_descriptions.append(f"is_pos3_{p}_{PIRATE_NAMES[p]}")
+
+# is_pos4 for all pirates
+for p in pirates_including_the_first:
+    varnames.append(f"is_pos4_{p}")
+    varnames_with_descriptions.append(f"is_pos4_{p}_{PIRATE_NAMES[p]}")
+
+# Fit the model using xlogit
+# Use position (1-4) as the alternative since each match has exactly 4 positions
+model = MultinomialLogit()
+model.fit(
+    X=long_format[varnames],
+    y=long_format["win"],
+    varnames=varnames,
+    ids=long_format["match_id"],
+    alts=long_format["position"],
+    fit_intercept=False,  # We're handling intercepts manually via ASC variables
 )
-per_pirate_fa_and_per_pirate_pos_mnl.fit_mle(np.zeros(119))
-per_pirate_fa_and_per_pirate_pos_mnl.get_statsmodels_summary()
+model.summary()
+
+# Extract parameters as a pandas Series for compatibility with existing code
+params = pd.Series(model.coeff_, index=varnames)
 
 
 def generate_javascript(params) -> str:
@@ -217,13 +262,13 @@ static LOGIT_IS_POS4: [f64; 20] = [
 print("Writing output files...")
 print("Creating javascript.js...")
 Path("./output/javascript.js").write_text(
-    generate_javascript(per_pirate_fa_and_per_pirate_pos_mnl.params),
+    generate_javascript(params),
 )
 print("Creating rust.rs...")
 Path("./output/rust.rs").write_text(
-    generate_rust(per_pirate_fa_and_per_pirate_pos_mnl.params),
+    generate_rust(params),
 )
 print("Creating python.py...")
 Path("./output/python.py").write_text(
-    generate_python(per_pirate_fa_and_per_pirate_pos_mnl.params),
+    generate_python(params),
 )

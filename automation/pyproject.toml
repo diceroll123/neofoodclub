@@ -7,9 +7,6 @@ requires-python = ">=3.13,<3.14"
 dependencies = [
     "numpy>=2.1.2",
     "pandas>=2.2.3",
-    "pylogit",
+    "xlogit",
     "requests<3",
 ]
-
-[tool.uv.sources]
-pylogit = { git = "https://github.com/replicahq/pylogit.git", rev = "c51787b7e2829ba7ccd2ea0614a456e253ae3f07" }
