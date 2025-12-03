@@ -1,27 +1,27 @@
+#!/bin/bash
+set -e
+
 # Get the directory of the current script
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# Change to the script's directory
 cd "$DIR"
 
-# Build/run the docker container
-docker compose run --rm nfc_values
+# Ensure output directory exists
+mkdir -p output
 
-# copy file from ./output/javascript.js to ../src/app/constants_logit.js
-cp "$DIR/output/javascript.js" "$DIR/../src/app/constants_logit.js"
-
-# stage the changes
-git add "$DIR/output/"
-git add "$DIR/raw_json/"
-git add "$DIR/../src/app/constants_logit.js"
+# Build and run the pipeline
+docker compose build
+docker compose run --rm pipeline
 
 # check if the files exist before committing or pushing
 if [ ! -f "$DIR/output/javascript.js" ]; then
+    echo "Error: javascript.js was not generated"
     exit 1
 fi
 
-# commit the changes
-git commit -m "Auto-update logit constants"
+# Copy to frontend
+cp "$DIR/output/javascript.js" "$DIR/../src/app/constants_logit.js"
 
-# push the changes
+# Stage and commit changes
+git add "$DIR/output/" "$DIR/raw_json/" "$DIR/../src/app/constants_logit.js"
+git commit -m "Auto-update logit constants"
 git push
