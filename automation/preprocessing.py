@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-import pandas as pd
+import polars as pl
 from constants import NEGATIVE_FAS, POSITIVE_FAS
 
 # fmt: off
@@ -9,12 +9,12 @@ columns = ["round", "arena", "pirate1", "pirate2", "pirate3", "pirate4", "fa1", 
 # fmt: on
 
 
-def get_df_from_file(path: Path) -> pd.DataFrame:
-    df = pd.DataFrame([], columns=columns)
+def get_df_from_file(path: Path) -> pl.DataFrame:
+    rows = []
     data = json.loads(path.read_text())
     winners = data["winners"]
     if winners is None or not all(winners):
-        return df
+        return pl.DataFrame(schema=columns)
 
     round = data["round"]
     for arena in range(5):
@@ -40,18 +40,23 @@ def get_df_from_file(path: Path) -> pd.DataFrame:
         _, opening_odds1, opening_odds2, opening_odds3, opening_odds4 = data["openingOdds"][arena]
         _, closing_odds1, closing_odds2, closing_odds3, closing_odds4 = data["currentOdds"][arena]
         winner = winners[arena]
-        df_temp = pd.DataFrame([[round, arena, pirate1, pirate2, pirate3, pirate4, fa1, fa2, fa3, fa4, pfa1, pfa2, pfa3, pfa4, nfa1, nfa2, nfa3, nfa4, opening_odds1, opening_odds2, opening_odds3, opening_odds4, closing_odds1, closing_odds2, closing_odds3, closing_odds4, winner]], columns=columns)
+        rows.append([round, arena, pirate1, pirate2, pirate3, pirate4, fa1, fa2, fa3, fa4, pfa1, pfa2, pfa3, pfa4, nfa1, nfa2, nfa3, nfa4, opening_odds1, opening_odds2, opening_odds3, opening_odds4, closing_odds1, closing_odds2, closing_odds3, closing_odds4, winner])
         # fmt: on
-        df = pd.concat([df, df_temp], ignore_index=True)
-    return df
+    if rows:
+        return pl.DataFrame(rows, schema=columns)
+    return pl.DataFrame(schema=columns)
 
 
 pathlist = list(Path("raw_json").glob("**/*.json"))
-df = pd.DataFrame([], columns=columns)
+dfs = []
 for path in pathlist:
-    df = pd.concat([df, get_df_from_file(path)], ignore_index=True)
+    df = get_df_from_file(path)
+    if df.height > 0:
+        dfs.append(df)
 
-df = df.convert_dtypes()
-df = df.sort_values(by=["round", "arena"], ignore_index=True)
-
-df.to_csv("./output/history.csv", index=False)
+if dfs:
+    df = pl.concat(dfs)
+    df = df.sort(["round", "arena"])
+    df.write_csv("./output/history.csv")
+else:
+    pl.DataFrame(schema=columns).write_csv("./output/history.csv")
