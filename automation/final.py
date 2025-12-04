@@ -259,19 +259,19 @@ model.summary()
 # Create a helper class to mimic pandas Series .iloc behavior
 @dataclass
 class IlocIndexer:
-    coeff: np.ndarray
+    coeff: np.ndarray[float]
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> float:
         return self.coeff[idx]
 
 
 @dataclass
 class ParamsSeries:
-    varnames: list
-    coeff: np.ndarray
+    varnames: list[str]
+    coeff: np.ndarray[float]
     iloc: IlocIndexer = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.iloc = IlocIndexer(self.coeff)
 
 
