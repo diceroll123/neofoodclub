@@ -14,6 +14,8 @@ import {
 import * as React from "react";
 import NeopointIcon from "./images/np-icon.svg";
 import { VercelCredit } from "./components/VercelCredit";
+import { RoundContext } from "./RoundState";
+import { makeBetURL } from "./util";
 
 function Logo() {
   return (
@@ -51,6 +53,24 @@ function KoFiButtion() {
 }
 
 export default function Footer() {
+  const { roundState, currentBet, allBets, allBetAmounts } =
+    React.useContext(RoundContext);
+
+  const classicHref = React.useMemo(() => {
+    const baseUrl = "https://foodclub.neocities.org";
+
+    const roundNumber = roundState.currentSelectedRound;
+    if (!roundNumber) return baseUrl;
+
+    const betPathHash = makeBetURL(
+      roundNumber,
+      allBets[currentBet],
+      allBetAmounts[currentBet],
+      true
+    );
+    return `${baseUrl}${betPathHash}`;
+  }, [roundState, currentBet, allBets, allBetAmounts]);
+
   return (
     <>
       <Divider />
@@ -90,7 +110,7 @@ export default function Footer() {
 
             <Stack align={"flex-start"}>
               <ListHeader>NeoFoodClub Stuff</ListHeader>
-              <Link isExternal href="https://foodclub.neocities.org/">
+              <Link isExternal href={classicHref}>
                 Classic NeoFoodClub
               </Link>
               <Link
