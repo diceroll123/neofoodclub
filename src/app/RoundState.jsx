@@ -1,4 +1,4 @@
-import { createContext, useReducer, useState, useEffect } from "react";
+import { createContext, useMemo, useReducer, useState } from "react";
 import {
   getTableMode,
   reducer,
@@ -50,19 +50,10 @@ const StateProvider = ({ children }) => {
     0: { ...initialState.betAmounts },
   });
 
-  const [calculations, setCalculations] = useState(
-    calculateRoundData(
-      roundState,
-      allBets[currentBet],
-      allBetAmounts[currentBet]
-    )
-  );
-
-  useEffect(() => {
-    let bets = allBets[currentBet];
-    let betAmounts = allBetAmounts[currentBet];
-
-    setCalculations(calculateRoundData(roundState, bets, betAmounts));
+  const calculations = useMemo(() => {
+    const bets = allBets[currentBet];
+    const betAmounts = allBetAmounts[currentBet];
+    return calculateRoundData(roundState, bets, betAmounts);
   }, [roundState, currentBet, allBets, allBetAmounts]);
 
   const addNewSet = (name, bets, betAmounts, maybe_replace = false) => {
