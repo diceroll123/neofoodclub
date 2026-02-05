@@ -53,6 +53,22 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+        runtimeCaching: [
+          {
+            urlPattern: /\.png$/i,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "images",
+              expiration: {
+                maxEntries: 50,
+              },
+            },
+          },
+        ],
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+        clientsClaim: true,
+        skipWaiting: true,
       },
     }),
     reactScanPlugin(), // Add our custom plugin
