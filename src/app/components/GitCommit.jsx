@@ -3,7 +3,7 @@ import React from "react";
 
 export function GitCommit() {
   const commitHash =
-    process.env.REACT_APP_VERCEL_GIT_COMMIT_SHA || "development";
+    import.meta.env.REACT_APP_VERCEL_GIT_COMMIT_SHA || "development";
   const shortHash = commitHash.substring(0, 7);
 
   return (
