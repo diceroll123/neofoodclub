@@ -19,49 +19,6 @@
       href="/icon-16x16.png"
     />
     <title>NeoFoodClub</title>
-    <script>
-      // Migrate users stuck on old service worker (d613dd6 and earlier)
-      // This runs before React loads to ensure it executes even if old SW serves cached content
-      if ("serviceWorker" in navigator && !sessionStorage.getItem("sw-migration-complete")) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          var needsMigration = false;
-
-          registrations.forEach(function(registration) {
-            var swUrl = (registration.active && registration.active.scriptURL) ||
-                       (registration.waiting && registration.waiting.scriptURL) ||
-                       (registration.installing && registration.installing.scriptURL) || "";
-            // Check for old service worker: the old code registered /service-worker.js
-            // The new VitePWA setup generates /sw.js
-            if (swUrl.includes("/service-worker.js")) {
-              needsMigration = true;
-              console.log("Found old service worker (/service-worker.js), unregistering:", swUrl);
-              registration.unregister();
-            }
-          });
-
-          function completeMigration() {
-            sessionStorage.setItem("sw-migration-complete", "true");
-            if (needsMigration) {
-              console.log("Old service worker and caches cleared. Reloading...");
-              setTimeout(function() {
-                window.location.reload();
-              }, 100);
-            }
-          }
-
-          if (needsMigration && "caches" in window) {
-            caches.keys().then(function(cacheNames) {
-              return Promise.all(cacheNames.map(function(cacheName) {
-                console.log("Deleting old cache:", cacheName);
-                return caches.delete(cacheName);
-              }));
-            }).then(completeMigration);
-          } else {
-            completeMigration();
-          }
-        });
-      }
-    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
