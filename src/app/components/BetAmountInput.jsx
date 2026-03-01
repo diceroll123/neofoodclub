@@ -7,6 +7,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState, useContext } from "react";
 
+import { MIN_BET_AMOUNT, MAX_BET_AMOUNT, DEFAULT_BET_AMOUNT } from "../constants";
 import { RoundContext } from "../RoundState";
 
 // this is the number input element next to bets
@@ -49,18 +50,18 @@ export default function BetAmountInput(props) {
       onChange={(value) => setTempMaxBet(value)}
       onBlur={(e) => {
         let value = parseInt(e.target.value);
-        if (isNaN(value) || value < 50) {
-          value = -1000;
+        if (isNaN(value) || value < MIN_BET_AMOUNT) {
+          value = DEFAULT_BET_AMOUNT;
         }
 
-        value = Math.min(value, 500000);
+        value = Math.min(value, MAX_BET_AMOUNT);
 
         setTempMaxBet(value);
       }}
       onFocus={(e) => e.target.select()}
       size="sm"
-      min={-1000}
-      max={500000}
+      min={DEFAULT_BET_AMOUNT}
+      max={MAX_BET_AMOUNT}
       allowMouseWheel
       width="90px"
     >

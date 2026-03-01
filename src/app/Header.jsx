@@ -31,6 +31,11 @@ import moment from "moment";
 import NeopointIcon from "./images/np-icon.svg";
 
 import {
+  MIN_BET_AMOUNT,
+  MAX_BET_AMOUNT,
+  DEFAULT_BET_AMOUNT,
+} from "./constants";
+import {
   calculateBaseMaxBet,
   calculateRoundOverPercentage,
   getMaxBet,
@@ -206,8 +211,8 @@ function MaxBetInput() {
             return;
           }
 
-          if (isNaN(value) || value < 50) {
-            value = -1000;
+          if (isNaN(value) || value < MIN_BET_AMOUNT) {
+            value = DEFAULT_BET_AMOUNT;
           }
 
           setTempMaxBet(value);
@@ -228,8 +233,8 @@ function MaxBetInput() {
             isClosable: true,
           });
         }}
-        min={-1000}
-        max={500000}
+        min={DEFAULT_BET_AMOUNT}
+        max={MAX_BET_AMOUNT}
         allowMouseWheel
         w="100%"
       >

@@ -2,6 +2,7 @@ import { Button } from "@chakra-ui/react";
 import React, { useEffect, useContext, useState } from "react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 
+import { MIN_BET_AMOUNT } from "../constants";
 import { RoundContext } from "../RoundState";
 
 // this element is the "Place Bet" button inside the PayoutTable
@@ -43,7 +44,7 @@ const PlaceThisBetButton = (props) => {
     return <ErrorBetButton>Round is over!</ErrorBetButton>;
   }
 
-  if (allBetAmounts[currentBet][betNum] < 50) {
+  if (allBetAmounts[currentBet][betNum] < MIN_BET_AMOUNT) {
     return <ErrorBetButton>Invalid bet amount!</ErrorBetButton>;
   }
 

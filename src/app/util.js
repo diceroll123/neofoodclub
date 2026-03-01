@@ -2,6 +2,11 @@ import { useColorModeValue } from "@chakra-ui/react";
 import Cookies from "universal-cookie";
 import moment from "moment";
 import {
+  MIN_BET_AMOUNT,
+  MAX_BET_AMOUNT,
+  DEFAULT_BET_AMOUNT,
+} from "./constants";
+import {
   calculateArenaRatios,
   calculatePayoutTables,
   computePirateFAs,
@@ -100,7 +105,7 @@ export function parseBetUrl(url) {
       : 10;
   for (let index = 1; index <= amountOfBets; index++) {
     bets[index] = tempBets[index] || [0, 0, 0, 0, 0];
-    betAmounts[index] = tempBetAmounts[index] || -1000;
+    betAmounts[index] = tempBetAmounts[index] || DEFAULT_BET_AMOUNT;
   }
 
   let round = urlParams.get("round");
@@ -189,15 +194,15 @@ export function getMaxBet(currentSelectedRound) {
   const cookies = new Cookies();
   let maxBet = cookies.get("baseMaxBet");
   if (maxBet === undefined) {
-    return -1000;
+    return DEFAULT_BET_AMOUNT;
   }
   let value = calculateMaxBet(parseInt(maxBet), currentSelectedRound);
 
-  if (value < 50) {
-    return -1000;
+  if (value < MIN_BET_AMOUNT) {
+    return DEFAULT_BET_AMOUNT;
   }
 
-  return Math.min(500_000, value);
+  return Math.min(MAX_BET_AMOUNT, value);
 }
 
 export function getTableMode() {
@@ -248,7 +253,9 @@ export function anyBetsExist(betsObject) {
 }
 
 export function anyBetAmountsExist(betAmountsObject) {
-  return Object.values(betAmountsObject || {}).some((amount) => amount >= 50);
+  return Object.values(betAmountsObject || {}).some(
+    (amount) => amount >= MIN_BET_AMOUNT
+  );
 }
 
 export function anyBetsDuplicate(betsObject) {
@@ -319,7 +326,7 @@ export function makeEmptyBets(length) {
 export function makeEmptyBetAmounts(length) {
   const betAmounts = {};
   for (let index = 1; index <= length; index++) {
-    betAmounts[index] = -1000;
+    betAmounts[index] = DEFAULT_BET_AMOUNT;
   }
   return betAmounts;
 }
@@ -339,19 +346,16 @@ export function determineBetAmount(maxBet, betCap) {
   // maxBet is the user-set max bet amount for a round.
   // betCap is the highest bet amount for a bet (1,000,000 / odds + 1) // (the +1 is so we cross the 1M line)
 
-  // first, determine if there IS a max bet set. If not, just return -1000.
-  if (maxBet < 50) {
-    return -1000;
+  // first, determine if there IS a max bet set. If not, just return DEFAULT_BET_AMOUNT.
+  if (maxBet < MIN_BET_AMOUNT) {
+    return DEFAULT_BET_AMOUNT;
   }
 
-  if (betCap < 50) {
-    // if the highest bet amount to hit 1M on this bet is under 50, return 50, the minimum bet amount.
-    return 50;
+  if (betCap < MIN_BET_AMOUNT) {
+    return MIN_BET_AMOUNT;
   }
 
-  // if we've made it this far,
-  // we must go with the smallest of maxBet, betCap, or 500K
-  return Math.min(maxBet, betCap, 500_000);
+  return Math.min(maxBet, betCap, MAX_BET_AMOUNT);
 }
 
 export function amountAbbreviation(value) {
@@ -431,7 +435,7 @@ export function makeBetValues(bets, betAmounts, odds, probabilities) {
       }
     }
     // yes, the for-loop above had to be separate.
-    const amount = (betAmounts || {})[betIndex] || -1000;
+    const amount = (betAmounts || {})[betIndex] || DEFAULT_BET_AMOUNT;
     const theseOdds = betOdds[betIndex];
     const prob = betProbabilities[betIndex];
     betPayoffs[betIndex] = Math.min(1_000_000, amount * theseOdds);

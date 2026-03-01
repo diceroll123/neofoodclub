@@ -77,7 +77,12 @@ import {
 import { RoundContext } from "./RoundState";
 import PirateSelect from "./components/PirateSelect";
 import SettingsBox from "./components/SettingsBox";
-import { PIRATE_NAMES, SHORTHAND_PIRATE_NAMES } from "./constants";
+import {
+  MIN_BET_AMOUNT,
+  DEFAULT_BET_AMOUNT,
+  PIRATE_NAMES,
+  SHORTHAND_PIRATE_NAMES,
+} from "./constants";
 
 const cartesian = (...a) =>
   a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
@@ -467,7 +472,7 @@ const calculateBets = (roundState, usedProbabilities, ...pirates) => {
 
     betCaps[betBinary] = betCap;
     betOdds[betBinary] = totalOdds;
-    if (maxBet >= 50) {
+    if (maxBet >= MIN_BET_AMOUNT) {
       // Net expected
       const maxCap = Math.min(betCap, maxBet);
       pirateCombos[betBinary] = ((winChance * winnings) / maxCap - 1) * maxCap;
@@ -731,7 +736,7 @@ const BetFunctions = (props) => {
     }
 
     // make per-bet maxbets
-    if (maxBet >= 50) {
+    if (maxBet >= MIN_BET_AMOUNT) {
       let odds = [];
       let bins = [];
       for (const pirates of Object.values(bets)) {
@@ -1048,7 +1053,7 @@ const BetBadges = (props) => {
   const invalidBetAmounts = Object.values(betOdds).filter((odds, index) => {
     if (odds > 0 && betAmounts) {
       let betAmount = betAmounts[index + 1];
-      return betAmount !== -1000 && betAmount < 50;
+      return betAmount !== DEFAULT_BET_AMOUNT && betAmount < MIN_BET_AMOUNT;
     }
     return false;
   });
@@ -1144,7 +1149,7 @@ const BetBadges = (props) => {
   ) {
     let betAmountsTotal = 0;
     Object.values(betAmounts).forEach((amount) => {
-      if (amount !== -1000) {
+      if (amount !== DEFAULT_BET_AMOUNT) {
         betAmountsTotal += amount;
       }
     });

@@ -9,6 +9,11 @@ import {
 } from "@chakra-ui/react";
 import { useContext } from "react";
 import { RoundContext } from "../RoundState";
+import {
+  MIN_BET_AMOUNT,
+  MAX_BET_AMOUNT,
+  DEFAULT_BET_AMOUNT,
+} from "../constants";
 import { determineBetAmount, getMaxBet } from "../util";
 import { FaFillDrip, FaInfinity } from "react-icons/fa6";
 
@@ -36,7 +41,7 @@ const BetAmountsButtons = (props) => {
           betAmounts[index] = value;
         }
       } else {
-        betAmounts[index] = -1000;
+        betAmounts[index] = DEFAULT_BET_AMOUNT;
       }
     }
     setAllBetAmounts({ ...allBetAmounts, [currentBet]: betAmounts });
@@ -50,11 +55,11 @@ const BetAmountsButtons = (props) => {
         betAmounts[index] += amount;
       }
 
-      if (betAmounts[index] < 50) {
-        betAmounts[index] = -1000;
+      if (betAmounts[index] < MIN_BET_AMOUNT) {
+        betAmounts[index] = DEFAULT_BET_AMOUNT;
       }
 
-      betAmounts[index] = Math.min(betAmounts[index], 500000);
+      betAmounts[index] = Math.min(betAmounts[index], MAX_BET_AMOUNT);
     }
     setAllBetAmounts({ ...allBetAmounts, [currentBet]: betAmounts });
   };
@@ -109,7 +114,7 @@ const BetAmountsButtons = (props) => {
           <Button
             size="sm"
             onClick={() => {
-              setBetAmounts(-1000, false);
+              setBetAmounts(DEFAULT_BET_AMOUNT, false);
             }}
             colorScheme="red"
             {...rest}

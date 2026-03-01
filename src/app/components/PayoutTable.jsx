@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
-import { PIRATE_NAMES } from "../constants";
+import { MIN_BET_AMOUNT, PIRATE_NAMES } from "../constants";
 import { computePirateBinary } from "../maths";
 import { displayAsPercent, useTableColors } from "../util";
 import BetAmountInput from "./BetAmountInput";
@@ -130,7 +130,7 @@ const PayoutTable = (props) => {
 
               let betAmount = allBetAmounts[currentBet][betIndex + 1];
               let baBg =
-                betAmount < 50 ? colors.red : getMaxBetColor(betIndex + 1);
+                betAmount < MIN_BET_AMOUNT ? colors.red : getMaxBetColor(betIndex + 1);
               let mbBg = getMaxBetColor(betIndex + 1);
 
               let betNumBgColor = "transparent";
