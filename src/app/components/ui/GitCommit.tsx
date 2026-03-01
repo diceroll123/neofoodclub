@@ -9,7 +9,7 @@ export function GitCommit(): React.ReactElement {
       Commit:
       {commitHash !== 'development' ? (
         <Link
-          href={`https://github.com/diceroll123/neofoodclub/commit/${commitHash}`}
+          href={`https://github.com/rneopets/neofoodclub/commit/${commitHash}`}
           target="_blank"
           rel="noopener noreferrer"
           ml={1}
