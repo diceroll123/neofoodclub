@@ -115,7 +115,7 @@ export default function Footer() {
               </Link>
               <Link
                 isExternal
-                href="https://github.com/diceroll123/neofoodclub"
+                href="https://github.com/rneopets/neofoodclub"
               >
                 Source Code
               </Link>

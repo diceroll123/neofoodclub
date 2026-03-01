@@ -11,7 +11,7 @@ export function GitCommit() {
       Commit:
       {commitHash !== "development" ? (
         <Link
-          href={`https://github.com/diceroll123/neofoodclub/commit/${commitHash}`}
+          href={`https://github.com/rneopets/neofoodclub/commit/${commitHash}`}
           isExternal
           ml={1}
         >
